@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>A-Frame Particle System Component Example</title>
+    <meta name="description" content="Merry Christmas 2021!">
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://unpkg.com/aframe-environment-component@1.2.0/dist/aframe-environment-component.min.js"></script>
+    <!-- unpkg version of particle system hits shader compile errors -->
+    <!-- <script src="https://unpkg.com/aframe-particle-system-component@1.0.x/dist/aframe-particle-system-component.min.js"></script>-->
+    <script src="./lib/aframe-particle-system-component.js"></script>
+
+  </head>
+  <body>
+    <a-scene>
+      <a-entity environment="groundColor: #ffffff;
+                             groundColor2: #eeeeee;
+                             ground: noise;
+                             groundYScale: 4;
+                             groundTexture: walkernoise;
+                             dressing: trees;
+                             dressingAmount: 50;
+                             dressingColor: #ffffff;
+                             dressingScale: 1;
+                             dressingVariance: 10, 10, 10;
+                             lighting: distant
+                              "></a-entity>
+      <a-entity position="0 2.25 -15" particle-system="preset: snow; particleCount: 15000"></a-entity>
+
+    </a-scene>
+  </body>
+</html>
+<!--
+active: !0,
+                seed: 8,
+                skyType: "gradient",
+                skyColor: "#24b59f",
+                horizonColor: "#eff9b7",
+                lighting: "distant",
+                lightPosition: {
+                    x: -1.2,
+                    y: .88,
+                    z: -.55
+                },
+                fog: .8,
+                flatShading: !1,
+                playArea: 1,
+                ground: "noise",
+                groundYScale: 4.18,
+                groundTexture: "squares",
+                groundColor: "#937a24",
+                groundColor2: "#987d2e",
+                dressing: "trees",
+                dressingAmount: 500,
+                dressingColor: "#888b1d",
+                dressingScale: 1,
+                dressingVariance: {
+                    x: 10,
+                    y: 10,
+                    z: 10
+                },
+                dressingUniformScale: !0,
+                dressingOnPlayArea: 0,
+                grid: "none",
+                gridColor: "#c5a543",
+                shadow: !1
+-->
