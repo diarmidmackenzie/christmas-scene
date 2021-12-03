@@ -25,8 +25,13 @@
                              dressingVariance: 10, 10, 10;
                              lighting: distant
                               "></a-entity>
-      <a-entity position="0 2.25 -15" particle-system="preset: snow; particleCount: 15000"></a-entity>
-
+      <a-entity position="0 12 0" particle-system="preset: snow;
+                                                  size: 0.1;
+                                                  velocityValue: 0 2 0;
+                                                  positionSpread: 20 2 20;
+                                                  maxAge: 6;
+                                                  velocitySpread: 1 0 1;
+                                                  particleCount: 15000"></a-entity>      
     </a-scene>
   </body>
 </html>
