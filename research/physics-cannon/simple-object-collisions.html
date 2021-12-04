@@ -1,0 +1,83 @@
+<html>
+  <head>
+    <title>Moving a single object with Ammo.js</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://mixedreality.mozilla.org/ammo.js/builds/ammo.wasm.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/n5ro/aframe-physics-system@v4.0.1/dist/aframe-physics-system.js"></script>
+    <script src="./move-objects.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/diarmidmackenzie/key-bindings@v0.3-alpha/key-bindings.min.js"></script>
+    <script>
+    AFRAME.registerComponent('movable-object-simple', {
+
+      init() {
+        this.el.setAttribute('ammo-body', 'type: kinematic');
+        this.el.setAttribute('ammo-body', 'emitCollisionEvents: true');
+        this.el.setAttribute('ammo-shape', 'type: hull');
+
+        this.el.addEventListener("collidestart", this.collideStart.bind(this));
+        this.el.addEventListener("collideend", this.collideEnd.bind(this));
+
+        this.state = OBJECT_FIXED;
+        this.stickyOverlaps = [];
+      },
+
+      // collideStart & collideEnd used to track overlaps with static objects, to
+      // correctly handle release.
+      collideStart(event) {
+
+        targetEl = event.detail.targetEl;
+
+        if (targetEl.hasAttribute('sticky-object')) {
+          console.log(`add sticky Overlap with ${targetEl.id}`);
+          this.stickyOverlaps.push(targetEl);
+          console.log(`${this.stickyOverlaps.length} sticky overlaps in total`);
+        }
+      },
+
+      collideEnd(event) {
+        if (targetEl.hasAttribute('sticky-object')) {
+          const index = this.stickyOverlaps.indexOf(targetEl)
+
+          if (index > -1) {
+            console.log(`remove sticky Overlap with ${targetEl.id}`);
+            this.stickyOverlaps.splice(index, 1);
+            console.log(`${this.stickyOverlaps.length} sticky overlaps in total`);
+          }
+          else {
+            comsole.warn("Unexpected - collideEnd doesn't match element");
+            console.log(`${this.stickyOverlaps} sticky overlaps in total`);
+          }
+        }
+      }
+    });
+    </script>
+  </head>
+  <body>
+    <a-scene debug physics="driver: ammo; debug: true; debugDrawMode: 1;" >
+     <a-assets>
+       <a-mixin id="snowball"
+                material="color:gray; opacity:0.5"
+                geometry="primitive:sphere;segments-height:7;segments-width:13;radius:0.5"
+                sticky-object>
+       </a-mixin>
+       <a-mixin id="carrot"
+                material="color:orange"
+                geometry="primitive:cone;height:0.2;radius-bottom:0.025; radius-top:0.005">
+       </a-mixin>
+     </a-assets>
+
+     <a-entity id="snowman-head" mixin="snowball" scale="0.7 0.7 0.7" position="-0.5 1.5 -1"></a-entity>
+     </a-entity>
+     <a-entity id="mover" position="-0.1 1.5 -1">
+        <a-entity id="carrot-nose" mixin="carrot" rotation="0 0 -90"
+        movable-object-simple>
+        </a-entity>
+        <a-sphere id="test" color="red" radius = "0.1" position = "0.5 0 0"
+        ammo-body="type: kinematic" ammo-shape="fit: auto; type: sphere; sphereRadius: 0.25"
+        key-bindings="bindings:KeyI=up,KeyK=down,KeyJ=left,KeyL=right,ShiftLeft=togglegrip"
+        hand-keyboard-controls>
+        </a-sphere>
+      </a-entity>
+    </a-scene>
+  </body>
+</html>

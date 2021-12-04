@@ -1,0 +1,44 @@
+<html>
+  <head>
+    <title>Moving Objects with Ammo.js</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://mixedreality.mozilla.org/ammo.js/builds/ammo.wasm.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/n5ro/aframe-physics-system@v4.0.1/dist/aframe-physics-system.js"></script>
+    <script src="./move-objects.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/diarmidmackenzie/key-bindings@v0.3-alpha/key-bindings.min.js"></script>
+  </head>
+  <body>
+    <a-scene debug physics="driver: ammo; debug: true; debugDrawMode: 1;" >
+     <a-assets>
+       <a-mixin id="snowball"
+                material="color:gray; opacity:0.5"
+                geometry="primitive:sphere;segments-height:7;segments-width:13;radius:0.5"
+                sticky-object>
+       </a-mixin>
+       <a-mixin id="carrot"
+                material="color:orange"
+                geometry="primitive:cone;height:0.2;radius-bottom:0.025; radius-top:0.005"
+                movable-object>
+       </a-mixin>
+     </a-assets>
+     <a-entity id="physics-wrapper">
+
+        <a-box id="lhand" hand
+               material="color:red;opacity:0.5"
+               width="0.1" depth="0.1" height="0.1"
+               key-bindings="bindings:KeyI=up,KeyK=down,KeyJ=left,KeyL=right,ShiftLeft=togglegrip"
+               hand-keyboard-controls
+               position="0.2 1.5 -1">
+        </a-box>
+         <a-entity id="snowman-head" mixin="snowball" scale="0.7 0.7 0.7" position="-0.5 1.5 -1"></a-entity>
+         <a-entity id="carrot-nose" mixin="carrot" rotation="0 0 -90" position="-0.1 1.5 -1"></a-entity>
+         <a-box id="floor-plane"
+                width = "20" height = "1" depth = "20"
+                ammo-body="type: static" ammo-shape="type: box"
+                position = "0 0.5 0"
+                visible = false>
+         </a-box>
+      </a-entity>
+    </a-scene>
+  </body>
+</html>
