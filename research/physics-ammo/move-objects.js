@@ -43,7 +43,7 @@ AFRAME.registerComponent('movable-object', {
   setKinematic() {
     // set object to kinematic.
     console.log("set to kinematic")
-    if (this.el.components['ammo-body'].data.type === 'kinematic') return;
+    //if (this.el.components['ammo-body'].data.type === 'kinematic') return;
 
     /* Attempt to recreate a whole new object - really not working!
 
@@ -71,16 +71,18 @@ AFRAME.registerComponent('movable-object', {
     */
 
     /* simplest update... */
-    this.el.setAttribute('ammo-body', 'mass: 1.101'); // needed to bypasss Ammo code that ignores first update.
-    this.el.setAttribute('ammo-body', 'type: kinematic');
+    //this.el.setAttribute('ammo-body', 'mass: 1.101'); // needed to bypasss Ammo code that ignores first update.
+    //this.el.setAttribute('ammo-body', 'type: kinematic');
 
+    // Given up on AMmo physics for now, implementing my own gravity...
+    this.basicGravity = false;
   },
 
   setDynamic() {
     // set object to dynamic.
     console.log("set to dynamic")
 
-    if (this.el.components['ammo-body'].data.type === 'dynamic') return;
+    //if (this.el.components['ammo-body'].data.type === 'dynamic') return;
 
 /* Attempt to recreate a whole new object - really not working!
     const position = this.el.getAttribute('position');
@@ -107,9 +109,12 @@ AFRAME.registerComponent('movable-object', {
     */
 
     /* simplest update... */
-    this.el.setAttribute('ammo-body', 'mass: 1.102'); // needed to bypasss Ammo code that ignores first update.
-    this.el.setAttribute('ammo-body', 'type: dynamic');
+    //this.el.setAttribute('ammo-body', 'mass: 1.102'); // needed to bypasss Ammo code that ignores first update.
+    //this.el.setAttribute('ammo-body', 'type: dynamic');
 
+    // Given up on AMmo physics for now, implementing my own gravity...
+    this.basicGravity = true;
+    this.yVelocity = 0;
   },
 
   // collideStart & collideEnd used to track overlaps with static objects, to
@@ -175,6 +180,14 @@ AFRAME.registerComponent('movable-object', {
       console.log("released - becomes loose dynamic object")
       this.setDynamic();
       this.state = OBJECT_LOOSE;
+    }
+  },
+
+  tick(time, timeDelta) {
+
+    if (this.basicGravity) {
+      this.el.object3D.position.y += this.yVelocity * timeDelta / 1000;
+      this.yVelocity -= 9.8 * timeDelta / 1000;
     }
   }
 });
