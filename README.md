@@ -21,3 +21,7 @@ Here's the features I have added so far.
 - Made it snow!
 - Added basic snowman with eyes, mouth, nose, hat and arms.
 
+**4 December**
+
+- Grab and reposition snowman's face & arms.
+
