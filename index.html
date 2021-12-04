@@ -2,17 +2,20 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>A-Frame Particle System Component Example</title>
+    <title>Winter Wonderland Christmas Playground</title>
     <meta name="description" content="Merry Christmas 2021!">
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://unpkg.com/aframe-environment-component@1.2.0/dist/aframe-environment-component.min.js"></script>
     <!-- unpkg version of particle system hits shader compile errors -->
     <!-- <script src="https://unpkg.com/aframe-particle-system-component@1.0.x/dist/aframe-particle-system-component.min.js"></script>-->
     <script src="./lib/aframe-particle-system-component.js"></script>
+    <script src="https://mixedreality.mozilla.org/ammo.js/builds/ammo.wasm.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/n5ro/aframe-physics-system@v4.0.1/dist/aframe-physics-system.js"></script>
+    <script src="./src/move-objects.js"></script>
 
   </head>
   <body>
-    <a-scene debug>
+    <a-scene physics="driver: ammo">
       <a-assets>
         <a-mixin id="snowball"
                  material="color:white"
@@ -57,23 +60,39 @@
                                                   maxAge: 6;
                                                   velocitySpread: 1 0 1;
                                                   particleCount: 15000"></a-entity>
-
-      <a-entity id="snowman-base" mixin="snowball" position="0 0.4 -1.5"></a-entity>
-      <a-entity id="snowman-head" mixin="snowball" scale="0.7 0.7 0.7" position="0 1.1 -1.5"></a-entity>
-      <a-entity id="snowman-nose" mixin="carrot" rotation="90 0 0" position="0 1.1 -1.1"></a-entity>
-      <a-entity id="snowman-l-eye" mixin="coal" position="-0.1 1.2 -1.2"></a-entity>
-      <a-entity id="snowman-r-eye" mixin="coal" position="0.1 1.2 -1.2"></a-entity>
-      <a-entity id="snowman-mouth1" mixin="coal" position="-0.1 1.02 -1.21"></a-entity>
-      <a-entity id="snowman-mouth2" mixin="coal" position="-0.05 1 -1.2"></a-entity>
-      <a-entity id="snowman-mouth3" mixin="coal" position="0 1 -1.2"></a-entity>
-      <a-entity id="snowman-mouth4" mixin="coal" position="0.05  1 -1.2"></a-entity>
-      <a-entity id="snowman-mouth5" mixin="coal" position="0.1 1.02 -1.21"></a-entity>
-      <a-entity id="snowman-hat" position="0 1.4 -1.5">
-          <a-entity mixin="hat-brim" position="0 0 0"></a-entity>
-          <a-entity mixin="hat-top" position="0 0.15 0"></a-entity>
+      <a-entity>
+        <a-camera position="0 1.6 0"></a-camera>
+        <a-entity id="rhand" hand
+                  hand-controls="hand: right">
+        </a-entity>
+        <a-entity id="lhand" hand
+                  hand-controls="hand: left">
+        </a-entity>
       </a-entity>
-      <a-entity id="snowman-l-arm" mixin="branch" rotation="0 0 80" position="-0.5 0.7 -1.5"></a-entity>
-      <a-entity id="snowman-r-arm" mixin="branch" rotation="0 0 100" position="0.5 0.7 -1.5"></a-entity>
+      <a-entity id="play-area">
+        <a-entity id="snowman-base" mixin="snowball" position="0 0.4 -1.5" sticky-object></a-entity>
+        <a-entity id="snowman-head" mixin="snowball" scale="0.7 0.7 0.7" position="0 1.1 -1.5" sticky-object></a-entity>
+        <a-entity id="snowman-nose" mixin="carrot" rotation="90 0 0" position="0 1.1 -1.1" movable-object></a-entity>
+        <a-entity id="snowman-l-eye" mixin="coal" position="-0.1 1.2 -1.2" movable-object></a-entity>
+        <a-entity id="snowman-r-eye" mixin="coal" position="0.1 1.2 -1.2" movable-object></a-entity>
+        <a-entity id="snowman-mouth1" mixin="coal" position="-0.1 1.02 -1.21" movable-object></a-entity>
+        <a-entity id="snowman-mouth2" mixin="coal" position="-0.05 1 -1.2" movable-object></a-entity>
+        <a-entity id="snowman-mouth3" mixin="coal" position="0 1 -1.2" movable-object></a-entity>
+        <a-entity id="snowman-mouth4" mixin="coal" position="0.05  1 -1.2" movable-object></a-entity>
+        <a-entity id="snowman-mouth5" mixin="coal" position="0.1 1.02 -1.21" movable-object></a-entity>
+        <a-entity id="snowman-hat" position="0 1.4 -1.5">
+            <a-entity mixin="hat-brim" position="0 0 0"></a-entity>
+            <a-entity mixin="hat-top" position="0 0.15 0"></a-entity>
+        </a-entity>
+        <a-entity id="snowman-l-arm" mixin="branch" rotation="0 0 80" position="-0.5 0.7 -1.5" movable-object></a-entity>
+        <a-entity id="snowman-r-arm" mixin="branch" rotation="0 0 100" position="0.5 0.7 -1.5" movable-object></a-entity>
+        <a-box id="floor-plane"
+               width = "20" height = "1" depth = "20"
+               sticky-object
+               position = "0 -0.5 0"
+               visible = false>
+        </a-box>
+      </a-entity>
     </a-scene>
   </body>
 </html>
