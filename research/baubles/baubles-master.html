@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Baubles</title>
+    <meta name="description" content="Merry Christmas 2021!">
+    <!-- Latest master build - as per link here:
+    https://aframe.io/aframe/dist/#master-builds-->
+    <script src="https://aframe.io/aframe/dist/aframe-master.min.js"></script>
+    <!--Component attempted to set "environment" on THREE.js Scene,
+        to avoid dependence on A-Frame spherical-env-map component.
+        To use this set <a-scene environment="#env">.  But didn't yet get it to work.
+        Probably not loading the texture correctly...-->
+
+    <!-- <script>
+      AFRAME.registerComponent('environment', {
+        schema: {
+          file: {type: 'string'}
+        },
+
+        init() {
+          this.texture = new THREE.TextureLoader().load(this.data.file);
+          this.el.sceneEl.object3D.environment = this.texture;
+        }
+      });
+    </script>-->
+  </head>
+  <body>
+    <!--<a-scene environment="#env">--> <!-- for use with script above-->
+    <a-scene environment="#env">
+      <a-assets>
+          <img id="env" src="./environment.png"/>
+      </a-assets>
+        <a-sphere color="red" position="-1 2 -2" spherical-env-map="#env" metalness="1.0" roughness="0.0" radius="0.2"></a-sphere>
+        <a-sphere color="silver" position="0 1 -2" spherical-env-map="#env" metalness="1.0" roughness="0.0" radius="0.2"></a-sphere>
+        <a-sphere color="green" position="1 2 -2" spherical-env-map="#env" metalness="1.0" roughness="0.0" radius="0.2"></a-sphere>
+      <a-sky color="#333"> </a-sky>
+    </a-scene>
+  </body>
+</html>
