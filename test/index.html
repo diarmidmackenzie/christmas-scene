@@ -15,7 +15,7 @@
 
   </head>
   <body>
-    <a-scene physics="driver: ammo">
+    <a-scene physics="driver: ammo; debug: true; debugDrawMode: 1;">
       <a-assets>
         <a-mixin id="snowball"
                  material="color:white"
@@ -80,9 +80,11 @@
         <a-entity id="snowman-mouth3" mixin="coal" position="0 1 -1.2" movable-object></a-entity>
         <a-entity id="snowman-mouth4" mixin="coal" position="0.05  1 -1.2" movable-object></a-entity>
         <a-entity id="snowman-mouth5" mixin="coal" position="0.1 1.02 -1.21" movable-object></a-entity>
-        <a-entity id="snowman-hat" position="0 1.4 -1.5">
-            <a-entity mixin="hat-brim" position="0 0 0"></a-entity>
-            <a-entity mixin="hat-top" position="0 0.15 0"></a-entity>
+        <a-entity id="snowman-hat"  position="0 1.4 -1.5">
+            <a-entity mixin="hat-brim" position="0 0 0" movable-object>
+                <a-entity mixin="hat-top" position="0 0.15 0"></a-entity>
+            </a-entity>
+
         </a-entity>
         <a-entity id="snowman-l-arm" mixin="branch" rotation="0 0 80" position="-0.5 0.7 -1.5" movable-object></a-entity>
         <a-entity id="snowman-r-arm" mixin="branch" rotation="0 0 100" position="0.5 0.7 -1.5" movable-object></a-entity>
