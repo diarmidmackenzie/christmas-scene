@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Branch and Top Hat Models</title>
+    <meta name="description" content="Merry Christmas 2021!">
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="./custom-geometries.js"></script>
+  </head>
+  <body>
+    <a-scene>
+      <a-assets>
+        <a-mixin id="branch"
+                 material="color:brown"
+                 geometry="primitive:branch"
+                 rotation="0 0 -90"
+                 scale="0.25 0.25 0.25">
+        </a-mixin>
+        <a-mixin id="tophat"
+                 material="color:black"
+                 geometry="primitive:tophat"
+                 rotation="0 0 0">
+        </a-mixin>
+      </a-assets>
+
+      <a-entity id="play-area">
+
+        <a-entity id="snowman-arm" mixin="branch"  position="0 1 -1.5">
+        </a-entity>
+
+        <a-entity id="snowman-hat" mixin="tophat"  position="-1 1.4 -1.5">
+        </a-entity>
+
+      </a-entity>
+    </a-scene>
+  </body>
+</html>
