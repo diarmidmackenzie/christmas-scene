@@ -31,6 +31,14 @@ AFRAME.registerComponent('movable-object', {
 
     this.state = OBJECT_FIXED;
     this.stickyOverlaps = [];
+
+    this.lastPositions = [new THREE.Vector3(),
+                          new THREE.Vector3()];
+    this.lastTimeDeltas = [0, 0];
+    this.historyPointer = 0;
+
+    this.velocity = new THREE.Vector3();
+    this.velocityDelta = new THREE.Vector3();
   },
 
   remove() {
@@ -114,7 +122,6 @@ AFRAME.registerComponent('movable-object', {
 
     // Given up on AMmo physics for now, implementing my own gravity...
     this.basicGravity = true;
-    this.yVelocity = 0;
   },
 
   // collideStart & collideEnd used to track overlaps with static objects, to
@@ -185,9 +192,31 @@ AFRAME.registerComponent('movable-object', {
 
   tick(time, timeDelta) {
 
-    if (this.basicGravity) {
-      this.el.object3D.position.y += this.yVelocity * timeDelta / 1000;
-      this.yVelocity -= 9.8 * timeDelta / 1000;
+    if (!this.basicGravity) {
+      this.lastPositions[this.historyPointer].copy(this.el.object3D.position);
+      this.lastTimeDeltas[this.historyPointer] = timeDelta;
+      this.historyPointer = 1 - this.historyPointer;
+      this.gravityStarting = true;
+    }
+    else {
+      if (this.gravityStarting) {
+        // we extract the velocity from the last 2 frames.
+        // historyPointer always indicates the older time interval.
+        // for TimeDelta, we take the other slot, which tells us the elapsed time *after* that
+        // measurement to the newer measurement.
+        this.velocity.subVectors(this.el.object3D.position, this.lastPositions[this.historyPointer]);
+        // For reasons I don't yet understand, boosting velocity by a factor of 2
+        // makes it feel much more realistic.
+        this.velocity.multiplyScalar(2000 / (timeDelta + this.lastTimeDeltas[1 - this.historyPointer]));
+        console.log("initial velocity:");
+        console.log(this.velocity);
+        this.gravityStarting = false;
+      }
+
+      this.velocity.y -= 9.8 * timeDelta / 1000;
+      this.velocityDelta.copy(this.velocity);
+      this.velocityDelta.multiplyScalar(timeDelta / 1000);
+      this.el.object3D.position.add(this.velocityDelta);
     }
   }
 });

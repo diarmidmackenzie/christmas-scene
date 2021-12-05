@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Winter Wonderland Christmas Playground</title>
+    <meta name="description" content="Merry Christmas 2021!">
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://unpkg.com/aframe-environment-component@1.2.0/dist/aframe-environment-component.min.js"></script>
+    <!-- unpkg version of particle system hits shader compile errors -->
+    <!-- <script src="https://unpkg.com/aframe-particle-system-component@1.0.x/dist/aframe-particle-system-component.min.js"></script>-->
+    <script src="../lib/aframe-particle-system-component.js"></script>
+    <script src="https://mixedreality.mozilla.org/ammo.js/builds/ammo.wasm.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/n5ro/aframe-physics-system@v4.0.1/dist/aframe-physics-system.js"></script>
+    <script src="../research/physics-ammo/move-objects.js"></script>
+
+  </head>
+  <body>
+    <a-scene physics="driver: ammo">
+      <a-assets>
+        <a-mixin id="snowball"
+                 material="color:white"
+                 geometry="primitive:sphere;segments-height:7;segments-width:13;radius:0.5" >
+        </a-mixin>
+        <a-mixin id="coal"
+                 material="color:black"
+                 geometry="primitive:sphere;segments-height:7;segments-width:13;radius:0.04" >
+        </a-mixin>
+        <a-mixin id="carrot"
+                 material="color:orange"
+                 geometry="primitive:cone;height:0.2;radius-bottom:0.025; radius-top:0.005" >
+        </a-mixin>
+        <a-mixin id="hat-brim"
+                 material="color:black"
+                 geometry="primitive:cylinder;height:0.04;radius:0.25" >
+        </a-mixin>
+        <a-mixin id="hat-top"
+                 material="color:black"
+                 geometry="primitive:cylinder;height:0.3;radius:0.15" >
+        </a-mixin>
+        <a-mixin id="branch"
+                 material="color:brown"
+                 geometry="primitive:cylinder;height:0.6;radius:0.02" >
+        </a-mixin>
+      </a-assets>
+      <a-entity environment="groundColor: #ffffff;
+                             groundColor2: #eeeeee;
+                             ground: noise;
+                             groundYScale: 4;
+                             groundTexture: walkernoise;
+                             dressing: trees;
+                             dressingAmount: 50;
+                             dressingColor: #ffffff;
+                             dressingScale: 1;
+                             lighting: distant
+                              "></a-entity>
+      <a-entity position="0 12 0" particle-system="preset: snow;
+                                                  size: 0.1;
+                                                  velocityValue: 0 2 0;
+                                                  positionSpread: 20 2 20;
+                                                  maxAge: 6;
+                                                  velocitySpread: 1 0 1;
+                                                  particleCount: 15000"></a-entity>
+      <a-entity>
+        <a-camera position="0 1.6 0"></a-camera>
+        <a-entity id="rhand" hand
+                  hand-controls="hand: right">
+        </a-entity>
+        <a-entity id="lhand" hand
+                  hand-controls="hand: left">
+        </a-entity>
+      </a-entity>
+      <a-entity id="play-area">
+        <a-entity id="snowman-base" mixin="snowball" position="0 0.4 -1.5" sticky-object></a-entity>
+        <a-entity id="snowman-head" mixin="snowball" scale="0.7 0.7 0.7" position="0 1.1 -1.5" sticky-object></a-entity>
+        <a-entity id="snowman-nose" mixin="carrot" rotation="90 0 0" position="0 1.1 -1.1" movable-object></a-entity>
+        <a-entity id="snowman-l-eye" mixin="coal" position="-0.1 1.2 -1.2" movable-object></a-entity>
+        <a-entity id="snowman-r-eye" mixin="coal" position="0.1 1.2 -1.2" movable-object></a-entity>
+        <a-entity id="snowman-mouth1" mixin="coal" position="-0.1 1.02 -1.21" movable-object></a-entity>
+        <a-entity id="snowman-mouth2" mixin="coal" position="-0.05 1 -1.2" movable-object></a-entity>
+        <a-entity id="snowman-mouth3" mixin="coal" position="0 1 -1.2" movable-object></a-entity>
+        <a-entity id="snowman-mouth4" mixin="coal" position="0.05  1 -1.2" movable-object></a-entity>
+        <a-entity id="snowman-mouth5" mixin="coal" position="0.1 1.02 -1.21" movable-object></a-entity>
+        <a-entity id="snowman-hat" position="0 1.4 -1.5">
+            <a-entity mixin="hat-brim" position="0 0 0"></a-entity>
+            <a-entity mixin="hat-top" position="0 0.15 0"></a-entity>
+        </a-entity>
+        <a-entity id="snowman-l-arm" mixin="branch" rotation="0 0 80" position="-0.5 0.7 -1.5" movable-object></a-entity>
+        <a-entity id="snowman-r-arm" mixin="branch" rotation="0 0 100" position="0.5 0.7 -1.5" movable-object></a-entity>
+        <a-box id="floor-plane"
+               width = "20" height = "1" depth = "20"
+               sticky-object
+               position = "0 -0.5 0"
+               visible = false>
+        </a-box>
+      </a-entity>
+    </a-scene>
+  </body>
+</html>
