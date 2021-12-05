@@ -27,11 +27,18 @@
     <!--<a-scene environment="#env">--> <!-- for use with script above-->
     <a-scene environment="#env">
       <a-assets>
-          <img id="env" src="./environment.png"/>
+        <a-cubemap id="env">
+          <img src="./environment-right.png">
+          <img src="./environment-left.png">
+          <img src="./environment-top.png">
+          <img src="./environment-bottom.png">
+          <img src="./environment-front.png">
+          <img src="./environment-back.png">
+        </a-cubemap>
       </a-assets>
-        <a-sphere color="red" position="-1 2 -2" spherical-env-map="#env" metalness="1.0" roughness="0.0" radius="0.2"></a-sphere>
-        <a-sphere color="silver" position="0 1 -2" spherical-env-map="#env" metalness="1.0" roughness="0.0" radius="0.2"></a-sphere>
-        <a-sphere color="green" position="1 2 -2" spherical-env-map="#env" metalness="1.0" roughness="0.0" radius="0.2"></a-sphere>
+        <a-sphere color="red" position="-1 2 -2" env-map="#env" metalness="1.0" roughness="0.0" radius="0.2"></a-sphere>
+        <a-sphere color="silver" position="0 1 -2" env-map="#env" metalness="1.0" roughness="0.0" radius="0.2"></a-sphere>
+        <a-sphere color="green" position="1 2 -2" env-map="#env" metalness="1.0" roughness="0.0" radius="0.2"></a-sphere>
       <a-sky color="#333"> </a-sky>
     </a-scene>
   </body>
