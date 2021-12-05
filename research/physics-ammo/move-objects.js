@@ -13,6 +13,9 @@ OBJECT_LOOSE = 3;
 TYPE_STATIC = 'static';
 
 AFRAME.registerComponent('movable-object', {
+  schema: {
+    gravity: {type: 'number', default: 9.8}
+  },
 
   init() {
     this.el.setAttribute('ammo-body', 'type: kinematic');
@@ -34,11 +37,16 @@ AFRAME.registerComponent('movable-object', {
 
     this.lastPositions = [new THREE.Vector3(),
                           new THREE.Vector3()];
+    this.lastQuaternions = [new THREE.Quaternion(),
+                            new THREE.Quaternion()];
     this.lastTimeDeltas = [0, 0];
     this.historyPointer = 0;
 
     this.velocity = new THREE.Vector3();
     this.velocityDelta = new THREE.Vector3();
+    this.tempQuaternion = new THREE.Quaternion();
+    this.rotationAxis = new THREE.Vector3();    
+    this.rotationSpeed = 0;
   },
 
   remove() {
@@ -194,6 +202,7 @@ AFRAME.registerComponent('movable-object', {
 
     if (!this.basicGravity) {
       this.lastPositions[this.historyPointer].copy(this.el.object3D.position);
+      this.lastQuaternions[this.historyPointer].copy(this.el.object3D.quaternion);
       this.lastTimeDeltas[this.historyPointer] = timeDelta;
       this.historyPointer = 1 - this.historyPointer;
       this.gravityStarting = true;
@@ -210,13 +219,35 @@ AFRAME.registerComponent('movable-object', {
         this.velocity.multiplyScalar(2000 / (timeDelta + this.lastTimeDeltas[1 - this.historyPointer]));
         console.log("initial velocity:");
         console.log(this.velocity);
+
+        // Similar exercise with rotation, which we store as an axis/angle,
+        // for easy scalar multiplication.
+        // Getting rotation axis from Quaternion is simply a matter of normalizing the (x, y, z)
+        // components, interpreted as a vector.
+        // http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToAngle/index.htm
+        this.lastQuaternions[this.historyPointer]
+        this.el.object3D.quaternion
+        this.tempQuaternion.copy(this.lastQuaternions[this.historyPointer]).invert();
+        this.tempQuaternion.multiply(this.el.object3D.quaternion)
+
+        this.rotationAxis.set(this.tempQuaternion.x,
+                              this.tempQuaternion.y,
+                              this.tempQuaternion.z).normalize();
+        const rotationAngle = this.lastQuaternions[this.historyPointer].angleTo(this.el.object3D.quaternion);
+        this.rotationSpeed = rotationAngle * (2000 / (timeDelta + this.lastTimeDeltas[1 - this.historyPointer]));
+
         this.gravityStarting = false;
       }
 
-      this.velocity.y -= 9.8 * timeDelta / 1000;
+      this.velocity.y -= this.data.gravity * timeDelta / 1000;
       this.velocityDelta.copy(this.velocity);
       this.velocityDelta.multiplyScalar(timeDelta / 1000);
       this.el.object3D.position.add(this.velocityDelta);
+
+      // apply rotation.
+      const angle = this.rotationSpeed * timeDelta / 1000;
+      this.tempQuaternion.setFromAxisAngle(this.rotationAxis, angle);
+      this.el.object3D.quaternion.multiply(this.tempQuaternion);
     }
   }
 });
@@ -434,6 +465,8 @@ AFRAME.registerComponent('hand-keyboard-controls', {
     this.el.addEventListener('down', () => this.el.object3D.position.y -= 0.01)
     this.el.addEventListener('left', () => this.el.object3D.position.x -= 0.01)
     this.el.addEventListener('right', () => this.el.object3D.position.x += 0.01)
+    this.el.addEventListener('turnCW', () => this.el.object3D.rotation.z -= 0.01)
+    this.el.addEventListener('turnCCW', () => this.el.object3D.rotation.z += 0.01)
     this.el.addEventListener('togglegrip', () => {
       if (!this.gripDown) {
         this.gripDown = true;

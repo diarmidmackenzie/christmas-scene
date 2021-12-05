@@ -18,7 +18,7 @@
        <a-mixin id="carrot"
                 material="color:orange"
                 geometry="primitive:cone;height:0.2;radius-bottom:0.025; radius-top:0.005"
-                movable-object>
+                movable-object="gravity:1">
        </a-mixin>
      </a-assets>
      <a-entity id="physics-wrapper">
@@ -26,7 +26,8 @@
         <a-box id="lhand" hand
                material="color:red;opacity:0.5"
                width="0.1" depth="0.1" height="0.1"
-               key-bindings="bindings:KeyI=up,KeyK=down,KeyJ=left,KeyL=right,ShiftLeft=togglegrip"
+               key-bindings="bindings:KeyI=up,KeyK=down,KeyJ=left,KeyL=right,
+                             ShiftLeft=togglegrip,KeyO=turnCCW,KeyP=turnCW;"
                hand-keyboard-controls
                position="0.2 1.5 -1">
         </a-box>
