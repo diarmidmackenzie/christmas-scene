@@ -25,3 +25,11 @@ Here's the features I have added so far.
 
 - Grab and reposition snowman's face & arms.
 
+**5 December**
+
+- Retain objects' rotation & velocity on release - allows throwing of objects, juggling etc.
+
+**6 December**
+
+- Add Christmas tree with multi-colour baubles, which show reflections of the environment.
+
