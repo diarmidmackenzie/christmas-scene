@@ -38,24 +38,21 @@
                  material="color:orange"
                  geometry="primitive:cone;height:0.2;radius-bottom:0.025; radius-top:0.005" >
         </a-mixin>
-        <a-mixin id="hat-brim"
+        <a-mixin id="hat"
                  material="color:black"
-                 geometry="primitive:cylinder;height:0.04;radius:0.25" >
-        </a-mixin>
-        <a-mixin id="hat-top"
-                 material="color:black"
-                 geometry="primitive:cylinder;height:0.3;radius:0.15" >
+                 geometry="primitive:tophat" >
         </a-mixin>
         <a-mixin id="branch"
-                 material="color:brown"
-                 geometry="primitive:cylinder;height:0.6;radius:0.02" >
+                 material="color:#5C4033"
+                 geometry="primitive:branch"
+                 scale="0.2 0.2 0.2">
         </a-mixin>
         <a-mixin id="tree-tier"
                  material="color:green"
                  geometry="primitive:cone;height:0.5;radius-bottom:0.5;segments-height:1;segments-radial:9">
         </a-mixin>
         <a-mixin id="trunk"
-                 material="color:brown"
+                 material="color:#5C4033"
                  geometry="primitive:cylinder;height:0.5;radius:0.1;">
         </a-mixin>
         <!-- env-map dosesn't seem to work when deployed via mix-ins, hence no mixin for baubles-->
@@ -98,14 +95,10 @@
         <a-entity id="snowman-mouth3" mixin="coal" position="0 1 -1.2" movable-object></a-entity>
         <a-entity id="snowman-mouth4" mixin="coal" position="0.05  1 -1.2" movable-object></a-entity>
         <a-entity id="snowman-mouth5" mixin="coal" position="0.1 1.02 -1.21" movable-object></a-entity>
-        <a-entity id="snowman-hat"  position="0 1.4 -1.5">
-            <a-entity mixin="hat-brim" position="0 0 0" movable-object>
-                <a-entity mixin="hat-top" position="0 0.15 0"></a-entity>
-            </a-entity>
-
+        <a-entity id="snowman-hat" mixin="hat" position="0 1.55 -1.5" movable-object>
         </a-entity>
-        <a-entity id="snowman-l-arm" mixin="branch" rotation="0 0 80" position="-0.5 0.7 -1.5" movable-object></a-entity>
-        <a-entity id="snowman-r-arm" mixin="branch" rotation="0 0 100" position="0.5 0.7 -1.5" movable-object></a-entity>
+        <a-entity id="snowman-l-arm" mixin="branch" rotation="0 0 80" position="-0.6 0.7 -1.5" movable-object></a-entity>
+        <a-entity id="snowman-r-arm" mixin="branch" rotation="0 0 -100" position="0.6 0.7 -1.5" movable-object></a-entity>
         <a-entity id="tree-trunk" mixin="trunk" position="1.5 0.25 0"></a-entity>
         <!--Creating movable-object children of sticky-object breaks sticky-objects across whole scene.  Not yet understood why!-->
         <!-- current solution: don't have any such children.  further research needed on this.-->

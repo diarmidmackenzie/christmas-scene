@@ -1,3 +1,13 @@
+function recenterGeometry(geometry) {
+  geometry.computeBoundingBox();
+  const center = new THREE.Vector3();
+
+  center.addVectors(geometry.boundingBox.min, geometry.boundingBox.max);
+  center.multiplyScalar(0.5);
+  geometry.translate(-center.x, -center.y, -center.z)
+  geometry.computeBoundingBox();
+}
+
 AFRAME.registerGeometry('branch', {
   schema: {
   },
@@ -27,6 +37,7 @@ AFRAME.registerGeometry('branch', {
 
     this.geometry = THREE.BufferGeometryUtils.mergeBufferGeometries(geometries);
 
+    recenterGeometry(this.geometry);
   }
 });
 
@@ -43,5 +54,6 @@ AFRAME.registerGeometry('tophat', {
     geometries[1].translate(0, 0.15, 0);
     this.geometry = THREE.BufferGeometryUtils.mergeBufferGeometries(geometries);
 
+    recenterGeometry(this.geometry);
   }
 });
