@@ -2,13 +2,14 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Branch and Top Hat Models</title>
+    <title>Various Custom Models</title>
     <meta name="description" content="Merry Christmas 2021!">
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="./custom-geometries.js"></script>
   </head>
   <body>
     <a-scene>
+      <a-sky color="#888"></a-sky>
       <a-assets>
         <a-mixin id="branch"
                  material="color:brown"
@@ -22,7 +23,7 @@
                  rotation="0 0 0">
         </a-mixin>
         <a-mixin id="icicle"
-                 material="color:white; opacity:0.5"
+                 material="color:white; opacity:1.0; metalness: 0.2;roughness:1.0"
                  geometry="primitive:icicle">
         </a-mixin>
       </a-assets>
@@ -35,8 +36,13 @@
         <a-entity id="snowman-hat" mixin="tophat"  position="-1 1.4 -1.5">
         </a-entity>
 
-        <a-entity id="icicle-entity" mixin="icicle"  position="1 1.4 -1.5">
+        <a-entity id="icicle-entity" mixin="icicle"  position="1.05 1.4 -1.5" scale ="0.8 0.8 0.8">
         </a-entity>
+        <a-entity id="icicle-entity" mixin="icicle" position="1.4 1.3 -1.5">
+        </a-entity>
+        <a-entity id="icicle-entity" mixin="icicle"  position="1.9 1.2 -1.5"  scale ="1.2 1.2 1.2">
+        </a-entity>
+
 
       </a-entity>
     </a-scene>

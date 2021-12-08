@@ -31,5 +31,32 @@ Here's the features I have added so far.
 
 **6 December**
 
-- Add Christmas tree with multi-colour baubles, which show reflections of the environment.
+- Added Christmas tree with multi-colour baubles, which show reflections of the environment.
+
+**7 December**
+
+- Replaced the snowman's broomstick arms with more organic-looking sticks.  Also gave him a new hat, which can be moved about.
+
+**8 December**
+
+- Added a xylophone made of icicles.  This can be played with your hands, or using one of the snowman's arms as a atick.
+
+
+
+### Credits
+
+
+Xylophone sounds by DANMITCH3LL, via freesound.org, under CC BY 3.0 license.
+
+https://freesound.org/people/DANMITCH3LL/packs/14220/
+
+
+
+Built using [A-Frame](https://aframe.io/) and [THREE.js](https://threejs.org/)
+
+Environment from [A-Frame Environment Component](https://github.com/supermedium/aframe-environment-component)
+
+Particles from 
+
+Collisions & physics uses [A-Frame Physics System](https://github.com/n5ro/aframe-physics-system) and [Ammo.js](https://github.com/kripken/ammo.js/)
 

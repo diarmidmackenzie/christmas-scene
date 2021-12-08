@@ -48,10 +48,31 @@ AFRAME.registerGeometry('tophat', {
   init: function (data) {
     //radiusTop, radiusBottom, height, radialSegments
     const geometries = [];
-    // 3 initial long segments
+    // 2 cylinders, one tall and thin for the hat, one short and wider for the brim.
     geometries.push(new THREE.CylinderGeometry(0.25, 0.25, 0.04, 11));
     geometries.push(new THREE.CylinderGeometry(0.15, 0.15, 0.3, 11));
     geometries[1].translate(0, 0.15, 0);
+    this.geometry = THREE.BufferGeometryUtils.mergeBufferGeometries(geometries);
+
+    recenterGeometry(this.geometry);
+  }
+});
+
+AFRAME.registerGeometry('icicle', {
+  schema: {
+  },
+
+  init: function (data) {
+
+    const geometries = [];
+    // 3 cylinders, getting gradually pointier
+    //radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded
+    geometries.push(new THREE.CylinderGeometry(0.2, 0.1, 0.25, 9, 1, true));
+    geometries.push(new THREE.CylinderGeometry(0.1, 0.05, 0.25, 9, 1, true));
+    geometries[1].translate(0, -0.25, 0);
+    geometries.push(new THREE.CylinderGeometry(0.05, 0.01, 0.5, 9, 1, true));
+    geometries[2].translate(0, -0.6, 0);
+
     this.geometry = THREE.BufferGeometryUtils.mergeBufferGeometries(geometries);
 
     recenterGeometry(this.geometry);
