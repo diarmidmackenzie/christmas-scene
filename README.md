@@ -41,7 +41,9 @@ Here's the features I have added so far.
 
 - Added a xylophone made of icicles.  This can be played with your hands, or using one of the snowman's arms as a atick.
 
+**9 December**
 
+- Added a calendar and Christmas countdown.
 
 ### Credits
 
