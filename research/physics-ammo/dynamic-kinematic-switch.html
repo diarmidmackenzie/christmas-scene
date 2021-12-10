@@ -1,0 +1,126 @@
+<html>
+  <head>
+    <title>Moving a single object with Ammo.js</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://mixedreality.mozilla.org/ammo.js/builds/ammo.wasm.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/n5ro/aframe-physics-system@v4.0.1/dist/aframe-physics-system.js"></script>
+    <script src="./move-objects.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/diarmidmackenzie/key-bindings@v0.3-alpha/key-bindings.min.js"></script>
+    <script>
+
+    COLORS = [
+      'red', 'orange', 'yellow', 'green', 'cyan', 'blue', 'magenta'
+    ]
+    MAX_COLOR = 6;
+    AFRAME.registerComponent('physics-object-2', {
+
+      init() {
+        this.el.setAttribute('ammo-body', 'type: dynamic');
+        this.el.setAttribute('ammo-body', 'emitCollisionEvents: true; activationState: disableDeactivation');
+        this.el.setAttribute('ammo-body', 'gravity: 0 -0.2 0');
+        this.el.setAttribute('ammo-shape', 'type: hull');
+
+        this.el.addEventListener("collidestart", this.collideStart.bind(this));
+        this.el.addEventListener("collideend", this.collideEnd.bind(this));
+
+        this.el.addEventListener("kinematic", this.becomeKinematic.bind(this));
+        this.el.addEventListener("dynamic", this.becomeDynamic.bind(this));
+
+        this.el.addEventListener("body-loaded", () => {
+          setTimeout(() => {
+            this.el.setAttribute('ammo-body', 'type:kinematic');
+            this.el.setAttribute('ammo-body', 'type:dynamic');
+            this.el.setAttribute('ammo-body', 'type:kinematic');
+          }, 1);
+        });
+
+        this.state = OBJECT_FIXED;
+        this.stickyOverlaps = [];
+
+        this.colorIndex = 0;
+      },
+
+      becomeDynamic() {
+        console.log(`${this.el.id} becoming dynamic`);
+
+        this.el.setAttribute('ammo-body', 'type:dynamic');
+        /*
+        this.inner.setAttribute('ammo-body', 'activationState', "disableSimulation");
+        this.el.setAttribute('ammo-body', 'activationState', "active");
+        */
+      },
+
+      becomeKinematic() {
+        console.log(`${this.el.id} becoming kinematic`);
+
+        this.el.setAttribute('ammo-body', 'type:kinematic');
+        //this.el.setAttribute('ammo-body', 'type:dynamic');
+        //this.el.setAttribute('ammo-body', 'type:kinematic');
+
+        /*
+        this.el.setAttribute('ammo-body', 'activationState', "disableSimulation");
+        this.inner.setAttribute('ammo-body', 'activationState', "active");
+        */
+      },
+
+      // collideStart & collideEnd used to track overlaps with static objects, to
+      // correctly handle release.
+      collideStart(event) {
+        console.log("Collide Start")
+        console.log(event)
+        this.colorIndex += 1;
+        if (this.colorIndex > MAX_COLOR) this.colorIndex = 0;
+        this.el.setAttribute("color", COLORS[this.colorIndex])
+
+      },
+
+      collideEnd(event) {
+        console.log("Collide End")
+        console.log(event)
+        this.colorIndex += 1;
+        if (this.colorIndex > MAX_COLOR) this.colorIndex = 0;
+        this.el.setAttribute("color", COLORS[this.colorIndex])
+
+      }
+    });
+    </script>
+  </head>
+  <body>
+    <a-scene debug physics="driver: ammo;gravity:1; debug: true; debugDrawMode: 1" >
+     <a-entity id="test-area" position="0 1.5 -1">
+        <a-sphere id="test" color="red" radius = "0.1" position = "0.5 0.5 0"
+        physics-object-2
+        key-bindings="bindings:KeyI=up,KeyK=down,KeyJ=left,KeyL=right,ShiftLeft=togglegrip,Digit1=dynamic,Digit2=kinematic"
+        hand-keyboard-controls>
+        </a-sphere>
+
+        <a-box id="tilted-plane1"
+                height = "0.1"
+                color='blue'
+                ammo-body="type: static" ammo-shape="fit: auto"
+                position = "0.4 0 0" rotation = "0 0 45">
+         </a-box>
+     </a-entity>
+
+     <a-box id="floor-plane"
+             width = "20" height = "1" depth = "20"
+             color='grey'
+             ammo-body="type: static" ammo-shape="fit: auto"
+             position = "0 -0.5 0">
+      </a-box>
+    </a-scene>
+    <div style ="position:fixed;top:20px;left:20px">
+      <p>
+        Basic 2D simulation of function to switch between dynamic & kinematic ammo bodies.<br>
+        Keyboard Controls:<br>
+        Sphere begins in Kinematic Mode.
+        1 to set Dynamic Mode.
+        2 to set Kinematic Mode.
+        In Kinematic Mode, IJKL (like WASD) to move the sphere<br>
+        Sphere changes color (cycling through the rainbow) eac time a collision begins or ends.
+        This allows for easy confirmation that collisions are being detected (there are also console logs).
+        Gravity is artificially low, to make behaviour easier to ovbserve.<br>
+      </p>
+    </div>
+  </body>
+</html>
