@@ -16,7 +16,7 @@
 
   </head>
   <body>
-    <a-scene stats physics="driver: ammo; debug: true; debugDrawMode: 1;">
+    <a-scene stats physics="driver: ammo; debug: true; debugDrawMode: 1;">-->
       <a-assets>
         <a-cubemap id="env">
           <img src="../assets/environment-left.png">
@@ -50,7 +50,7 @@
         </a-mixin>
         <a-mixin id="hat"
                  material="color:black"
-                 geometry="primitive:tophat" >
+                 geometry="primitive:tophat-hollow" >
         </a-mixin>
         <a-mixin id="branch"
                  material="color:#5C4033"
@@ -64,6 +64,10 @@
         <a-mixin id="trunk"
                  material="color:#5C4033"
                  geometry="primitive:cylinder;height:0.5;radius:0.1;">
+        </a-mixin>
+        <a-mixin id="star"
+                 material="color:yellow; metalness: 0.8; roughness:0.2"
+                 geometry="primitive:star; innerRadius:0.04;outerRadius:0.12;points:5;depth:0.01">
         </a-mixin>
         <!-- env-map dosesn't seem to work when deployed via mix-ins, hence no mixin for baubles-->
       </a-assets>
@@ -105,7 +109,7 @@
         <a-entity id="snowman-mouth3" mixin="coal" position="0 1 -1.2" movable-object></a-entity>
         <a-entity id="snowman-mouth4" mixin="coal" position="0.05  1 -1.2" movable-object></a-entity>
         <a-entity id="snowman-mouth5" mixin="coal" position="0.1 1.02 -1.21" movable-object></a-entity>
-        <a-entity id="snowman-hat" mixin="hat" position="0 1.55 -1.5" movable-object>
+        <a-entity id="snowman-hat" mixin="hat" position="0 1.65 -1.5" movable-object="hull:false" ammo-shape="type:hacd">
         </a-entity>
         <a-entity id="snowman-l-arm" mixin="branch" rotation="0 0 80" position="-0.6 0.7 -1.5" movable-object></a-entity>
         <a-entity id="snowman-r-arm" mixin="branch" rotation="0 0 -100" position="0.6 0.7 -1.5" movable-object></a-entity>
@@ -141,6 +145,8 @@
                     env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object></a-sphere>
           <a-sphere color="blue" cylindrical-position="height: -0.08; radius:0.264; angle:-45"
                     env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object></a-sphere>
+        </a-entity>
+        <a-entity id="star" mixin="star" rotation="0 90 0" position="1.45 1.6 0" movable-object material="envMap:#env">
         </a-entity>
 
         <!--frame for icicle xylophone-->
