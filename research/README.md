@@ -121,11 +121,11 @@ Objects that can be affixed to the snowman are:
 - Kinetic when embedded in the snowman's face.
 - Kinetic when handled (so they can be pushed into a static object)
 - Manipulated by tick-based sync to controller position (this is the only viable way to manipulate a kinetic object, since constraints don't work with kinetic objects)
-- Dynamic when released (so they drop to the floor, and engage in other physics interactions, as required)
+- Dynamic when released (so they drop to the floor, and engage in other physics interactions, as required) 
 
 Demo of this here:
 
-https://diarmidmackenzie.github.io/christmas-scene/research/physics-ammo/dynamic-kinematic-switch.html
+https://diarmidmackenzie.github.io/christmas-scene/research/physics-ammo/move-objects-ph2.html
 
 
 
@@ -141,6 +141,30 @@ This might be a good fit for objects like Xmas presents, where it makes less sen
 - Snowman's hat might be better handled in this category.  Right now it's a bit weird that you can jam the hat brim into the snowman's belly and it just stays there...
 
   
+
+#### Testing of Phase 2 in Christmas Scene
+
+Phase 2 physics basically seems to work.
+
+- Some new things work that didn't before - e.g. put the snowman's hat on the ground and drop coals / baubles onto it.  This kind of function will be great to have as we further enrich the environment.
+
+A couple of concerns.
+
+- Some suggestions of perf degradation.  But not sure how there can be much difference - most objects are still not dynamic most of the time -  only when in flight - when they return to the ground (which is "sticky") they become kinematic again.
+  - So maybe I was imagining this.  Haven't done any proper measurements yet (could look at it using: https://github.com/kylebakerio/vr-super-stats)
+
+- I'm not sure about velocity / rotation on release.
+
+  - I was surprised to see this "just worked".  But not convinced it's quite as natural-feeling as what I had before...
+
+  - I suspect the way it is working is that the kinematic hand collider is exerting forces on the dynamic object, once it becomes dynamic.  That might not be a good idea, because the level & direction of overlap will be unpredictable, so might result in some quite unexpected forces (which I think matches what I'm seeing)
+
+  - Possible alternatives to look at:
+
+    1. Disabled collisions on hand on grip release, and see what that does to velocity/rotation on release.  I suspect this will result in *no* velocity/rotation on release.  So then possibly add back in the function we had to measure & apply pre-release velocity?
+    2. Might it be better for held objects to be dynamic, and be held using constraints (like superhands does it)?  Reason I didn't want this is that I think you'll get weird repulsion behaviour if you stick an object into the snowman, and then release - it will probably ping away from the snowman's body.  But maybe worth confirming this is a problem.  (though I do recall seeing exactly this problem in superhands demos, when you push an object into the floor, so I'm pretty confident this will be an issue....)
+
+    
 
 #### Other notes
 
