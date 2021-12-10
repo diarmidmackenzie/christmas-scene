@@ -63,6 +63,10 @@
                  material="color:#5C4033"
                  geometry="primitive:cylinder;height:0.5;radius:0.1;">
         </a-mixin>
+        <a-mixin id="star"
+                 material="color:yellow; metalness: 0.8; roughness:0.2"
+                 geometry="primitive:star; innerRadius:0.04;outerRadius:0.12;points:5;depth:0.01">
+        </a-mixin>
       </a-assets>
       <a-entity environment="groundColor: #ffffff;
                              groundColor2: #eeeeee;
@@ -138,6 +142,8 @@
                     env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object></a-sphere>
           <a-sphere color="blue" cylindrical-position="height: -0.08; radius:0.264; angle:-45"
                     env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object></a-sphere>
+        </a-entity>
+        <a-entity id="star" mixin="star" rotation="0 90 0" position="1.45 1.6 0" movable-object material="envMap:#env">
         </a-entity>
 
         <!--frame for icicle xylophone-->
