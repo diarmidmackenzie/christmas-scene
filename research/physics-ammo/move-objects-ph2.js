@@ -14,14 +14,18 @@ TYPE_STATIC = 'static';
 
 AFRAME.registerComponent('movable-object', {
   schema: {
-    gravity: {type: 'number', default: 9.8}
+    gravity: {type: 'number', default: 9.8},
+    hull: {type: 'boolean', default: true}
   },
 
   init() {
     // must start as dynamic of ever to become dynamic (Amm.js bug).
     this.el.setAttribute('ammo-body', 'type: dynamic');
     this.el.setAttribute('ammo-body', 'emitCollisionEvents: true');
-    this.el.setAttribute('ammo-shape', 'type: hull');
+    if (this.data.hull) {
+      // if not hull, must be specified externally.
+      this.el.setAttribute('ammo-shape', 'type: hull');
+    }
 
     // Basic logic of this element:
     // When held, kinematic, move anywhere.
