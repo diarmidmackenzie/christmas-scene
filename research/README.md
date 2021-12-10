@@ -114,7 +114,7 @@ Switching to kinematic twice is enough to flush out the bug where switching to k
 
 I expect that both of these bugs can be fixed within A-Frame physics system itself (will raise issues shortly), but it's convenient to be able to work with a published release, and the workarounds are not too onerous.
 
-On the basis of this workaround, I'm now planning to move to an updated (phase 2) physics system.
+On the basis of this workaround, I'm now moving to an updated (phase 2) physics system.
 
 Objects that can be affixed to the snowman are:
 
@@ -123,7 +123,9 @@ Objects that can be affixed to the snowman are:
 - Manipulated by tick-based sync to controller position (this is the only viable way to manipulate a kinetic object, since constraints don't work with kinetic objects)
 - Dynamic when released (so they drop to the floor, and engage in other physics interactions, as required)
 
-> Demo of this updated system coming soon...
+Demo of this here:
+
+https://diarmidmackenzie.github.io/christmas-scene/research/physics-ammo/dynamic-kinematic-switch.html
 
 
 
@@ -155,6 +157,6 @@ Other ways I tried to switch between kinetic & dynamic - neither worked at all w
 
 
 
-I did briefly look at Cannon.js.  A-Frame physics system didn't give me the level of collision info I needed, but the direct Cannon.js API would probably have met my needs.  I was hesitant to go further along this path because I've seen Cannon.js deliver some fairly unrealistic physics simulation in the past.
+I did briefly look at Cannon.js.  A-Frame physics system didn't give me the level of collision info I needed, when using Cannon, but the direct Cannon.js API would probably have met my needs.  I was hesitant to go further along this path because I've seen Cannon.js deliver some fairly unrealistic physics simulation in the past.
 
 I haven't yet got around to looking at PhysX/Vartiste.  With the progress now made with Ammo.js, I don't expect that I will for this project...

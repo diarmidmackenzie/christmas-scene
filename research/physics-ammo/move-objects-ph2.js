@@ -18,19 +18,29 @@ AFRAME.registerComponent('movable-object', {
   },
 
   init() {
-    this.el.setAttribute('ammo-body', 'type: kinematic');
+    // must start as dynamic of ever to become dynamic (Amm.js bug).
+    this.el.setAttribute('ammo-body', 'type: dynamic');
     this.el.setAttribute('ammo-body', 'emitCollisionEvents: true');
     this.el.setAttribute('ammo-shape', 'type: hull');
 
     // Basic logic of this element:
-    // When held, disable physic, move anywhere.
+    // When held, kinematic, move anywhere.
     // When released
-    // - if in contact with a static object, become fixed.
-    // - else become free (dynamic physics object)
+    // - if in contact with a static object, stay kinematic.
+    // - else become dynamic
     this.el.addEventListener("collidestart", this.collideStart.bind(this));
     this.el.addEventListener("collideend", this.collideEnd.bind(this));
     this.el.addEventListener("grabbed", this.grabbed.bind(this));
     this.el.addEventListener("released", this.released.bind(this));
+
+   // Workaround for Ammo.js issues with switching from dynamic to kinematic & vice-versa.
+    this.el.addEventListener("body-loaded", () => {
+      setTimeout(() => {
+        this.el.setAttribute('ammo-body', 'type:kinematic');
+        this.el.setAttribute('ammo-body', 'type:dynamic');
+        this.el.setAttribute('ammo-body', 'type:kinematic');
+      }, 1);
+    });
 
     this.state = OBJECT_FIXED;
     this.stickyOverlaps = [];
@@ -45,7 +55,7 @@ AFRAME.registerComponent('movable-object', {
     this.velocity = new THREE.Vector3();
     this.velocityDelta = new THREE.Vector3();
     this.tempQuaternion = new THREE.Quaternion();
-    this.rotationAxis = new THREE.Vector3();    
+    this.rotationAxis = new THREE.Vector3();
     this.rotationSpeed = 0;
   },
 
@@ -59,77 +69,18 @@ AFRAME.registerComponent('movable-object', {
   setKinematic() {
     // set object to kinematic.
     console.log("set to kinematic")
-    //if (this.el.components['ammo-body'].data.type === 'kinematic') return;
-
-    /* Attempt to recreate a whole new object - really not working!
-
-    const position = this.el.getAttribute('position');
-    const rotation = this.el.getAttribute('rotation');
-    this.el.setAttribute('position', position);
-    this.el.setAttribute('rotation', rotation);
-    this.el.flushToDOM();
     this.el.setAttribute('ammo-body', 'type: kinematic');
-    newEl = this.el.cloneNode();
-    this.el.parentNode.appendChild(newEl);
-    this.el.emit('replace-element', {oldEl: this.el, newEl: newEl});
-    this.el.parentNode.removeChild(this.el);*/
-    /*
-    this.el.removeEventListener("collidestart", this.collideStart.bind(this));
-    this.el.removeEventListener("collideend", this.collideEnd.bind(this));
-    this.el.removeAttribute('ammo-body');
-    this.el.removeAttribute('ammo-shape');
-    this.el.setAttribute('ammo-body', 'type: kinematic; emitCollisionEvents: true');
-    this.el.setAttribute('ammo-shape', 'type: hull');
-    //this.stickyOverlaps = []; // reflects the fact that collisions data seemed to be cleared out.
 
-    this.el.addEventListener("collidestart", this.collideStart.bind(this));
-    this.el.addEventListener("collideend", this.collideEnd.bind(this));
-    */
-
-    /* simplest update... */
-    //this.el.setAttribute('ammo-body', 'mass: 1.101'); // needed to bypasss Ammo code that ignores first update.
-    //this.el.setAttribute('ammo-body', 'type: kinematic');
-
-    // Given up on AMmo physics for now, implementing my own gravity...
-    this.basicGravity = false;
   },
 
   setDynamic() {
     // set object to dynamic.
     console.log("set to dynamic")
-
-    //if (this.el.components['ammo-body'].data.type === 'dynamic') return;
-
-/* Attempt to recreate a whole new object - really not working!
-    const position = this.el.getAttribute('position');
-    const rotation = this.el.getAttribute('rotation');
-    this.el.setAttribute('position', position);
-    this.el.setAttribute('rotation', rotation);
-    this.el.flushToDOM();
     this.el.setAttribute('ammo-body', 'type: dynamic');
-    newEl = this.el.cloneNode();
-    this.el.parentNode.appendChild(newEl);
-    this.el.emit('replace-element', {oldEl: this.el, newEl: newEl});
-    this.el.parentNode.removeChild(this.el);
-*/
-    /*
-    this.el.removeEventListener("collidestart", this.collideStart.bind(this));
-    this.el.removeEventListener("collideend", this.collideEnd.bind(this));
-    this.el.removeAttribute('ammo-body');
-    this.el.removeAttribute('ammo-shape');
-    this.el.setAttribute('ammo-body', 'type: dynamic; emitCollisionEvents: true');
-    this.el.setAttribute('ammo-shape', 'type: hull');
-    //this.stickyOverlaps = [];
-    this.el.addEventListener("collidestart", this.collideStart.bind(this));
-    this.el.addEventListener("collideend", this.collideEnd.bind(this));
-    */
 
-    /* simplest update... */
-    //this.el.setAttribute('ammo-body', 'mass: 1.102'); // needed to bypasss Ammo code that ignores first update.
-    //this.el.setAttribute('ammo-body', 'type: dynamic');
+    // set initial velocity & rotation based on prior movement.
+    // To Do...
 
-    // Given up on AMmo physics for now, implementing my own gravity...
-    this.basicGravity = true;
   },
 
   // collideStart & collideEnd used to track overlaps with static objects, to
@@ -199,13 +150,13 @@ AFRAME.registerComponent('movable-object', {
   },
 
   tick(time, timeDelta) {
-
-    if (!this.basicGravity) {
+/*
+    if (this.state === OBJECT_HELD) {
       this.lastPositions[this.historyPointer].copy(this.el.object3D.position);
       this.lastQuaternions[this.historyPointer].copy(this.el.object3D.quaternion);
       this.lastTimeDeltas[this.historyPointer] = timeDelta;
       this.historyPointer = 1 - this.historyPointer;
-      this.gravityStarting = true;
+      this.physicsStarting = true;
     }
     else {
       if (this.gravityStarting) {
@@ -249,6 +200,7 @@ AFRAME.registerComponent('movable-object', {
       this.tempQuaternion.setFromAxisAngle(this.rotationAxis, angle);
       this.el.object3D.quaternion.multiply(this.tempQuaternion);
     }
+    */
   }
 });
 
@@ -331,6 +283,7 @@ AFRAME.registerComponent('hand', {
 
       // weird case where other forces on object (e.g. manual policing of floor)
       // mean it pops out of our hand.
+      // !! Not seeing a need for this yet...
       /*if (this.grabbedEl === targetEl) {
         this.releaseObject(this.grabbedEl);
       }*/
@@ -338,54 +291,23 @@ AFRAME.registerComponent('hand', {
   },
 
   grabObject(el) {
-    // constrain object to controller.
-    // constraint goes from controller to object.
+
     this.setConstraint(el, this.collider);
-    // switching parent - save off old parent first.  If
-    // already a saved parent, keep that one.
-/*
-    if (this.savedParent == null) {
-      this.savedParent = el.object3D.parent;
-    }
-    this.reparent(el.object3D, el.object3D.parent, this.el.object3D)*/
     this.grabbedEl = el;
-    //this.awaitingNewElement = true;
-    el.addEventListener('replace-element', this.elementReplaced.bind(this));
-
-    // need to manually update this as we won't get a collisionend event after reparenting.
-    //this.collisions = [];
-
     // signal to element it has been grabbed.
     el.emit("grabbed")
   },
 
-  elementReplaced(event) {
-
-    //this.awaitingNewElement = false;
-
-    if (this.grabbedEl === event.detail.oldEl) {
-      this.grabbedEl = event.detail.newEl
-    }
-
-    if (this.lockedObject === event.detail.oldEl.object3D) {
-      this.lockedObject = event.detail.newEl.object3D;
-    }
-  },
-
   releaseObject(el) {
 
-    // reparent object3D to previous parent..
     this.removeConstraint(el);
-    /*this.reparent(el.object3D, this.el.object3D, this.savedParent)
-    this.savedParent = null; */
     this.grabbedEl = null;
 
     // signal to element it has been released.
     el.emit("released")
 
-    // need to manually update this as we won't get a collisionend event after reparenting.
-    //this.collisions = [];
   },
+  // Could be useful in future for handling dynamic objects.
 /*
   setConstraint(fromEl, toEl) {
 
@@ -401,15 +323,6 @@ AFRAME.registerComponent('hand', {
     console.log(fromEl);
   },
 */
-  reparent(object, oldParent, newParent) {
-
-    this.tempMatrix.copy(newParent.matrixWorld).invert();
-    object.matrix.premultiply(oldParent.matrixWorld);
-    object.matrix.premultiply(this.tempMatrix);
-    object.matrix.decompose(object.position, object.quaternion, object.scale);
-    object.matrixWorldNeedsUpdate = true;
-    newParent.add(object);
-  },
 
   setConstraint(fromEl, toEl) {
 
