@@ -147,24 +147,20 @@ This might be a good fit for objects like Xmas presents, where it makes less sen
 Phase 2 physics basically seems to work.
 
 - Some new things work that didn't before - e.g. put the snowman's hat on the ground and drop coals / baubles onto it.  This kind of function will be great to have as we further enrich the environment.
+- Had to be careful with velocity on release.  Mostly this "just worked", but there were some unpredictable interactions between the kinematic hand collider, and the (newly dynamic) object on release which led to unpredictable forces on the released object
+  - Solved by disabling collisions on the hand collider for 500 msecs, on release of the grip.  With that change, this feels pretty good.
 
 A couple of concerns.
 
 - Some suggestions of perf degradation.  But not sure how there can be much difference - most objects are still not dynamic most of the time -  only when in flight - when they return to the ground (which is "sticky") they become kinematic again.
   - So maybe I was imagining this.  Haven't done any proper measurements yet (could look at it using: https://github.com/kylebakerio/vr-super-stats)
+- It crashes much more than it used to
+  - I used to see very occasional crashes, but they were rare
+  - Now I'm seeing a crash every few mins of playing with objects involving physics.  That's not really good enough....  ot yet managed to isolate a crash in a debugger.  Not sure what I'd be able to do with it if I did... I guess JS errors can probably be fixed fairly easily.  WASM errors would be much harder...
 
-- I'm not sure about velocity / rotation on release.
+The crashes are the main thing holding off rollout of "phase 2" physics, so I'll try & isolate some instances of this.
 
-  - I was surprised to see this "just worked".  But not convinced it's quite as natural-feeling as what I had before...
 
-  - I suspect the way it is working is that the kinematic hand collider is exerting forces on the dynamic object, once it becomes dynamic.  That might not be a good idea, because the level & direction of overlap will be unpredictable, so might result in some quite unexpected forces (which I think matches what I'm seeing)
-
-  - Possible alternatives to look at:
-
-    1. Disabled collisions on hand on grip release, and see what that does to velocity/rotation on release.  I suspect this will result in *no* velocity/rotation on release.  So then possibly add back in the function we had to measure & apply pre-release velocity?
-    2. Might it be better for held objects to be dynamic, and be held using constraints (like superhands does it)?  Reason I didn't want this is that I think you'll get weird repulsion behaviour if you stick an object into the snowman, and then release - it will probably ping away from the snowman's body.  But maybe worth confirming this is a problem.  (though I do recall seeing exactly this problem in superhands demos, when you push an object into the floor, so I'm pretty confident this will be an issue....)
-
-    
 
 #### Other notes
 
@@ -183,4 +179,4 @@ Other ways I tried to switch between kinetic & dynamic - neither worked at all w
 
 I did briefly look at Cannon.js.  A-Frame physics system didn't give me the level of collision info I needed, when using Cannon, but the direct Cannon.js API would probably have met my needs.  I was hesitant to go further along this path because I've seen Cannon.js deliver some fairly unrealistic physics simulation in the past.
 
-I haven't yet got around to looking at PhysX/Vartiste.  With the progress now made with Ammo.js, I don't expect that I will for this project...
+I haven't yet got around to looking at PhysX/Vartiste.  With the progress now made with Ammo.js, I don't expect that I will for this project... (the Ammo.js crashes being the one thing that might change this, if I can't solve them...)

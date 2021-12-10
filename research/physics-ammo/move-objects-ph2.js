@@ -235,6 +235,8 @@ AFRAME.registerComponent('hand', {
   gripDown() {
 
     this.gripDown = true;
+    // collider should be set already, but set it again to be sure.
+    this.collider.setAttribute('ammo-body', 'disableCollision: false');
 
     if (this.collisions.length > 0) {
       console.log("grab object on grip down")
@@ -245,6 +247,12 @@ AFRAME.registerComponent('hand', {
   gripUp() {
 
     this.gripDown = false;
+    // remove collisions, so we don't apply weird forces to objects as we release them.
+    // 500 msecs should be plenty.
+    this.collider.setAttribute('ammo-body', 'disableCollision: true');
+    setTimeout(() => {
+      this.collider.setAttribute('ammo-body', 'disableCollision: false')
+    }, 500);
 
     if (this.grabbedEl) {
       console.log("release object on grip up")
