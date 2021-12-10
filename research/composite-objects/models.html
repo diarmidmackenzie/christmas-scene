@@ -22,9 +22,18 @@
                  geometry="primitive:tophat"
                  rotation="0 0 0">
         </a-mixin>
+        <a-mixin id="tophat-hollow"
+                 material="color:black"
+                 geometry="primitive:tophat-hollow"
+                 rotation="0 0 0">
+        </a-mixin>
         <a-mixin id="icicle"
                  material="color:white; opacity:1.0; metalness: 0.2;roughness:1.0"
                  geometry="primitive:icicle">
+        </a-mixin>
+        <a-mixin id="star"
+                 material="color:yellow; metalness: 0.8; roughness:0.2"
+                 geometry="primitive:star; innerRadius:0.05;outerRadius:0.15;points:5;depth:0.01">
         </a-mixin>
       </a-assets>
 
@@ -33,7 +42,7 @@
         <a-entity id="snowman-arm" mixin="branch"  position="0 1 -1.5">
         </a-entity>
 
-        <a-entity id="snowman-hat" mixin="tophat"  position="-1 1.4 -1.5">
+        <a-entity id="snowman-hat" mixin="tophat-hollow" position="-1 1.4 -1.5">
         </a-entity>
 
         <a-entity id="icicle-entity" mixin="icicle"  position="1.05 1.4 -1.5" scale ="0.8 0.8 0.8">
@@ -41,6 +50,9 @@
         <a-entity id="icicle-entity" mixin="icicle" position="1.4 1.3 -1.5">
         </a-entity>
         <a-entity id="icicle-entity" mixin="icicle"  position="1.9 1.2 -1.5"  scale ="1.2 1.2 1.2">
+        </a-entity>
+
+        <a-entity id="star" mixin="star" position="0 2 -1.5">
         </a-entity>
 
 

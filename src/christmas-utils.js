@@ -58,6 +58,94 @@ AFRAME.registerGeometry('tophat', {
   }
 });
 
+AFRAME.registerGeometry('tophat-hollow', {
+  schema: {
+  },
+
+  init: function (data) {
+    //radiusTop, radiusBottom, height, radialSegments
+    const geometries = [];
+
+    const brimShape = new THREE.Shape();
+    brimShape.absarc(0, 0, 0.25, 0, 2 * Math.PI);
+    const brimHole = new THREE.Path();
+    brimHole.absarc(0, 0, 0.15, 0, 2 * Math.PI);
+    brimShape.holes.push(brimHole)
+
+    const brimSettings = {
+    	steps: 1,
+    	depth: 0.04,
+    	bevelEnabled: false
+    };
+
+    const topShape = new THREE.Shape();
+    topShape.absarc(0, 0, 0.15, 0, 2 * Math.PI);
+    const topHole = new THREE.Path();
+    topHole.absarc(0, 0, 0.14, 0, 2 * Math.PI);
+    topShape.holes.push(topHole)
+    const topSettings = {
+      steps: 1,
+      depth: 0.3,
+      bevelEnabled: false
+    };
+
+    const capShape = new THREE.Shape();
+    capShape.absarc(0, 0, 0.15, 0, 2 * Math.PI);
+    const capSettings = {
+      steps: 1,
+      depth: 0.04,
+      bevelEnabled: false
+    };
+
+    geometries.push(new THREE.ExtrudeGeometry(brimShape, brimSettings));
+    geometries.push(new THREE.ExtrudeGeometry(topShape, topSettings));
+    geometries.push(new THREE.ExtrudeGeometry(capShape, capSettings));
+    geometries[2].translate(0, 0, 0.3);
+    this.geometry = THREE.BufferGeometryUtils.mergeBufferGeometries(geometries);
+
+    recenterGeometry(this.geometry);
+    this.geometry.rotateX(-Math.PI/2)
+  }
+});
+
+AFRAME.registerGeometry('star', {
+  schema: {
+    points: {default: 5},
+    outerRadius: {default: 3},
+    innerRadius: {default: 1},
+    depth: {default: 0.5},
+  },
+
+  init: function (data) {
+
+    var starPoints = [];
+    const radii = [data.outerRadius, data.innerRadius]
+    var toggle = 0
+    for (var ii = 0; ii < (data.points * 2); ii++) {
+      const angle = (ii * Math.PI * 2)/data.points;
+      const x = radii[toggle] * Math.sin(angle)
+      const y = radii[toggle] * Math.cos(angle)
+
+      toggle = 1 - toggle;
+
+      starPoints.push(new THREE.Vector2 (x, y));
+    }
+
+    var starShape = new THREE.Shape(starPoints);
+
+    var extrusionSettings = {
+        curveSegments: 5,
+        depth: data.depth,
+        bevelEnabled: false
+    };
+
+    var starGeometry = new THREE.ExtrudeGeometry(starShape, extrusionSettings);
+
+    this.geometry = starGeometry;
+    recenterGeometry(this.geometry);
+  }
+});
+
 AFRAME.registerGeometry('icicle', {
   schema: {
   },
