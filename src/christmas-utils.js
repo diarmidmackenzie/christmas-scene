@@ -73,6 +73,7 @@ AFRAME.registerGeometry('tophat-hollow', {
     brimShape.holes.push(brimHole)
 
     const brimSettings = {
+      curveSegments: 5,
     	steps: 1,
     	depth: 0.04,
     	bevelEnabled: false
@@ -84,6 +85,7 @@ AFRAME.registerGeometry('tophat-hollow', {
     topHole.absarc(0, 0, 0.14, 0, 2 * Math.PI);
     topShape.holes.push(topHole)
     const topSettings = {
+      curveSegments: 5,
       steps: 1,
       depth: 0.3,
       bevelEnabled: false
@@ -92,6 +94,7 @@ AFRAME.registerGeometry('tophat-hollow', {
     const capShape = new THREE.Shape();
     capShape.absarc(0, 0, 0.15, 0, 2 * Math.PI);
     const capSettings = {
+      curveSegments: 5,
       steps: 1,
       depth: 0.04,
       bevelEnabled: false

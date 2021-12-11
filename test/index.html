@@ -10,14 +10,14 @@
     <!-- <script src="https://unpkg.com/aframe-particle-system-component@1.0.x/dist/aframe-particle-system-component.min.js"></script>-->
     <script src="../lib/aframe-particle-system-component.js"></script>
     <script src="https://mixedreality.mozilla.org/ammo.js/builds/ammo.wasm.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/n5ro/aframe-physics-system@v4.0.1/dist/aframe-physics-system.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/diarmidmackenzie/aframe-physics-system@latest/dist/aframe-physics-system.min.js"></script>
     <script src="../research/physics-ammo/move-objects-ph2.js"></script>
     <script src="../src/christmas-utils.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/kylebakerio/vr-super-stats@1.5.0/vr-super-stats.js"></script>
 
   </head>
   <body>
-    <a-scene vr-super-stats stats physics="driver: ammo; debug: true; debugDrawMode: 1;">-->
+    <a-scene vr-super-stats stats physics="driver: ammo"><!--; debug: true; debugDrawMode: 1">-->
       <a-assets>
         <a-cubemap id="env">
           <img src="../assets/environment-left.png">
@@ -51,7 +51,7 @@
         </a-mixin>
         <a-mixin id="hat"
                  material="color:black"
-                 geometry="primitive:tophat-hollow" >
+                 geometry="primitive:tophat-hollow">
         </a-mixin>
         <a-mixin id="branch"
                  material="color:#5C4033"
@@ -102,7 +102,7 @@
       <a-entity id="play-area">
         <a-entity id="snowman-base" mixin="snowball" position="0 0.4 -1.5" sticky-object></a-entity>
         <a-entity id="snowman-head" mixin="snowball" scale="0.7 0.7 0.7" position="0 1.1 -1.5" sticky-object></a-entity>
-        <a-entity id="snowman-nose" mixin="carrot" rotation="90 0 0" position="0 1.1 -1.1" movable-object></a-entity>
+        <a-entity id="snowman-nose" mixin="carrot" rotation="90 0 0" position="0 1.1 -1.1" movable-object="hull:false" ammo-shape="type:cone;fit:manual;halfExtents:0.025 0.11 0.025"></a-entity>
         <a-entity id="snowman-l-eye" mixin="coal" position="-0.1 1.2 -1.2" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
         <a-entity id="snowman-r-eye" mixin="coal" position="0.1 1.2 -1.2" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
         <a-entity id="snowman-mouth1" mixin="coal" position="-0.1 1.02 -1.21" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
@@ -114,6 +114,7 @@
         </a-entity>
         <a-entity id="snowman-l-arm" mixin="branch" rotation="0 0 80" position="-0.6 0.7 -1.5" movable-object></a-entity>
         <a-entity id="snowman-r-arm" mixin="branch" rotation="0 0 -100" position="0.6 0.7 -1.5" movable-object></a-entity>
+
         <a-entity id="tree-trunk" mixin="trunk" position="1.5 0.25 0"></a-entity>
         <!--Creating movable-object children of sticky-object breaks sticky-objects across whole scene.  Not yet understood why!-->
         <!-- current solution: don't have any such children.  further research needed on this.-->
@@ -121,7 +122,7 @@
         </a-entity>
         <a-entity position="1.5 0.75 0" rotation="0 90 0">
           <a-sphere color="red" cylindrical-position="height: -0.12; radius:0.396; angle:45"
-                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.05"></a-sphere>
+                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
           <a-sphere color="yellow" cylindrical-position="height: -0.12; radius:0.396; angle:0"
                     env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
           <a-sphere color="green" cylindrical-position="height: -0.12; radius:0.396; angle:-45"
