@@ -13,10 +13,11 @@
     <script src="https://cdn.jsdelivr.net/gh/n5ro/aframe-physics-system@v4.0.1/dist/aframe-physics-system.js"></script>
     <script src="../research/physics-ammo/move-objects-ph2.js"></script>
     <script src="../src/christmas-utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/kylebakerio/vr-super-stats@1.5.0/vr-super-stats.js"></script>
 
   </head>
   <body>
-    <a-scene stats physics="driver: ammo; debug: true; debugDrawMode: 1;">-->
+    <a-scene vr-super-stats stats physics="driver: ammo; debug: true; debugDrawMode: 1;">-->
       <a-assets>
         <a-cubemap id="env">
           <img src="../assets/environment-left.png">
@@ -102,13 +103,13 @@
         <a-entity id="snowman-base" mixin="snowball" position="0 0.4 -1.5" sticky-object></a-entity>
         <a-entity id="snowman-head" mixin="snowball" scale="0.7 0.7 0.7" position="0 1.1 -1.5" sticky-object></a-entity>
         <a-entity id="snowman-nose" mixin="carrot" rotation="90 0 0" position="0 1.1 -1.1" movable-object></a-entity>
-        <a-entity id="snowman-l-eye" mixin="coal" position="-0.1 1.2 -1.2" movable-object></a-entity>
-        <a-entity id="snowman-r-eye" mixin="coal" position="0.1 1.2 -1.2" movable-object></a-entity>
-        <a-entity id="snowman-mouth1" mixin="coal" position="-0.1 1.02 -1.21" movable-object></a-entity>
-        <a-entity id="snowman-mouth2" mixin="coal" position="-0.05 1 -1.2" movable-object></a-entity>
-        <a-entity id="snowman-mouth3" mixin="coal" position="0 1 -1.2" movable-object></a-entity>
-        <a-entity id="snowman-mouth4" mixin="coal" position="0.05  1 -1.2" movable-object></a-entity>
-        <a-entity id="snowman-mouth5" mixin="coal" position="0.1 1.02 -1.21" movable-object></a-entity>
+        <a-entity id="snowman-l-eye" mixin="coal" position="-0.1 1.2 -1.2" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
+        <a-entity id="snowman-r-eye" mixin="coal" position="0.1 1.2 -1.2" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
+        <a-entity id="snowman-mouth1" mixin="coal" position="-0.1 1.02 -1.21" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
+        <a-entity id="snowman-mouth2" mixin="coal" position="-0.05 1 -1.2" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
+        <a-entity id="snowman-mouth3" mixin="coal" position="0 1 -1.2" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
+        <a-entity id="snowman-mouth4" mixin="coal" position="0.05  1 -1.2" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
+        <a-entity id="snowman-mouth5" mixin="coal" position="0.1 1.02 -1.21" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
         <a-entity id="snowman-hat" mixin="hat" position="0 1.65 -1.5" movable-object="hull:false" ammo-shape="type:hacd">
         </a-entity>
         <a-entity id="snowman-l-arm" mixin="branch" rotation="0 0 80" position="-0.6 0.7 -1.5" movable-object></a-entity>
@@ -120,31 +121,31 @@
         </a-entity>
         <a-entity position="1.5 0.75 0" rotation="0 90 0">
           <a-sphere color="red" cylindrical-position="height: -0.12; radius:0.396; angle:45"
-                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object></a-sphere>
+                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.05"></a-sphere>
           <a-sphere color="yellow" cylindrical-position="height: -0.12; radius:0.396; angle:0"
-                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object></a-sphere>
+                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
           <a-sphere color="green" cylindrical-position="height: -0.12; radius:0.396; angle:-45"
-                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object></a-sphere>
+                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
         </a-entity>
         <a-entity id="tree-2nd-tier" mixin="tree-tier" position="1.5 1.05 0" sticky-object>
         </a-entity>
         <a-entity position="1.5 1.05 0" rotation="0 90 0">
           <a-sphere color="blue" cylindrical-position="height: -0.1; radius:0.33; angle:45"
-                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object></a-sphere>
+                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
           <a-sphere color="silver" cylindrical-position="height: -0.1; radius:0.33; angle:0"
-                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object></a-sphere>
+                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
           <a-sphere color="red" cylindrical-position="height: -0.1; radius:0.33; angle:-45"
-                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object></a-sphere>
+                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
         </a-entity>
         <a-entity id="tree-3rd-tier" mixin="tree-tier" scale="0.8 0.8 0.8" position="1.5 1.35 0" sticky-object>
         </a-entity>
         <a-entity position="1.5 1.35 0" rotation="0 90 0">
           <a-sphere color="yellow" cylindrical-position="height: -0.08; radius:0.264; angle:45"
-                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object></a-sphere>
+                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
           <a-sphere color="green" cylindrical-position="height: -0.08; radius:0.264; angle:0"
-                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object></a-sphere>
+                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
           <a-sphere color="blue" cylindrical-position="height: -0.08; radius:0.264; angle:-45"
-                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object></a-sphere>
+                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
         </a-entity>
         <a-entity id="star" mixin="star" rotation="0 90 0" position="1.45 1.6 0" movable-object material="envMap:#env">
         </a-entity>
