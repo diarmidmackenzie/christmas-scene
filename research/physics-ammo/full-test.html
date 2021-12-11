@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Winter Wonderland Christmas Playground - Test with Ammo.js</title>
+    <meta name="description" content="Merry Christmas 2021!">
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://unpkg.com/aframe-environment-component@1.2.0/dist/aframe-environment-component.min.js"></script>
+    <!-- unpkg version of particle system hits shader compile errors -->
+    <!-- <script src="https://unpkg.com/aframe-particle-system-component@1.0.x/dist/aframe-particle-system-component.min.js"></script>-->
+    <script src="../lib/aframe-particle-system-component.js"></script>
+    <script src="https://mixedreality.mozilla.org/ammo.js/builds/ammo.wasm.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/n5ro/aframe-physics-system@v4.0.1/dist/aframe-physics-system.js"></script>
+    <script src="./move-objects-ph2.js"></script>
+    <script src="../../src/christmas-utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/kylebakerio/vr-super-stats@1.5.0/vr-super-stats.js"></script>
+
+  </head>
+  <body>
+    <a-scene vr-super-stats stats physics="driver: ammo; debug: true; debugDrawMode: 1;">-->
+      <a-assets>
+        <a-cubemap id="env">
+          <img src="../../assets/environment-left.png">
+          <img src="../../assets/environment-left.png">
+          <img src="../../assets/environment-top.png">
+          <img src="../../assets/environment-bottom.png">
+          <img src="../../assets/environment-back.png">
+          <img src="../../assets/environment-back.png">
+        </a-cubemap>
+
+        <audio id="xC" src="../../assets/xylophone/xC.wav"></audio>
+        <audio id="xD" src="../../assets/xylophone/xD.wav"></audio>
+        <audio id="xE" src="../../assets/xylophone/xE.wav"></audio>
+        <audio id="xF" src="../../assets/xylophone/xF.wav"></audio>
+        <audio id="xG" src="../../assets/xylophone/xG.wav"></audio>
+        <audio id="xA" src="../../assets/xylophone/xA.wav"></audio>
+        <audio id="xB" src="../../../assets/xylophone/xB.wav"></audio>
+        <audio id="xC2" src="../../assets/xylophone/xC2.wav"></audio>
+
+        <a-mixin id="snowball"
+                 material="color:white"
+                 geometry="primitive:sphere;segments-height:7;segments-width:13;radius:0.5" >
+        </a-mixin>
+        <a-mixin id="coal"
+                 material="color:black"
+                 geometry="primitive:sphere;segments-height:7;segments-width:13;radius:0.04" >
+        </a-mixin>
+        <a-mixin id="carrot"
+                 material="color:orange"
+                 geometry="primitive:cone;height:0.2;radius-bottom:0.025; radius-top:0.005" >
+        </a-mixin>
+        <a-mixin id="hat"
+                 material="color:black"
+                 geometry="primitive:tophat-hollow" >
+        </a-mixin>
+        <a-mixin id="branch"
+                 material="color:#5C4033"
+                 geometry="primitive:branch"
+                 scale="0.2 0.2 0.2">
+        </a-mixin>
+        <a-mixin id="tree-tier"
+                 material="color:green"
+                 geometry="primitive:cone;height:0.5;radius-bottom:0.5;segments-height:1;segments-radial:9">
+        </a-mixin>
+        <a-mixin id="trunk"
+                 material="color:#5C4033"
+                 geometry="primitive:cylinder;height:0.5;radius:0.1;">
+        </a-mixin>
+        <a-mixin id="star"
+                 material="color:yellow; metalness: 0.8; roughness:0.2"
+                 geometry="primitive:star; innerRadius:0.04;outerRadius:0.12;points:5;depth:0.01">
+        </a-mixin>
+        <!-- env-map dosesn't seem to work when deployed via mix-ins, hence no mixin for baubles-->
+      </a-assets>
+      <a-entity environment="groundColor: #ffffff;
+                             groundColor2: #eeeeee;
+                             ground: noise;
+                             groundYScale: 4;
+                             groundTexture: walkernoise;
+                             dressing: trees;
+                             dressingAmount: 50;
+                             dressingColor: #ffffff;
+                             dressingScale: 1;
+                             lighting: distant
+                              "></a-entity>
+      <a-entity position="0 12 0" particle-system="preset: snow;
+                                                  size: 0.1;
+                                                  velocityValue: 0 2 0;
+                                                  positionSpread: 20 2 20;
+                                                  maxAge: 6;
+                                                  velocitySpread: 1 0 1;
+                                                  particleCount: 15000"></a-entity>
+      <a-entity>
+        <a-camera position="0 1.6 0"></a-camera>
+        <a-entity id="rhand" hand
+                  hand-controls="hand: right">
+        </a-entity>
+        <a-entity id="lhand" hand
+                  hand-controls="hand: left">
+        </a-entity>
+      </a-entity>
+      <a-entity id="play-area">
+        <a-entity id="snowman-base" mixin="snowball" position="0 0.4 -1.5" sticky-object></a-entity>
+        <a-entity id="snowman-head" mixin="snowball" scale="0.7 0.7 0.7" position="0 1.1 -1.5" sticky-object></a-entity>
+        <a-entity id="snowman-nose" mixin="carrot" rotation="90 0 0" position="0 1.1 -1.1" movable-object></a-entity>
+        <a-entity id="snowman-l-eye" mixin="coal" position="-0.1 1.2 -1.2" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
+        <a-entity id="snowman-r-eye" mixin="coal" position="0.1 1.2 -1.2" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
+        <a-entity id="snowman-mouth1" mixin="coal" position="-0.1 1.02 -1.21" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
+        <a-entity id="snowman-mouth2" mixin="coal" position="-0.05 1 -1.2" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
+        <a-entity id="snowman-mouth3" mixin="coal" position="0 1 -1.2" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
+        <a-entity id="snowman-mouth4" mixin="coal" position="0.05  1 -1.2" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
+        <a-entity id="snowman-mouth5" mixin="coal" position="0.1 1.02 -1.21" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
+        <a-entity id="snowman-hat" mixin="hat" position="0 1.65 -1.5" movable-object="hull:false" ammo-shape="type:hacd">
+        </a-entity>
+        <a-entity id="snowman-l-arm" mixin="branch" rotation="0 0 80" position="-0.6 0.7 -1.5" movable-object></a-entity>
+        <a-entity id="snowman-r-arm" mixin="branch" rotation="0 0 -100" position="0.6 0.7 -1.5" movable-object></a-entity>
+        <a-entity id="tree-trunk" mixin="trunk" position="1.5 0.25 0"></a-entity>
+        <!--Creating movable-object children of sticky-object breaks sticky-objects across whole scene.  Not yet understood why!-->
+        <!-- current solution: don't have any such children.  further research needed on this.-->
+        <a-entity id="tree-base-tier" mixin="tree-tier" scale="1.2 1.2 1.2" position="1.5 0.75 0" sticky-object>
+        </a-entity>
+        <a-entity position="1.5 0.75 0" rotation="0 90 0">
+          <a-sphere color="red" cylindrical-position="height: -0.12; radius:0.396; angle:45"
+                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.05"></a-sphere>
+          <a-sphere color="yellow" cylindrical-position="height: -0.12; radius:0.396; angle:0"
+                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
+          <a-sphere color="green" cylindrical-position="height: -0.12; radius:0.396; angle:-45"
+                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
+        </a-entity>
+        <a-entity id="tree-2nd-tier" mixin="tree-tier" position="1.5 1.05 0" sticky-object>
+        </a-entity>
+        <a-entity position="1.5 1.05 0" rotation="0 90 0">
+          <a-sphere color="blue" cylindrical-position="height: -0.1; radius:0.33; angle:45"
+                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
+          <a-sphere color="silver" cylindrical-position="height: -0.1; radius:0.33; angle:0"
+                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
+          <a-sphere color="red" cylindrical-position="height: -0.1; radius:0.33; angle:-45"
+                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
+        </a-entity>
+        <a-entity id="tree-3rd-tier" mixin="tree-tier" scale="0.8 0.8 0.8" position="1.5 1.35 0" sticky-object>
+        </a-entity>
+        <a-entity position="1.5 1.35 0" rotation="0 90 0">
+          <a-sphere color="yellow" cylindrical-position="height: -0.08; radius:0.264; angle:45"
+                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
+          <a-sphere color="green" cylindrical-position="height: -0.08; radius:0.264; angle:0"
+                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
+          <a-sphere color="blue" cylindrical-position="height: -0.08; radius:0.264; angle:-45"
+                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
+        </a-entity>
+        <a-entity id="star" mixin="star" rotation="0 90 0" position="1.45 1.6 0" movable-object material="envMap:#env">
+        </a-entity>
+
+        <!--frame for icicle xylophone-->
+        <a-box position="0.5 0.9 1.5" color="#5C4033" width="0.1" depth="0.2" height="1.8"></a-box>
+        <a-box position="-0.5 0.9 1.5" color="#5C4033" width="0.1" depth="0.2" height="1.8"></a-box>
+        <a-box position="0 1.81 1.5" color="#5C4033" width="1.1" depth="0.2" height="0.02"></a-box>
+        <a-entity id="xylophone" position="0 1.8 1.5" xylophone="count:8;width:0.9"></a-entity>
+
+        <a-box id="floor-plane"
+               width = "20" height = "1" depth = "20"
+               sticky-object
+               position = "0 -0.5 0"
+               visible = false>
+        </a-box>
+      </a-entity>
+    </a-scene>
+  </body>
+</html>
