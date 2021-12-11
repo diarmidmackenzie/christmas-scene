@@ -28,6 +28,14 @@ AFRAME.registerComponent('movable-object', {
       this.el.setAttribute('ammo-shape', 'type: hull');
     }
 
+    // set to invisible until fully initialized, so we don't see weird effects
+    // of being temporarily dynamic.
+    this.visible = this.el.object3D.visible;
+    this.el.object3D.visible = false;
+
+    this.position = new THREE.Vector3();
+    this.position.copy(this.el.object3D.position)
+
     // Basic logic of this element:
     // When held, kinematic, move anywhere.
     // When released
@@ -44,6 +52,13 @@ AFRAME.registerComponent('movable-object', {
         this.el.setAttribute('ammo-body', 'type:kinematic');
         this.el.setAttribute('ammo-body', 'type:dynamic');
         this.el.setAttribute('ammo-body', {type : this.data.initialState});
+
+        // reset position if kinematic.
+        if (this.data.initialState === 'kinematic') {
+          this.el.object3D.position.copy(this.position)
+        }
+        // and make visible again (if appropriate).
+        this.el.object3D.visible = this.visible;
       }, 1);
     });
 
