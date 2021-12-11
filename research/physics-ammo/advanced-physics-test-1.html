@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Advanced Physics Test 1 - Hat & Coals</title>
+    <meta name="description" content="Advanced Physics Test 1 - Hat & Coals">
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://mixedreality.mozilla.org/ammo.js/builds/ammo.wasm.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/n5ro/aframe-physics-system@v4.0.1/dist/aframe-physics-system.js"></script>
+    <script src="../physics-ammo/move-objects-ph2.js"></script>
+    <script src="../../src/christmas-utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/diarmidmackenzie/key-bindings@v0.3-alpha/key-bindings.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/kylebakerio/vr-super-stats@1.5.0/vr-super-stats.js"></script>
+
+  </head>
+  <body>
+    <a-scene vr-super-stats stats physics="driver: ammo; debug: true; debugDrawMode: 1;">-->
+      <a-assets>
+        <a-mixin id="coal"
+                 material="color:blue"
+                 geometry="primitive:sphere;segments-height:7;segments-width:13;radius:0.04">
+        </a-mixin>
+        <a-mixin id="hat"
+                 material="color:black"
+                 geometry="primitive:tophat-hollow" >
+        </a-mixin>
+        <a-mixin id="carrot"
+                 material="color:orange"
+                 geometry="primitive:cone;height:0.2;radius-bottom:0.025; radius-top:0.005" >
+        </a-mixin>
+        <a-mixin id="branch"
+                 material="color:#5C4033"
+                 geometry="primitive:branch"
+                 scale="0.2 0.2 0.2">
+        </a-mixin>
+        <!-- env-map dosesn't seem to work when deployed via mix-ins, hence no mixin for baubles-->
+      </a-assets>
+      <a-entity>
+        <a-camera position="0 1.6 0"></a-camera>
+        <a-entity id="rhand" hand
+                  hand-controls="hand: right">
+        </a-entity>
+        <a-entity id="lhand" hand
+                  hand-controls="hand: left">
+        </a-entity>
+      </a-entity>
+      <a-entity id="play-area">
+        <!-- hat upsiide down so coals can fal into it-->
+        <a-entity id="snowman-hat" mixin="hat" rotation="180 0 0" position="0 1 -0.5" movable-object="hull:false" ammo-shape="type:hacd"
+                  key-bindings="bindings:KeyI=up,KeyK=down,KeyJ=left,KeyL=right,
+                                ShiftLeft=togglegrip,KeyO=turnCCW,KeyP=turnCW;"
+                  hand-keyboard-controls>
+        </a-entity>
+        <a-entity id="snowman-coal1" mixin="coal" position="0 1.5 -0.5" movable-object="initialState:dynamic"></a-entity>
+        <a-entity id="snowman-coal2" mixin="coal" position="0 1.6 -0.5" movable-object="initialState:dynamic"></a-entity>
+        <a-entity id="snowman-coal3" mixin="coal" position="0 1.7 -0.5" movable-object="initialState:dynamic"></a-entity>
+        <a-entity id="snowman-coal4" mixin="coal" position="0 1.8 -0.5" movable-object="initialState:dynamic"></a-entity>
+        <a-entity id="snowman-coal5" mixin="coal" position="0 1.9 -0.5" movable-object="initialState:dynamic"></a-entity>
+        <a-entity id="snowman-coal6" mixin="coal" position="0 2.0 -0.5" movable-object="initialState:dynamic"></a-entity>
+        <a-entity id="snowman-coal7" mixin="coal" position="0 2.1 -0.5" movable-object="initialState:dynamic"></a-entity>
+        <a-entity id="snowman-coal8" mixin="coal" position="0 2.2 -0.5" movable-object="initialState:dynamic"></a-entity>
+        <a-entity id="snowman-coal9" mixin="coal" position="0 2.3 -0.5" movable-object="initialState:dynamic"></a-entity>
+        <a-entity id="snowman-coal10" mixin="coal" position="0 2.4 -0.5" movable-object="initialState:dynamic"></a-entity>
+        <a-entity id="snowman-coal11" mixin="coal" position="0 2.5 -0.5" movable-object="initialState:dynamic"></a-entity>
+        <a-entity id="snowman-nose1" mixin="carrot" rotation="90 0 0" position="0 2.6 -0.5" movable-object="initialState:dynamic"></a-entity>
+        <a-entity id="snowman-nose2" mixin="carrot" rotation="90 0 0" position="0 2.7 -0.5" movable-object="initialState:dynamic"></a-entity>
+        <a-entity id="snowman-nose3" mixin="carrot" rotation="90 0 0" position="0 2.8 -0.5" movable-object="initialState:dynamic"></a-entity>
+        <a-entity id="snowman-nose4" mixin="carrot" rotation="90 0 0" position="0 2.9 -0.5" movable-object="initialState:dynamic"></a-entity>
+        <a-entity id="snowman-arm1" mixin="branch" scale="0.1 0.1 0.1" rotation="90 0 0" position="0 3.1 -0.5" movable-object="initialState:dynamic"></a-entity>
+        <a-entity id="snowman-arm2" mixin="branch" scale="0.1 0.1 0.1" rotation="90 0 0" position="0 3.1 -0.5" movable-object="initialState:dynamic"></a-entity>
+        <a-entity id="snowman-arm3" mixin="branch" scale="0.1 0.1 0.1" rotation="90 0 0" position="0 3.1 -0.5" movable-object="initialState:dynamic"></a-entity>
+        <a-entity id="snowman-arm4" mixin="branch" scale="0.1 0.1 0.1" rotation="90 0 0" position="0 3.1 -0.5" movable-object="initialState:dynamic"></a-entity>
+        <a-entity id="snowman-arm5" mixin="branch" scale="0.1 0.1 0.1" rotation="90 0 0" position="0 3.1 -0.5" movable-object="initialState:dynamic"></a-entity>
+
+        <a-box id="floor-plane"
+               width = "20" height = "1" depth = "20"
+               sticky-object
+               position = "0 -0.5 0"
+               visible = false>
+        </a-box>
+      </a-entity>
+    </a-scene>
+    <div style ="position:fixed;top:20px;left:20px">
+      <p>
+        Hollow snowman's hat full of dynamic spheres.<br>
+        Key goal of this test is to reproduce stability problems (crashes) seen in VR.
+        Keyboard Controls:<br>
+        IJKL (like WASD) to move the hat<br>
+        O & P to rotate CCW & CW<br>
+      </p>
+    </div>
+  </body>
+</html>

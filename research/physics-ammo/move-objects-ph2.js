@@ -15,7 +15,8 @@ TYPE_STATIC = 'static';
 AFRAME.registerComponent('movable-object', {
   schema: {
     gravity: {type: 'number', default: 9.8},
-    hull: {type: 'boolean', default: true}
+    hull: {type: 'boolean', default: true},
+    initialState: {type: 'string', default: 'kinematic'}
   },
 
   init() {
@@ -42,7 +43,7 @@ AFRAME.registerComponent('movable-object', {
       setTimeout(() => {
         this.el.setAttribute('ammo-body', 'type:kinematic');
         this.el.setAttribute('ammo-body', 'type:dynamic');
-        this.el.setAttribute('ammo-body', 'type:kinematic');
+        this.el.setAttribute('ammo-body', {type : this.data.initialState});
       }, 1);
     });
 
