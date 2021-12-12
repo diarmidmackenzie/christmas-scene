@@ -1,3 +1,19 @@
+Current status:
+
+- Static objects OK
+- Stickable objects OK
+- Dynamic non-sticky objects OK
+- Sticky dynamic objects not OK - really need reparenting working with physics to manage these in a stable way...
+- New throwing physics TBC - not yet tested in VR.
+
+
+
+Net steps:
+
+- Maybe move to this codebase & API anyway.  Works for everything in current scene & enables dynamic non-sticky objects.
+- Prototype re-parenting with Ammo.js physics *(why doesn't it work?  Can it work?)
+- Test how new velocity-on-release throwing physics feels.
+
 
 
 Sticky static object
