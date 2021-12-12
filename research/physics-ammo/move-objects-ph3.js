@@ -1,3 +1,5 @@
+// !! some fixes made to phase 2 physics have been applied across to phase 3.
+// But we still need to bring the "homemade physics" workaround over...
 
 OBJECT_FIXED = 1;
 OBJECT_HELD = 2;
@@ -36,8 +38,9 @@ AFRAME.registerComponent('movement', {
     // set up for dynamic objects is more complex.
 
     // must start as dynamic of ever to become dynamic (Ammo.js bug).
-    this.el.setAttribute('ammo-body', 'type: dynamic');
-    this.el.setAttribute('ammo-body', 'emitCollisionEvents: true');
+
+    // for case where object is spawned after physics initialized, these must both be set on the same call.
+    this.el.setAttribute('ammo-body', 'type: dynamic;emitCollisionEvents: true');
     this.el.setAttribute('ammo-body', `gravity: 0 ${-this.data.gravity} 0`);
 
     // set to invisible until fully initialized, so we don't see weird effects
@@ -58,21 +61,15 @@ AFRAME.registerComponent('movement', {
     this.el.addEventListener("grabbed", this.grabbed.bind(this));
     this.el.addEventListener("released", this.released.bind(this));
 
-   // Workaround for Ammo.js issues with switching from dynamic to kinematic & vice-versa.
-    this.el.addEventListener("body-loaded", () => {
-      setTimeout(() => {
-        this.el.setAttribute('ammo-body', 'type:kinematic');
-        this.el.setAttribute('ammo-body', 'type:dynamic');
-        this.el.setAttribute('ammo-body', {type : this.data.initialState});
-
-        // reset position if kinematic.
-        if (this.data.initialState === 'kinematic') {
-          this.el.object3D.position.copy(this.position)
-        }
-        // and make visible again (if appropriate).
-        this.el.object3D.visible = this.visible;
-      }, 1);
-    });
+    // Workaround for Ammo.js issues with switching from dynamic to kinematic & vice-versa.
+    if (this.el.components['ammo-body'].body) {
+      this.initOnceBodyLoaded();
+    }
+    else {
+      this.el.addEventListener("body-loaded", () => {
+        this.initOnceBodyLoaded();
+      });
+    }
 
     this.state = OBJECT_FIXED;
     this.stickyOverlaps = [];
@@ -96,6 +93,21 @@ AFRAME.registerComponent('movement', {
 
     // tick throttling for testing...
     this.tick = AFRAME.utils.throttleTick(this.tick, 200, this);
+  },
+
+  initOnceBodyLoaded() {
+    setTimeout(() => {
+      this.el.setAttribute('ammo-body', 'type:kinematic');
+      this.el.setAttribute('ammo-body', 'type:dynamic');
+      this.el.setAttribute('ammo-body', {type : this.data.initialState});
+
+      // reset position if kinematic.
+      if (this.data.initialState === 'kinematic') {
+        this.el.object3D.position.copy(this.position)
+      }
+      // and make visible again (if appropriate).
+      this.el.object3D.visible = this.visible;
+    }, 1);
   },
 
   remove() {
@@ -367,9 +379,11 @@ AFRAME.registerComponent('hand', {
     // remove collisions, so we don't apply weird forces to objects as we release them.
     // 500 msecs should be plenty.
     this.collider.setAttribute('ammo-body', 'disableCollision: true');
-    setTimeout(() => {
-      this.collider.setAttribute('ammo-body', 'disableCollision: false')
-    }, 500);
+
+    // actually, it's a nicer UX to have no collisions on grip up...
+    //setTimeout(() => {
+    //  this.collider.setAttribute('ammo-body', 'disableCollision: false')
+    //}, 500);
 
     if (this.grabbedEl) {
       console.log("release object on grip up")

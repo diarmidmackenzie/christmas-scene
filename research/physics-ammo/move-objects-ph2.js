@@ -16,13 +16,18 @@ AFRAME.registerComponent('movable-object', {
   schema: {
     gravity: {type: 'number', default: 9.8},
     hull: {type: 'boolean', default: true},
-    initialState: {type: 'string', default: 'kinematic'}
+    initialState: {type: 'string', default: 'kinematic'},
+    // how long we run "homegrown" (gravity-only physics, before switching on full collision physics)
+    // 150 msecs is enough to fall 11cm, which shuld be enough to clear the hand collider sphere (5cm radius).
+    releaseTimer: {type: 'number', default: 150}
   },
 
   init() {
-    // must start as dynamic of ever to become dynamic (Amm.js bug).
-    this.el.setAttribute('ammo-body', 'type: dynamic');
-    this.el.setAttribute('ammo-body', 'emitCollisionEvents: true');
+    // must start as dynamic of ever to become dynamic (Ammo.js bug).
+    // for case where object is spawned after physics initialized, these must both be set on the same call.
+    this.el.setAttribute('ammo-body', 'type: dynamic;emitCollisionEvents: true');
+    this.el.setAttribute('ammo-body', `gravity: 0 ${-this.data.gravity} 0`);
+
     if (this.data.hull) {
       // if not hull, must be specified externally.
       this.el.setAttribute('ammo-shape', 'type: hull');
@@ -47,20 +52,14 @@ AFRAME.registerComponent('movable-object', {
     this.el.addEventListener("released", this.released.bind(this));
 
    // Workaround for Ammo.js issues with switching from dynamic to kinematic & vice-versa.
-    this.el.addEventListener("body-loaded", () => {
-      setTimeout(() => {
-        this.el.setAttribute('ammo-body', 'type:kinematic');
-        this.el.setAttribute('ammo-body', 'type:dynamic');
-        this.el.setAttribute('ammo-body', {type : this.data.initialState});
-
-        // reset position if kinematic.
-        if (this.data.initialState === 'kinematic') {
-          this.el.object3D.position.copy(this.position)
-        }
-        // and make visible again (if appropriate).
-        this.el.object3D.visible = this.visible;
-      }, 1);
-    });
+    if (this.el.components['ammo-body'].body) {
+      this.initOnceBodyLoaded();
+    }
+    else {
+      this.el.addEventListener("body-loaded", () => {
+        this.initOnceBodyLoaded();
+      });
+    }
 
     this.state = OBJECT_FIXED;
     this.stickyOverlaps = [];
@@ -77,6 +76,21 @@ AFRAME.registerComponent('movable-object', {
     this.tempQuaternion = new THREE.Quaternion();
     this.rotationAxis = new THREE.Vector3();
     this.rotationSpeed = 0;
+  },
+
+  initOnceBodyLoaded() {
+    setTimeout(() => {
+      this.el.setAttribute('ammo-body', 'type:kinematic');
+      this.el.setAttribute('ammo-body', 'type:dynamic');
+      this.el.setAttribute('ammo-body', {type : this.data.initialState});
+
+      // reset position if kinematic.
+      if (this.data.initialState === 'kinematic') {
+        this.el.object3D.position.copy(this.position)
+      }
+      // and make visible again (if appropriate).
+      this.el.object3D.visible = this.visible;
+    }, 1);
   },
 
   remove() {
@@ -117,7 +131,7 @@ AFRAME.registerComponent('movable-object', {
 
       if (this.state !== OBJECT_HELD) {
          console.log("not held, and collided with sticky object - add constraint.")
-         this.el.setAttribute('ammo-constraint__static', `target:#${targetEl.id}`);
+         //this.el.setAttribute('ammo-constraint__static', `target:#${targetEl.id}`);
          this.setKinematic();
       }
     }
@@ -143,14 +157,16 @@ AFRAME.registerComponent('movable-object', {
     }
   },
 
-  grabbed() {
+  grabbed(event) {
     console.log("grabbed - release constraint to static object")
-    this.el.removeAttribute('ammo-constraint__static');
+    //this.el.removeAttribute('ammo-constraint__static');
     //this.setDynamic(); // dynamic needed for constraint to work.
     this.setKinematic(); // using parenting instead of constraints.
     this.state = OBJECT_HELD;
     console.log(this.el);
     //this.stickyOverlaps = [];
+
+    this.hand = event.detail.hand;
   },
 
   released() {
@@ -158,19 +174,56 @@ AFRAME.registerComponent('movable-object', {
       // overlaps with a static object.
       console.log("released - re-attach to static object")
       this.setKinematic();
-      this.el.setAttribute('ammo-constraint__static', `target:#${this.stickyOverlaps[0].id}`);
+      //this.el.setAttribute('ammo-constraint__static', `target:#${this.stickyOverlaps[0].id}`);
       this.state = OBJECT_FIXED;
     }
     else {
       // become a dynamic object.
       console.log("released - becomes loose dynamic object")
-      this.setDynamic();
+
       this.state = OBJECT_LOOSE;
-    }
+
+/*
+      if (Ammo.asm.$) {
+        // set velocity based on current hand velocity
+        this.hand.components['hand'].getHandVelocity(this.velocity);
+        this.velocity.applyMatrix4(this.hand.object3D.parent.matrixWorld);
+
+        const ammoVelocity = new Ammo.btVector3(0, 0, 0);
+        ammoVelocity.setX(5)//this.velocity.x);
+        ammoVelocity.setY(this.velocity.y);
+        ammoVelocity.setZ(this.velocity.z);
+        console.log("Initial ammo velocity on release:")
+        console.log(`x: ${ammoVelocity.x()}`)
+        console.log(`y: ${ammoVelocity.y()}`)
+        console.log(`z: ${ammoVelocity.z()}`)
+
+        this.el.body.setLinearVelocity(ammoVelocity);
+        Ammo.destroy(ammoVelocity);
+        /*setTimeout(() => {
+          this.el.body.setLinearVelocity(ammoVelocity);
+          Ammo.destroy(ammoVelocity);
+        }, 100)*/
+
+        // We run "homemade" physics for a short period, before Ammo dynamic physics
+        // take over.
+        // This is because with Ammo dynamic physics, we don't have a way of
+        // preventing the hand collider from interfering with the object path.
+        // Tried disabling collisions & setting masks, but none of this is
+        // proving effective.
+        // Not yet had time to create a proper clean repro & file a bug.
+        this.runHomemadePhysics = true;
+        setTimeout(() => {
+          this.setDynamic();
+          this.runHomemadePhysics = false;
+        }, this.data.releaseTimer)
+      }
+
+    this.hand = null;
   },
 
   tick(time, timeDelta) {
-/*
+
     if (this.state === OBJECT_HELD) {
       this.lastPositions[this.historyPointer].copy(this.el.object3D.position);
       this.lastQuaternions[this.historyPointer].copy(this.el.object3D.quaternion);
@@ -179,7 +232,7 @@ AFRAME.registerComponent('movable-object', {
       this.physicsStarting = true;
     }
     else {
-      if (this.gravityStarting) {
+      if (this.physicsStarting) {
         // we extract the velocity from the last 2 frames.
         // historyPointer always indicates the older time interval.
         // for TimeDelta, we take the other slot, which tells us the elapsed time *after* that
@@ -207,20 +260,21 @@ AFRAME.registerComponent('movable-object', {
         const rotationAngle = this.lastQuaternions[this.historyPointer].angleTo(this.el.object3D.quaternion);
         this.rotationSpeed = rotationAngle * (2000 / (timeDelta + this.lastTimeDeltas[1 - this.historyPointer]));
 
-        this.gravityStarting = false;
+        this.physicsStarting = false;
       }
 
-      this.velocity.y -= this.data.gravity * timeDelta / 1000;
-      this.velocityDelta.copy(this.velocity);
-      this.velocityDelta.multiplyScalar(timeDelta / 1000);
-      this.el.object3D.position.add(this.velocityDelta);
+      if (this.runHomemadePhysics) {
+        this.velocity.y -= this.data.gravity * timeDelta / 1000;
+        this.velocityDelta.copy(this.velocity);
+        this.velocityDelta.multiplyScalar(timeDelta / 1000);
+        this.el.object3D.position.add(this.velocityDelta);
 
-      // apply rotation.
-      const angle = this.rotationSpeed * timeDelta / 1000;
-      this.tempQuaternion.setFromAxisAngle(this.rotationAxis, angle);
-      this.el.object3D.quaternion.multiply(this.tempQuaternion);
+        // apply rotation.
+        const angle = this.rotationSpeed * timeDelta / 1000;
+        this.tempQuaternion.setFromAxisAngle(this.rotationAxis, angle);
+        this.el.object3D.quaternion.multiply(this.tempQuaternion);
+      }
     }
-    */
   }
 });
 
@@ -250,6 +304,20 @@ AFRAME.registerComponent('hand', {
 
     this.lockTransformMatrix = new THREE.Matrix4();
     this.newMatrix = new THREE.Matrix4();
+
+    // data used for velocity tracking of the hand.
+    this.lastPositions = [new THREE.Vector3(),
+                          new THREE.Vector3()];
+    this.lastQuaternions = [new THREE.Quaternion(),
+                            new THREE.Quaternion()];
+    this.lastTimeDeltas = [0, 0];
+    this.historyPointer = 0;
+
+    this.velocity = new THREE.Vector3();
+    this.velocityDelta = new THREE.Vector3();
+    this.tempQuaternion = new THREE.Quaternion();
+    this.rotationAxis = new THREE.Vector3();
+    this.rotationSpeed = 0;
   },
 
   gripDown() {
@@ -268,11 +336,15 @@ AFRAME.registerComponent('hand', {
 
     this.gripDown = false;
     // remove collisions, so we don't apply weird forces to objects as we release them.
-    // 500 msecs should be plenty.
+    // !! seems this is not working... dynamic body is still being influenced by kinematic body..
+    // Maybe doesn't act quickly enough?
+    // Not sure...
     this.collider.setAttribute('ammo-body', 'disableCollision: true');
-    setTimeout(() => {
-      this.collider.setAttribute('ammo-body', 'disableCollision: false')
-    }, 500);
+
+    // actually, it's a nicer UX to have no collisions on grip up...
+    //setTimeout(() => {
+    //  this.collider.setAttribute('ammo-body', 'disableCollision: false')
+    //}, 500);
 
     if (this.grabbedEl) {
       console.log("release object on grip up")
@@ -323,7 +395,7 @@ AFRAME.registerComponent('hand', {
     this.setConstraint(el, this.collider);
     this.grabbedEl = el;
     // signal to element it has been grabbed.
-    el.emit("grabbed")
+    el.emit("grabbed", {hand: this.el})
   },
 
   releaseObject(el) {
@@ -372,7 +444,7 @@ AFRAME.registerComponent('hand', {
 
   },
 
-  tick() {
+  tick(time, timeDelta) {
 
     //if (this.awaitingNewElement) return;
 
@@ -394,8 +466,29 @@ AFRAME.registerComponent('hand', {
       object.matrix.decompose(object.position, object.quaternion, object.scale);
       object.matrixWorldNeedsUpdate = true;
     }
-  }
 
+    // state tracking so we know the velocity of the hand.
+    // reported on getHandVelocity();
+    this.lastPositions[this.historyPointer].copy(this.el.object3D.position);
+    this.lastQuaternions[this.historyPointer].copy(this.el.object3D.quaternion);
+    this.lastTimeDeltas[this.historyPointer] = timeDelta;
+    this.historyPointer = 1 - this.historyPointer;
+
+  },
+
+  // get Hand velocity - should be called with a Vector3 as a parameter.
+  getHandVelocity(velocity) {
+
+    // we extract the velocity from the last 2 frames.
+    // historyPointer always indicates the older time interval.
+    // for TimeDelta, we take the other slot, which tells us the elapsed time *after* that
+    // measurement to the newer measurement.
+    velocity.subVectors(this.lastPositions[1 - this.historyPointer], this.lastPositions[this.historyPointer]);
+
+    velocity.multiplyScalar(1000 / (this.lastTimeDeltas[1 - this.historyPointer]));
+    console.log("velocity:");
+    console.log(velocity);
+  }
 });
 
 AFRAME.registerComponent('hand-keyboard-controls', {

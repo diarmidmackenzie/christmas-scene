@@ -1,0 +1,49 @@
+<html>
+  <head>
+    <title>Snowballs and Other Objects with Ammo.js</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://mixedreality.mozilla.org/ammo.js/builds/ammo.wasm.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/diarmidmackenzie/aframe-physics-system@v4.0.1.01/dist/aframe-physics-system.js"></script>
+    <script src="../../src/move-objects.js"></script>
+    <script src="./snowball-generator.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/diarmidmackenzie/key-bindings@v0.3-alpha/key-bindings.min.js"></script>
+  </head>
+  <body>
+    <a-scene debug physics="driver: ammo; debug: true; debugDrawMode: 1;" >
+     <a-assets>
+       <a-mixin id="snowball"
+                material="color:white"
+                geometry="primitive:sphere;segments-height:7;segments-width:13;radius:0.5"
+                movement="type:grabbable;stickiness:sticky">
+       </a-mixin>
+     </a-assets>
+     <a-entity id="physics-wrapper">
+        <a-box id="lhand" hand
+               material="color:red;opacity:0.5"
+               width="0.1" depth="0.1" height="0.1"
+               key-bindings="bindings:KeyI=up,KeyK=down,KeyJ=left,KeyL=right,
+                             ShiftLeft=togglegrip,KeyO=turnCCW,KeyP=turnCW;"
+               hand-keyboard-controls
+               snowball-generator="heightLevel:2.0"
+               position="0.2 1.5 -1">
+        </a-box>
+         <a-box id="floor-plane"
+                width = "20" height = "1" depth = "20"
+                sticky-object
+                color="blue"
+                position = "0 -0.5 0">
+         </a-box>
+      </a-entity>
+    </a-scene>
+    <div style ="position:fixed;top:20px;left:20px">
+      <p>
+        SNowball generation test.<br>
+        Keyboard Controls:<br>
+        IJKL (like WASD) to move the pink block (which represents a hand)<br>
+        Left Shift to grip (must be gripped to affect object).  Pink block becomes more transparent on grip.<br>
+        O & P to rotate CCW & CW (must be gripped to affect object)<br>
+        To generate a snowball, hold down grip for 1 second at a height below 2m (will be 0.1m in production)
+      </p>
+    </div>
+  </body>
+</html>
