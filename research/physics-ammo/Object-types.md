@@ -67,7 +67,7 @@ Wrapped up in a single component:
 
 movement="type: static | grabbable; stickiness: sticky | stickable | none"
 
-
+For easy access, "sticky" and "stickable" attributes are set directly on objects by the movement component.
 
 We'll call this rewrite "phase 3" - I want to preserve "phase 2" for demos etc.
 

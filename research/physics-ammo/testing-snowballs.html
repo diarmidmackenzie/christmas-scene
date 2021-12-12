@@ -4,21 +4,26 @@
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://mixedreality.mozilla.org/ammo.js/builds/ammo.wasm.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/diarmidmackenzie/aframe-physics-system@v4.0.1.01/dist/aframe-physics-system.js"></script>
-    <script src="./move-objects-ph2.js"></script>
+    <script src="./move-objects-ph3.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/diarmidmackenzie/key-bindings@v0.3-alpha/key-bindings.min.js"></script>
   </head>
   <body>
     <a-scene debug physics="driver: ammo; debug: true; debugDrawMode: 1;" >
      <a-assets>
-       <a-mixin id="snowball"
+       <a-mixin id="snowman"
                 material="color:gray; opacity:0.5"
                 geometry="primitive:sphere;segments-height:7;segments-width:13;radius:0.5"
-                sticky-object="static:false">
+                movement="type:static;stickiness:sticky">
+       </a-mixin>
+       <a-mixin id="snowball"
+                material="color:gray; opacity:0.5"
+                geometry="primitive:sphere;segments-height:7;segments-width:13;radius:0.1"
+                movement="type:grabbable;stickiness:sticky">
        </a-mixin>
        <a-mixin id="carrot"
                 material="color:orange"
                 geometry="primitive:cone;height:0.2;radius-bottom:0.025; radius-top:0.005"
-                movable-object="gravity:1">
+                movement="type:grabbable;stickiness:stickable;gravity:0.1">
        </a-mixin>
      </a-assets>
      <a-entity id="physics-wrapper">
@@ -31,9 +36,12 @@
                hand-keyboard-controls
                position="0.2 1.5 -1">
         </a-box>
-         <a-entity id="snowman-head" mixin="snowball" scale="0.7 0.7 0.7" position="-0.5 1.5 -1"
-                   movable-object></a-entity>
-         <a-entity id="carrot-nose" mixin="carrot" rotation="0 0 -90" position="-0.1 1.5 -1"></a-entity>
+         <a-entity id="snowman-head" mixin="snowman" scale="0.7 0.7 0.7" position="-0.5 1.5 -1"
+                   ammo-shape="type:sphere;sphereRadius:0.35"></a-entity>
+         <a-entity id="carrot-nose" mixin="carrot" rotation="0 0 -90" position="-0.1 1.5 -1"
+                   ammo-shape="type:cone;fit:manual;halfExtents:0.025 0.11 0.025"></a-entity>
+         <a-entity id="snowball" mixin="snowball" position="0 2 -1"
+                   ammo-shape="type:sphere;sphereRadius:0.1"></a-entity>
          <a-box id="floor-plane"
                 width = "20" height = "1" depth = "20"
                 sticky-object

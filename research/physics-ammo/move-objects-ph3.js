@@ -1,32 +1,44 @@
-AFRAME.registerComponent('sticky-object', {
-
-  init() {
-     this.el.setAttribute('ammo-body', 'type: static');
-     this.el.setAttribute('ammo-shape', 'type: hull');
-  }
-
-});
 
 OBJECT_FIXED = 1;
 OBJECT_HELD = 2;
 OBJECT_LOOSE = 3;
 TYPE_STATIC = 'static';
 
-AFRAME.registerComponent('movable-object', {
+AFRAME.registerComponent('movement', {
   schema: {
+    type: {type: 'string', default: 'grabbable', oneOf: ['static', 'grabbable']},
+    stickiness: {type: 'string', default: 'stickable', oneOf: ['sticky', 'stickable', 'none']},
     gravity: {type: 'number', default: 9.8},
-    hull: {type: 'boolean', default: true},
     initialState: {type: 'string', default: 'kinematic'}
   },
 
   init() {
-    // must start as dynamic of ever to become dynamic (Amm.js bug).
+
+    if (this.data.stickiness === 'sticky') {
+      this.el.setAttribute('sticky')
+    }
+
+    if (this.data.stickiness === 'stickable') {
+      this.el.setAttribute('stickable')
+    }
+
+    if (this.data.type === 'grabbable') {
+      this.el.setAttribute('grabbable')
+    }
+
+    if (this.data.type === 'static') {
+      // setup for static objects is very simple.
+      this.el.setAttribute('ammo-body', 'type: static');
+      this.el.setAttribute('ammo-body', 'emitCollisionEvents: true');
+      return;
+    }
+
+    // set up for dynamic objects is more complex.
+
+    // must start as dynamic of ever to become dynamic (Ammo.js bug).
     this.el.setAttribute('ammo-body', 'type: dynamic');
     this.el.setAttribute('ammo-body', 'emitCollisionEvents: true');
-    if (this.data.hull) {
-      // if not hull, must be specified externally.
-      this.el.setAttribute('ammo-shape', 'type: hull');
-    }
+    this.el.setAttribute('ammo-body', `gravity: 0 ${-this.data.gravity} 0`);
 
     // set to invisible until fully initialized, so we don't see weird effects
     // of being temporarily dynamic.
@@ -77,13 +89,24 @@ AFRAME.registerComponent('movable-object', {
     this.tempQuaternion = new THREE.Quaternion();
     this.rotationAxis = new THREE.Vector3();
     this.rotationSpeed = 0;
+
+    // matrices for working & for storing transform in relation to sticky parent.
+    this.tempMatrix = new THREE.Matrix4();
+    this.lockTransformMatrix = new THREE.Matrix4();
+
+    // tick throttling for testing...
+    this.tick = AFRAME.utils.throttleTick(this.tick, 200, this);
   },
 
   remove() {
-    this.el.removeEventListener("collidestart", this.collideStart.bind(this));
-    this.el.removeEventListener("collideend", this.collideEnd.bind(this));
-    this.el.removeEventListener("grabbed", this.grabbed.bind(this));
-    this.el.removeEventListener("released", this.released.bind(this));
+
+    if (this.data.type !== 'static') {
+
+      this.el.removeEventListener("collidestart", this.collideStart.bind(this));
+      this.el.removeEventListener("collideend", this.collideEnd.bind(this));
+      this.el.removeEventListener("grabbed", this.grabbed.bind(this));
+      this.el.removeEventListener("released", this.released.bind(this));
+    }
   },
 
   setKinematic() {
@@ -110,17 +133,46 @@ AFRAME.registerComponent('movable-object', {
     targetEl = event.detail.targetEl;
     console.log(`object starts collide with object ${targetEl.id}`)
 
-    if (targetEl.hasAttribute('sticky-object')) {
+    if (this.shouldStickToTarget(targetEl)) {
       console.log(`add sticky Overlap with ${targetEl.id}`);
       this.stickyOverlaps.push(targetEl);
       console.log(`${this.stickyOverlaps.length} sticky overlaps in total`);
 
       if (this.state !== OBJECT_HELD) {
          console.log("not held, and collided with sticky object - add constraint.")
-         this.el.setAttribute('ammo-constraint__static', `target:#${targetEl.id}`);
+
          this.setKinematic();
+         this.attachToStickyParent(this.stickyOverlaps[0]);
       }
     }
+  },
+
+  attachToStickyParent(stickyParent) {
+
+    // sets up thisl.lockTransformMatrix to represent the objects position
+    // (which should now be fixed), from the perspective of the sticky parent.
+    this.stickyParent = stickyParent;
+    this.lockTransformMatrix.copy(this.el.object3D.matrixWorld);
+    this.tempMatrix.copy(stickyParent.object3D.matrixWorld).invert();
+    this.lockTransformMatrix.premultiply(this.tempMatrix)
+  },
+
+  detachFromStickyParent() {
+
+    // sets up thisl.lockTransformMatrix to represent the objects position
+    // (which should now be fixed), from the perspective of the sticky parent.
+    this.stickyParent = null;
+  },
+
+  shouldStickToTarget(targetEl) {
+
+    if (targetEl.hasAttribute('sticky')) return true;
+
+    if (this.el.hasAttribute('sticky') &&
+        targetEl.hasAttribute('stickable')) return true;
+
+    return false;
+
   },
 
   collideEnd(event) {
@@ -128,7 +180,7 @@ AFRAME.registerComponent('movable-object', {
     targetEl = event.detail.targetEl;
     console.log(`object ends collide with object ${targetEl.id}`)
 
-    if (targetEl.hasAttribute('sticky-object')) {
+    if (this.shouldStickToTarget(targetEl)) {
       const index = this.stickyOverlaps.indexOf(targetEl)
 
       if (index > -1) {
@@ -141,16 +193,21 @@ AFRAME.registerComponent('movable-object', {
         console.log(`${this.stickyOverlaps} sticky overlaps in total`);
       }
     }
+
+    if (this.stickyOverlaps.length > 0) {
+      this.attachToStickyParent(this.stickyOverlaps[0]);
+    }
+    else {
+      this.detachFromStickyParent(this.stickyOverlaps[0]);
+    }
   },
 
   grabbed() {
     console.log("grabbed - release constraint to static object")
-    this.el.removeAttribute('ammo-constraint__static');
-    //this.setDynamic(); // dynamic needed for constraint to work.
-    this.setKinematic(); // using parenting instead of constraints.
+
+    this.setKinematic();
     this.state = OBJECT_HELD;
     console.log(this.el);
-    //this.stickyOverlaps = [];
   },
 
   released() {
@@ -158,20 +215,51 @@ AFRAME.registerComponent('movable-object', {
       // overlaps with a static object.
       console.log("released - re-attach to static object")
       this.setKinematic();
-      this.el.setAttribute('ammo-constraint__static', `target:#${this.stickyOverlaps[0].id}`);
       this.state = OBJECT_FIXED;
+      this.attachToStickyParent(this.stickyOverlaps[0]);
     }
     else {
       // become a dynamic object.
       console.log("released - becomes loose dynamic object")
       this.setDynamic();
       this.state = OBJECT_LOOSE;
+      this.detachFromStickyParent(this.stickyOverlaps[0]);
     }
   },
 
   tick(time, timeDelta) {
-/*
-    if (this.state === OBJECT_HELD) {
+
+    if (this.data.type === 'static') return;
+
+    // tie object to sticky parent (which may be moving).
+    if (this.stickyParent) {
+
+      const object = this.el.object3D;
+      const tiedTo = this.stickyParent.object3D;
+
+      // race condition can occur in object switchover.
+      if (!object.parent) return;
+      if (!tiedTo.parent) return;
+
+      // tempMatrix will translate a world matrix into object's parent's space.
+      // (the object's DOM parent, not the sticky parent it is tied to)
+      this.tempMatrix.copy(object.parent.matrixWorld).invert();
+
+      // object should stay fixed at this.lockTransformMatrix.
+      object.matrix.copy(this.lockTransformMatrix);
+      // express this in world co-ordinates...
+      object.matrix.premultiply(tiedTo.matrixWorld);
+      // ... and now in the object's parents's co-ordinates.
+      object.matrix.premultiply(this.tempMatrix);
+
+      // apply matrix to object.
+      object.matrix.decompose(object.position, object.quaternion, object.scale);
+      object.matrixWorldNeedsUpdate = true;
+    }
+
+    // Track velocity state, in case the object gets released to dynamic physics
+    // - in that case we want to initialze velocity
+    if (this.state !== OBJECT_LOOSE) {
       this.lastPositions[this.historyPointer].copy(this.el.object3D.position);
       this.lastQuaternions[this.historyPointer].copy(this.el.object3D.quaternion);
       this.lastTimeDeltas[this.historyPointer] = timeDelta;
@@ -179,7 +267,10 @@ AFRAME.registerComponent('movable-object', {
       this.physicsStarting = true;
     }
     else {
-      if (this.gravityStarting) {
+      if (this.physicsStarting) {
+        // In thr first frame after becoming a loose object, we calculate prior velocity & apply it to
+        // the object...
+
         // we extract the velocity from the last 2 frames.
         // historyPointer always indicates the older time interval.
         // for TimeDelta, we take the other slot, which tells us the elapsed time *after* that
@@ -191,6 +282,21 @@ AFRAME.registerComponent('movable-object', {
         console.log("initial velocity:");
         console.log(this.velocity);
 
+        if (Ammo.asm.$) {
+          // convert velocity to world co-ordinates.
+          this.velocity.applyMatrix4(this.el.object3D.parent.matrixWorld);
+
+          const ammoVelocity = new Ammo.btVector3(0, 0, 0);
+          ammoVelocity.x = this.velocity.x;
+          ammoVelocity.y = this.velocity.y;
+          ammoVelocity.z = this.velocity.z;
+          console.log("Initial ammo velocity on release:")
+          console.log(ammoVelocity)
+          this.el.body.setLinearVelocity(ammoVelocity);
+          Ammo.destroy(ammoVelocity);
+        }
+
+        /* Old code for rotation - we don't seem to need this...
         // Similar exercise with rotation, which we store as an axis/angle,
         // for easy scalar multiplication.
         // Getting rotation axis from Quaternion is simply a matter of normalizing the (x, y, z)
@@ -206,25 +312,16 @@ AFRAME.registerComponent('movable-object', {
                               this.tempQuaternion.z).normalize();
         const rotationAngle = this.lastQuaternions[this.historyPointer].angleTo(this.el.object3D.quaternion);
         this.rotationSpeed = rotationAngle * (2000 / (timeDelta + this.lastTimeDeltas[1 - this.historyPointer]));
+        */
 
-        this.gravityStarting = false;
+        // let the physics engine take it from here...
+        this.physicsStarting = false;
       }
-
-      this.velocity.y -= this.data.gravity * timeDelta / 1000;
-      this.velocityDelta.copy(this.velocity);
-      this.velocityDelta.multiplyScalar(timeDelta / 1000);
-      this.el.object3D.position.add(this.velocityDelta);
-
-      // apply rotation.
-      const angle = this.rotationSpeed * timeDelta / 1000;
-      this.tempQuaternion.setFromAxisAngle(this.rotationAxis, angle);
-      this.el.object3D.quaternion.multiply(this.tempQuaternion);
     }
-    */
   }
 });
 
-// Add to a controller, to allow it to manipulate movable-objects
+// Add to a controller, to allow it to manipulate grabbable objects
 AFRAME.registerComponent('hand', {
   init() {
     this.collider = document.createElement('a-sphere');
@@ -284,7 +381,7 @@ AFRAME.registerComponent('hand', {
   collideStart(event) {
     targetEl = event.detail.targetEl;
     console.log(`controller collides with object ${targetEl.id}`)
-    if (targetEl.hasAttribute('movable-object')) {
+    if (targetEl.hasAttribute('grabbable')) {
       this.collisions.push(targetEl);
 
       if (this.gripDown &&
@@ -298,7 +395,7 @@ AFRAME.registerComponent('hand', {
   collideEnd(event) {
     targetEl = event.detail.targetEl;
     console.log(`controller ends collide with object ${targetEl.id}`)
-    if (targetEl.hasAttribute('movable-object')) {
+    if (targetEl.hasAttribute('grabbable')) {
       const index = this.collisions.indexOf(targetEl)
 
       if (index > -1) {
