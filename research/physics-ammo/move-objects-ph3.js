@@ -1,6 +1,3 @@
-// !! some fixes made to phase 2 physics have been applied across to phase 3.
-// But we still need to bring the "homemade physics" workaround over...
-
 OBJECT_FIXED = 1;
 OBJECT_HELD = 2;
 OBJECT_LOOSE = 3;
@@ -179,7 +176,9 @@ AFRAME.registerComponent('movement', {
 
   shouldStickToTarget(targetEl) {
 
-    if (targetEl.hasAttribute('sticky')) return true;
+
+    if (this.el.hasAttribute('stickable') &&
+        targetEl.hasAttribute('sticky')) return true;
 
     if (this.el.hasAttribute('sticky') &&
         targetEl.hasAttribute('stickable')) return true;

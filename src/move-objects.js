@@ -1,21 +1,13 @@
-AFRAME.registerComponent('sticky-object', {
-
-  init() {
-     this.el.setAttribute('ammo-body', 'type: static');
-     this.el.setAttribute('ammo-shape', 'type: hull');
-  }
-
-});
-
 OBJECT_FIXED = 1;
 OBJECT_HELD = 2;
 OBJECT_LOOSE = 3;
 TYPE_STATIC = 'static';
 
-AFRAME.registerComponent('movable-object', {
+AFRAME.registerComponent('movement', {
   schema: {
+    type: {type: 'string', default: 'grabbable', oneOf: ['static', 'grabbable']},
+    stickiness: {type: 'string', default: 'stickable', oneOf: ['sticky', 'stickable', 'none']},
     gravity: {type: 'number', default: 9.8},
-    hull: {type: 'boolean', default: true},
     initialState: {type: 'string', default: 'kinematic'},
     // how long we run "homegrown" (gravity-only physics, before switching on full collision physics)
     // 150 msecs is enough to fall 11cm, which shuld be enough to clear the hand collider sphere (5cm radius).
@@ -23,15 +15,33 @@ AFRAME.registerComponent('movable-object', {
   },
 
   init() {
+
+    if (this.data.stickiness === 'sticky') {
+      this.el.setAttribute('sticky')
+    }
+
+    if (this.data.stickiness === 'stickable') {
+      this.el.setAttribute('stickable')
+    }
+
+    if (this.data.type === 'grabbable') {
+      this.el.setAttribute('grabbable')
+    }
+
+    if (this.data.type === 'static') {
+      // setup for static objects is very simple.
+      this.el.setAttribute('ammo-body', 'type: static');
+      this.el.setAttribute('ammo-body', 'emitCollisionEvents: true');
+      return;
+    }
+
+    // set up for dynamic objects is more complex.
+
     // must start as dynamic of ever to become dynamic (Ammo.js bug).
+
     // for case where object is spawned after physics initialized, these must both be set on the same call.
     this.el.setAttribute('ammo-body', 'type: dynamic;emitCollisionEvents: true');
     this.el.setAttribute('ammo-body', `gravity: 0 ${-this.data.gravity} 0`);
-
-    if (this.data.hull) {
-      // if not hull, must be specified externally.
-      this.el.setAttribute('ammo-shape', 'type: hull');
-    }
 
     // set to invisible until fully initialized, so we don't see weird effects
     // of being temporarily dynamic.
@@ -51,7 +61,7 @@ AFRAME.registerComponent('movable-object', {
     this.el.addEventListener("grabbed", this.grabbed.bind(this));
     this.el.addEventListener("released", this.released.bind(this));
 
-   // Workaround for Ammo.js issues with switching from dynamic to kinematic & vice-versa.
+    // Workaround for Ammo.js issues with switching from dynamic to kinematic & vice-versa.
     if (this.el.components['ammo-body'].body) {
       this.initOnceBodyLoaded();
     }
@@ -76,6 +86,11 @@ AFRAME.registerComponent('movable-object', {
     this.tempQuaternion = new THREE.Quaternion();
     this.rotationAxis = new THREE.Vector3();
     this.rotationSpeed = 0;
+
+    // matrices for working & for storing transform in relation to sticky parent.
+    this.tempMatrix = new THREE.Matrix4();
+    this.lockTransformMatrix = new THREE.Matrix4();
+
   },
 
   initOnceBodyLoaded() {
@@ -94,10 +109,14 @@ AFRAME.registerComponent('movable-object', {
   },
 
   remove() {
-    this.el.removeEventListener("collidestart", this.collideStart.bind(this));
-    this.el.removeEventListener("collideend", this.collideEnd.bind(this));
-    this.el.removeEventListener("grabbed", this.grabbed.bind(this));
-    this.el.removeEventListener("released", this.released.bind(this));
+
+    if (this.data.type !== 'static') {
+
+      this.el.removeEventListener("collidestart", this.collideStart.bind(this));
+      this.el.removeEventListener("collideend", this.collideEnd.bind(this));
+      this.el.removeEventListener("grabbed", this.grabbed.bind(this));
+      this.el.removeEventListener("released", this.released.bind(this));
+    }
   },
 
   setKinematic() {
@@ -124,17 +143,47 @@ AFRAME.registerComponent('movable-object', {
     targetEl = event.detail.targetEl;
     console.log(`object starts collide with object ${targetEl.id}`)
 
-    if (targetEl.hasAttribute('sticky-object')) {
+    if (this.shouldStickToTarget(targetEl)) {
       console.log(`add sticky Overlap with ${targetEl.id}`);
       this.stickyOverlaps.push(targetEl);
       console.log(`${this.stickyOverlaps.length} sticky overlaps in total`);
 
       if (this.state !== OBJECT_HELD) {
          console.log("not held, and collided with sticky object - add constraint.")
-         //this.el.setAttribute('ammo-constraint__static', `target:#${targetEl.id}`);
+
          this.setKinematic();
+         this.attachToStickyParent(this.stickyOverlaps[0]);
       }
     }
+  },
+
+  attachToStickyParent(stickyParent) {
+
+    // sets up thisl.lockTransformMatrix to represent the objects position
+    // (which should now be fixed), from the perspective of the sticky parent.
+    this.stickyParent = stickyParent;
+    this.lockTransformMatrix.copy(this.el.object3D.matrixWorld);
+    this.tempMatrix.copy(stickyParent.object3D.matrixWorld).invert();
+    this.lockTransformMatrix.premultiply(this.tempMatrix)
+  },
+
+  detachFromStickyParent() {
+
+    // sets up thisl.lockTransformMatrix to represent the objects position
+    // (which should now be fixed), from the perspective of the sticky parent.
+    this.stickyParent = null;
+  },
+
+  shouldStickToTarget(targetEl) {
+
+    if (this.el.hasAttribute('stickable') &&
+        targetEl.hasAttribute('sticky')) return true;
+
+    if (this.el.hasAttribute('sticky') &&
+        targetEl.hasAttribute('stickable')) return true;
+
+    return false;
+
   },
 
   collideEnd(event) {
@@ -142,7 +191,7 @@ AFRAME.registerComponent('movable-object', {
     targetEl = event.detail.targetEl;
     console.log(`object ends collide with object ${targetEl.id}`)
 
-    if (targetEl.hasAttribute('sticky-object')) {
+    if (this.shouldStickToTarget(targetEl)) {
       const index = this.stickyOverlaps.indexOf(targetEl)
 
       if (index > -1) {
@@ -151,22 +200,25 @@ AFRAME.registerComponent('movable-object', {
         console.log(`${this.stickyOverlaps.length} sticky overlaps in total`);
       }
       else {
-        comsole.warn("Unexpected - collideEnd doesn't match element");
+        console.warn("Unexpected - collideEnd doesn't match element");
         console.log(`${this.stickyOverlaps} sticky overlaps in total`);
       }
     }
+
+    if (this.stickyOverlaps.length > 0) {
+      this.attachToStickyParent(this.stickyOverlaps[0]);
+    }
+    else {
+      this.detachFromStickyParent(this.stickyOverlaps[0]);
+    }
   },
 
-  grabbed(event) {
+  grabbed() {
     console.log("grabbed - release constraint to static object")
-    //this.el.removeAttribute('ammo-constraint__static');
-    //this.setDynamic(); // dynamic needed for constraint to work.
-    this.setKinematic(); // using parenting instead of constraints.
+
+    this.setKinematic();
     this.state = OBJECT_HELD;
     console.log(this.el);
-    //this.stickyOverlaps = [];
-
-    this.hand = event.detail.hand;
   },
 
   released() {
@@ -174,57 +226,64 @@ AFRAME.registerComponent('movable-object', {
       // overlaps with a static object.
       console.log("released - re-attach to static object")
       this.setKinematic();
-      //this.el.setAttribute('ammo-constraint__static', `target:#${this.stickyOverlaps[0].id}`);
       this.state = OBJECT_FIXED;
+      this.attachToStickyParent(this.stickyOverlaps[0]);
     }
     else {
       // become a dynamic object.
       console.log("released - becomes loose dynamic object")
 
       this.state = OBJECT_LOOSE;
+      this.detachFromStickyParent(this.stickyOverlaps[0]);
 
-/*
-      if (Ammo.asm.$) {
-        // set velocity based on current hand velocity
-        this.hand.components['hand'].getHandVelocity(this.velocity);
-        this.velocity.applyMatrix4(this.hand.object3D.parent.matrixWorld);
-
-        const ammoVelocity = new Ammo.btVector3(0, 0, 0);
-        ammoVelocity.setX(5)//this.velocity.x);
-        ammoVelocity.setY(this.velocity.y);
-        ammoVelocity.setZ(this.velocity.z);
-        console.log("Initial ammo velocity on release:")
-        console.log(`x: ${ammoVelocity.x()}`)
-        console.log(`y: ${ammoVelocity.y()}`)
-        console.log(`z: ${ammoVelocity.z()}`)
-
-        this.el.body.setLinearVelocity(ammoVelocity);
-        Ammo.destroy(ammoVelocity);
-        /*setTimeout(() => {
-          this.el.body.setLinearVelocity(ammoVelocity);
-          Ammo.destroy(ammoVelocity);
-        }, 100)*/
-
-        // We run "homemade" physics for a short period, before Ammo dynamic physics
-        // take over.
-        // This is because with Ammo dynamic physics, we don't have a way of
-        // preventing the hand collider from interfering with the object path.
-        // Tried disabling collisions & setting masks, but none of this is
-        // proving effective.
-        // Not yet had time to create a proper clean repro & file a bug.
-        this.runHomemadePhysics = true;
-        setTimeout(() => {
-          this.setDynamic();
-          this.runHomemadePhysics = false;
-        }, this.data.releaseTimer)
-      }
-
-    this.hand = null;
+      // We run "homemade" physics for a short period, before Ammo dynamic physics
+      // take over.
+      // This is because with Ammo dynamic physics, we don't have a way of
+      // preventing the hand collider from interfering with the object path.
+      // Tried disabling collisions & setting masks, but none of this is
+      // proving effective.
+      // Not yet had time to create a proper clean repro & file a bug.
+      this.runHomemadePhysics = true;
+      setTimeout(() => {
+        this.setDynamic();
+        this.runHomemadePhysics = false;
+      }, this.data.releaseTimer);
+    }
   },
 
   tick(time, timeDelta) {
 
-    if (this.state === OBJECT_HELD) {
+    if (this.data.type === 'static') return;
+
+    // tie object to sticky parent (which may be moving).
+    if (this.state !== OBJECT_HELD && this.stickyParent) {
+
+      const object = this.el.object3D;
+      const tiedTo = this.stickyParent.object3D;
+
+      // race condition can occur in object switchover.
+      if (!object.parent) return;
+      if (!tiedTo.parent) return;
+
+      // tempMatrix will translate a world matrix into object's parent's space.
+      // (the object's DOM parent, not the sticky parent it is tied to)
+      this.tempMatrix.copy(object.parent.matrixWorld).invert();
+
+      // object should stay fixed at this.lockTransformMatrix.
+      object.matrix.copy(this.lockTransformMatrix);
+      // express this in world co-ordinates...
+      object.matrix.premultiply(tiedTo.matrixWorld);
+      // ... and now in the object's parents's co-ordinates.
+      object.matrix.premultiply(this.tempMatrix);
+
+      // apply matrix to object.
+      object.matrix.decompose(object.position, object.quaternion, object.scale);
+      object.matrixWorldNeedsUpdate = true;
+    }
+
+    // Track velocity state, in case the object gets released to dynamic physics
+    // - in that case we want to initialze velocity
+    if (this.state !== OBJECT_LOOSE) {
       this.lastPositions[this.historyPointer].copy(this.el.object3D.position);
       this.lastQuaternions[this.historyPointer].copy(this.el.object3D.quaternion);
       this.lastTimeDeltas[this.historyPointer] = timeDelta;
@@ -233,6 +292,18 @@ AFRAME.registerComponent('movable-object', {
     }
     else {
       if (this.physicsStarting) {
+        // In the first frame after becoming a loose object, we calculate prior velocity & apply it to
+        // the object...
+
+        /* Alternative Implementation - we might be able to read linear & angular velocities
+           directly from AMmo using
+           this.el.body.getLinearVelocity(ammoVelocityVector);
+           and
+           this.el.body.getAngularVelocity(ammoVelocityVector);
+
+           Not tried/tested that yet.
+        */
+
         // we extract the velocity from the last 2 frames.
         // historyPointer always indicates the older time interval.
         // for TimeDelta, we take the other slot, which tells us the elapsed time *after* that
@@ -264,10 +335,12 @@ AFRAME.registerComponent('movable-object', {
       }
 
       if (this.runHomemadePhysics) {
-        this.velocity.y -= this.data.gravity * timeDelta / 1000;
         this.velocityDelta.copy(this.velocity);
         this.velocityDelta.multiplyScalar(timeDelta / 1000);
         this.el.object3D.position.add(this.velocityDelta);
+
+        // Apply gravity to velocity for next tick.
+        this.velocity.y -= this.data.gravity * timeDelta / 1000;
 
         // apply rotation.
         const angle = this.rotationSpeed * timeDelta / 1000;
@@ -278,7 +351,7 @@ AFRAME.registerComponent('movable-object', {
   }
 });
 
-// Add to a controller, to allow it to manipulate movable-objects
+// Add to a controller, to allow it to manipulate grabbable objects
 AFRAME.registerComponent('hand', {
   init() {
     this.collider = document.createElement('a-sphere');
@@ -304,20 +377,6 @@ AFRAME.registerComponent('hand', {
 
     this.lockTransformMatrix = new THREE.Matrix4();
     this.newMatrix = new THREE.Matrix4();
-
-    // data used for velocity tracking of the hand.
-    this.lastPositions = [new THREE.Vector3(),
-                          new THREE.Vector3()];
-    this.lastQuaternions = [new THREE.Quaternion(),
-                            new THREE.Quaternion()];
-    this.lastTimeDeltas = [0, 0];
-    this.historyPointer = 0;
-
-    this.velocity = new THREE.Vector3();
-    this.velocityDelta = new THREE.Vector3();
-    this.tempQuaternion = new THREE.Quaternion();
-    this.rotationAxis = new THREE.Vector3();
-    this.rotationSpeed = 0;
   },
 
   gripDown() {
@@ -336,9 +395,7 @@ AFRAME.registerComponent('hand', {
 
     this.gripDown = false;
     // remove collisions, so we don't apply weird forces to objects as we release them.
-    // !! seems this is not working... dynamic body is still being influenced by kinematic body..
-    // Maybe doesn't act quickly enough?
-    // Not sure...
+    // 500 msecs should be plenty.
     this.collider.setAttribute('ammo-body', 'disableCollision: true');
 
     // actually, it's a nicer UX to have no collisions on grip up...
@@ -356,7 +413,7 @@ AFRAME.registerComponent('hand', {
   collideStart(event) {
     targetEl = event.detail.targetEl;
     console.log(`controller collides with object ${targetEl.id}`)
-    if (targetEl.hasAttribute('movable-object')) {
+    if (targetEl.hasAttribute('grabbable')) {
       this.collisions.push(targetEl);
 
       if (this.gripDown &&
@@ -370,7 +427,7 @@ AFRAME.registerComponent('hand', {
   collideEnd(event) {
     targetEl = event.detail.targetEl;
     console.log(`controller ends collide with object ${targetEl.id}`)
-    if (targetEl.hasAttribute('movable-object')) {
+    if (targetEl.hasAttribute('grabbable')) {
       const index = this.collisions.indexOf(targetEl)
 
       if (index > -1) {
@@ -395,7 +452,7 @@ AFRAME.registerComponent('hand', {
     this.setConstraint(el, this.collider);
     this.grabbedEl = el;
     // signal to element it has been grabbed.
-    el.emit("grabbed", {hand: this.el})
+    el.emit("grabbed")
   },
 
   releaseObject(el) {
@@ -444,7 +501,7 @@ AFRAME.registerComponent('hand', {
 
   },
 
-  tick(time, timeDelta) {
+  tick() {
 
     //if (this.awaitingNewElement) return;
 
@@ -466,28 +523,6 @@ AFRAME.registerComponent('hand', {
       object.matrix.decompose(object.position, object.quaternion, object.scale);
       object.matrixWorldNeedsUpdate = true;
     }
-
-    // state tracking so we know the velocity of the hand.
-    // reported on getHandVelocity();
-    this.lastPositions[this.historyPointer].copy(this.el.object3D.position);
-    this.lastQuaternions[this.historyPointer].copy(this.el.object3D.quaternion);
-    this.lastTimeDeltas[this.historyPointer] = timeDelta;
-    this.historyPointer = 1 - this.historyPointer;
-
-  },
-
-  // get Hand velocity - should be called with a Vector3 as a parameter.
-  getHandVelocity(velocity) {
-
-    // we extract the velocity from the last 2 frames.
-    // historyPointer always indicates the older time interval.
-    // for TimeDelta, we take the other slot, which tells us the elapsed time *after* that
-    // measurement to the newer measurement.
-    velocity.subVectors(this.lastPositions[1 - this.historyPointer], this.lastPositions[this.historyPointer]);
-
-    velocity.multiplyScalar(1000 / (this.lastTimeDeltas[1 - this.historyPointer]));
-    console.log("velocity:");
-    console.log(velocity);
   }
 
 });

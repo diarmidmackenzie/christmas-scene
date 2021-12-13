@@ -26,6 +26,7 @@
           <img src="./assets/environment-back.png">
           <img src="./assets/environment-back.png">
         </a-cubemap>
+
         <audio id="xC" src="./assets/xylophone/xC.wav"></audio>
         <audio id="xD" src="./assets/xylophone/xD.wav"></audio>
         <audio id="xE" src="./assets/xylophone/xE.wav"></audio>
@@ -34,30 +35,42 @@
         <audio id="xA" src="./assets/xylophone/xA.wav"></audio>
         <audio id="xB" src="./assets/xylophone/xB.wav"></audio>
         <audio id="xC2" src="./assets/xylophone/xC2.wav"></audio>
+
+        <a-mixin id="snowbase"
+                 material="color:white"
+                 geometry="primitive:sphere;segments-height:7;segments-width:13;radius:0.5"
+                 movement="type:static; stickiness:sticky">
+        </a-mixin>
         <a-mixin id="snowball"
                  material="color:white"
-                 geometry="primitive:sphere;segments-height:7;segments-width:13;radius:0.5" >
+                 geometry="primitive:sphere;segments-height:7;segments-width:13;radius:0.5"
+                 movement="type:grabbable; stickiness:stickable">
         </a-mixin>
         <a-mixin id="coal"
                  material="color:black"
-                 geometry="primitive:sphere;segments-height:7;segments-width:13;radius:0.04" >
+                 geometry="primitive:sphere;segments-height:7;segments-width:13;radius:0.04"
+                 movement="type:grabbable; stickiness:stickable">
         </a-mixin>
         <a-mixin id="carrot"
                  material="color:orange"
-                 geometry="primitive:cone;height:0.2;radius-bottom:0.025; radius-top:0.005" >
+                 geometry="primitive:cone;height:0.2;radius-bottom:0.025; radius-top:0.005"
+                 movement="type:grabbable; stickiness:stickable">
         </a-mixin>
         <a-mixin id="hat"
                  material="color:black"
-                 geometry="primitive:tophat-hollow">
+                 geometry="primitive:tophat-hollow"
+                 movement="type:grabbable; stickiness:stickable">
         </a-mixin>
         <a-mixin id="branch"
                  material="color:#5C4033"
                  geometry="primitive:branch"
-                 scale="0.2 0.2 0.2">
+                 scale="0.2 0.2 0.2"
+                 movement="type:grabbable; stickiness:stickable">
         </a-mixin>
         <a-mixin id="tree-tier"
                  material="color:green"
-                 geometry="primitive:cone;height:0.5;radius-bottom:0.5;segments-height:1;segments-radial:9">
+                 geometry="primitive:cone;height:0.5;radius-bottom:0.5;segments-height:1;segments-radial:9"
+                 movement="type:static; stickiness:sticky">
         </a-mixin>
         <a-mixin id="trunk"
                  material="color:#5C4033"
@@ -65,11 +78,47 @@
         </a-mixin>
         <a-mixin id="star"
                  material="color:yellow; metalness: 0.8; roughness:0.2"
-                 geometry="primitive:star; innerRadius:0.04;outerRadius:0.12;points:5;depth:0.01">
+                 geometry="primitive:star; innerRadius:0.04;outerRadius:0.12;points:5;depth:0.01"
+                 movement="type:grabbable; stickiness:stickable">
         </a-mixin>
         <a-mixin id="marble-run"
                  material="color:white; metalness: 0.8; roughness:0.2">
         </a-mixin>
+        <a-mixin id="ribbon-large"
+                 geometry="primitive:ribbon;height: 0.4; depth:0.5; width:0.5; ribbon:0.06">
+        </a-mixin>
+        <a-mixin id="present-large"
+                 geometry="primitive:box;height: 0.4; depth:0.5; width:0.5"
+                 movement="type:grabbable; stickiness:none; initialState:dynamic">
+        </a-mixin>
+        <a-mixin id="ribbon-medium"
+                 geometry="primitive:ribbon;height: 0.2; depth:0.3; width:0.2; ribbon:0.05">
+        </a-mixin>
+        <a-mixin id="present-medium"
+                 geometry="primitive:box;height: 0.2; depth:0.3; width:0.2"
+                 movement="type:grabbable; stickiness:none; initialState:dynamic">
+        </a-mixin>
+        <a-mixin id="ribbon-small"
+                 geometry="primitive:ribbon;height: 0.1; depth:0.2; width:0.1; ribbon:0.04">
+        </a-mixin>
+        <a-mixin id="present-small"
+                 geometry="primitive:box;height: 0.1; depth:0.2; width:0.1"
+                 movement="type:grabbable; stickiness:none; initialState:dynamic">
+        </a-mixin>
+        <a-mixin id="ribbon-gold"
+                 material="color:yellow; metalness: 0.5; roughness:0.2">
+        </a-mixin>
+        <a-mixin id="ribbon-green"
+                 material="color:green; metalness: 0.5; roughness:0.2">
+        </a-mixin>
+        <a-mixin id="ribbon-blue"
+                 material="color:green; metalness: 0.5; roughness:0.2">
+        </a-mixin>
+        <a-mixin id="ribbon-red"
+                 material="color:red; metalness: 0.5; roughness:0.2">
+        </a-mixin>
+
+        <!-- env-map dosesn't seem to work when deployed via mix-ins, hence no mixin for baubles-->
       </a-assets>
       <a-entity environment="groundColor: #ffffff;
                              groundColor2: #eeeeee;
@@ -101,56 +150,90 @@
         </a-entity>
       </a-entity>
       <a-entity id="play-area">
-        <a-entity id="snowman-base" mixin="snowball" position="0 0.4 -1.5" sticky-object></a-entity>
-        <a-entity id="snowman-head" mixin="snowball" scale="0.7 0.7 0.7" position="0 1.1 -1.5" sticky-object></a-entity>
-        <a-entity id="snowman-nose" mixin="carrot" rotation="90 0 0" position="0 1.1 -1.1" movable-object="hull:false" ammo-shape="type:cone;fit:manual;halfExtents:0.025 0.11 0.025"></a-entity>
-        <a-entity id="snowman-l-eye" mixin="coal" position="-0.1 1.2 -1.2" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
-        <a-entity id="snowman-r-eye" mixin="coal" position="0.1 1.2 -1.2" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
-        <a-entity id="snowman-mouth1" mixin="coal" position="-0.1 1.02 -1.21" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
-        <a-entity id="snowman-mouth2" mixin="coal" position="-0.05 1 -1.2" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
-        <a-entity id="snowman-mouth3" mixin="coal" position="0 1 -1.2" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
-        <a-entity id="snowman-mouth4" mixin="coal" position="0.05  1 -1.2" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
-        <a-entity id="snowman-mouth5" mixin="coal" position="0.1 1.02 -1.21" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
-        <a-entity id="snowman-hat" mixin="hat" position="0 1.56 -1.5" movable-object="hull:false" ammo-shape="type:hacd">
+        <a-entity id="snowman-base" mixin="snowbase" position="0 0.4 -1.5"
+                  ammo-shape="type:hull"></a-entity>
+        <a-entity id="snowman-head" mixin="snowbase" scale="0.7 0.7 0.7" position="0 1.1 -1.5"
+                  ammo-shape="type:hull"></a-entity>
+        <a-entity id="snowman-nose" mixin="carrot" rotation="90 0 0" position="0 1.1 -1.1"  ammo-shape="type:cone;fit:manual;halfExtents:0.025 0.11 0.025"></a-entity>
+        <a-entity id="snowman-l-eye" mixin="coal" position="-0.1 1.2 -1.2" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
+        <a-entity id="snowman-r-eye" mixin="coal" position="0.1 1.2 -1.2" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
+        <a-entity id="snowman-mouth1" mixin="coal" position="-0.1 1.02 -1.21" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
+        <a-entity id="snowman-mouth2" mixin="coal" position="-0.05 1 -1.2" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
+        <a-entity id="snowman-mouth3" mixin="coal" position="0 1 -1.2" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
+        <a-entity id="snowman-mouth4" mixin="coal" position="0.05  1 -1.2" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
+        <a-entity id="snowman-mouth5" mixin="coal" position="0.1 1.02 -1.21" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
+        <a-entity id="snowman-hat" mixin="hat" position="0 1.56 -1.5" ammo-shape="type:hacd">
         </a-entity>
-        <a-entity id="snowman-l-arm" mixin="branch" rotation="0 0 80" position="-0.6 0.7 -1.5" movable-object></a-entity>
-        <a-entity id="snowman-r-arm" mixin="branch" rotation="0 0 -100" position="0.6 0.7 -1.5" movable-object></a-entity>
+        <a-entity id="snowman-l-arm" mixin="branch" rotation="0 0 80" position="-0.6 0.7 -1.5" ammo-shape="type:hull"></a-entity>
+        <a-entity id="snowman-r-arm" mixin="branch" rotation="0 0 -100" position="0.6 0.7 -1.5" ammo-shape="type:hull"></a-entity>
 
         <a-entity id="tree-trunk" mixin="trunk" position="1.5 0.25 0"></a-entity>
-        <!--Creating movable-object children of sticky-object breaks sticky-objects across whole scene.  Not yet understood why!-->
-        <!-- current solution: don't have any such children.  further research needed on this.-->
-        <a-entity id="tree-base-tier" mixin="tree-tier" scale="1.2 1.2 1.2" position="1.5 0.75 0" sticky-object>
+        <!-- in the past, bables have worked better *not* as children of tree.
+             unclear if that's still true, but keeping things as consistent as possible for now-->
+        <a-entity id="tree-base-tier" mixin="tree-tier" scale="1.2 1.2 1.2" position="1.5 0.75 0"
+                  ammo-shape="type:hull">
         </a-entity>
         <a-entity position="1.5 0.75 0" rotation="0 90 0">
           <a-sphere color="red" cylindrical-position="height: -0.12; radius:0.396; angle:45"
-                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
+                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
           <a-sphere color="yellow" cylindrical-position="height: -0.12; radius:0.396; angle:0"
-                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
+                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
           <a-sphere color="green" cylindrical-position="height: -0.12; radius:0.396; angle:-45"
-                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
+                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
         </a-entity>
-        <a-entity id="tree-2nd-tier" mixin="tree-tier" position="1.5 1.05 0" sticky-object>
+        <a-entity id="tree-2nd-tier" mixin="tree-tier" position="1.5 1.05 0"
+                  ammo-shape="type:hull">
         </a-entity>
         <a-entity position="1.5 1.05 0" rotation="0 90 0">
           <a-sphere color="blue" cylindrical-position="height: -0.1; radius:0.33; angle:45"
-                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
+                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
           <a-sphere color="silver" cylindrical-position="height: -0.1; radius:0.33; angle:0"
-                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
+                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
           <a-sphere color="red" cylindrical-position="height: -0.1; radius:0.33; angle:-45"
-                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
+                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
         </a-entity>
-        <a-entity id="tree-3rd-tier" mixin="tree-tier" scale="0.8 0.8 0.8" position="1.5 1.35 0" sticky-object>
+        <a-entity id="tree-3rd-tier" mixin="tree-tier" scale="0.8 0.8 0.8" position="1.5 1.35 0"
+                  ammo-shape="type:hull">
         </a-entity>
         <a-entity position="1.5 1.35 0" rotation="0 90 0">
           <a-sphere color="yellow" cylindrical-position="height: -0.08; radius:0.264; angle:45"
-                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
+                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
           <a-sphere color="green" cylindrical-position="height: -0.08; radius:0.264; angle:0"
-                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
+                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
           <a-sphere color="blue" cylindrical-position="height: -0.08; radius:0.264; angle:-45"
-                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" movable-object="hull:false" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
+                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
+        </a-entity>
+        <a-entity id="star" mixin="star" rotation="0 90 0" position="1.45 1.6 0" ammo-shape="type:hull" material="envMap:#env">
         </a-entity>
 
-        <a-entity id="star" mixin="star" rotation="0 90 0" position="1.45 1.6 0" movable-object material="envMap:#env">
+        <a-entity id="present1" mixin="present-large" position="1.5 0.2 1"
+                  ammo-shape="type:box"
+                  rotation="0 20 0">
+          <a-entity id="ribbon1" mixin="ribbon-red ribbon-large"></a-entity>
+        </a-entity>
+        <a-entity id="present2" mixin="present-medium" position="1.6 0.1 -0.7"
+                  ammo-shape="type:box"
+                  rotation="0 -10 0">
+          <a-entity id="ribbon1" mixin="ribbon-medium ribbon-gold"></a-entity>
+        </a-entity>
+        <a-entity id="present3" mixin="present-small" position="1.3 0.05 -0.5"
+                  ammo-shape="type:box"
+                  rotation="0 30 0">
+          <a-entity id="ribbon1" mixin="ribbon-small ribbon-green"></a-entity>
+        </a-entity>
+        <a-entity id="present3" mixin="present-medium" position="1.3 0.1 0.5"
+                  ammo-shape="type:box"
+                  rotation="0 0 0">
+          <a-entity id="ribbon1" mixin="ribbon-medium ribbon-green"></a-entity>
+        </a-entity>
+        <a-entity id="present3" mixin="present-medium" position="1.1 0.1 -0.2"
+                  ammo-shape="type:box"
+                  rotation="0 -30 0">
+          <a-entity id="ribbon1" mixin="ribbon-medium ribbon-red"></a-entity>
+        </a-entity>
+        <a-entity id="present3" mixin="present-small" position="1.1 0.05 0.2"
+                  ammo-shape="type:box">
+          <a-entity id="ribbon1" mixin="ribbon-small ribbon-gold"></a-entity>
         </a-entity>
 
         <!--frame for icicle xylophone-->
@@ -236,8 +319,9 @@
         </a-box>
 
         <a-box id="floor-plane"
-               width = "20" height = "1" depth = "20"
-               sticky-object
+               width = "100" height = "1" depth = "100"
+               movement="type:static; stickiness:sticky"
+               ammo-shape="type:box"
                position = "0 -0.5 0"
                visible = false>
         </a-box>
