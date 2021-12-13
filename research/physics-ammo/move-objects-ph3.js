@@ -11,7 +11,10 @@ AFRAME.registerComponent('movement', {
     type: {type: 'string', default: 'grabbable', oneOf: ['static', 'grabbable']},
     stickiness: {type: 'string', default: 'stickable', oneOf: ['sticky', 'stickable', 'none']},
     gravity: {type: 'number', default: 9.8},
-    initialState: {type: 'string', default: 'kinematic'}
+    initialState: {type: 'string', default: 'kinematic'},
+    // how long we run "homegrown" (gravity-only physics, before switching on full collision physics)
+    // 150 msecs is enough to fall 11cm, which shuld be enough to clear the hand collider sphere (5cm radius).
+    releaseTimer: {type: 'number', default: 150}
   },
 
   init() {
@@ -201,7 +204,7 @@ AFRAME.registerComponent('movement', {
         console.log(`${this.stickyOverlaps.length} sticky overlaps in total`);
       }
       else {
-        comsole.warn("Unexpected - collideEnd doesn't match element");
+        console.warn("Unexpected - collideEnd doesn't match element");
         console.log(`${this.stickyOverlaps} sticky overlaps in total`);
       }
     }
@@ -233,9 +236,22 @@ AFRAME.registerComponent('movement', {
     else {
       // become a dynamic object.
       console.log("released - becomes loose dynamic object")
-      this.setDynamic();
+
       this.state = OBJECT_LOOSE;
       this.detachFromStickyParent(this.stickyOverlaps[0]);
+
+      // We run "homemade" physics for a short period, before Ammo dynamic physics
+      // take over.
+      // This is because with Ammo dynamic physics, we don't have a way of
+      // preventing the hand collider from interfering with the object path.
+      // Tried disabling collisions & setting masks, but none of this is
+      // proving effective.
+      // Not yet had time to create a proper clean repro & file a bug.
+      this.runHomemadePhysics = true;
+      setTimeout(() => {
+        this.setDynamic();
+        this.runHomemadePhysics = false;
+      }, this.data.releaseTimer);
     }
   },
 
@@ -244,7 +260,7 @@ AFRAME.registerComponent('movement', {
     if (this.data.type === 'static') return;
 
     // tie object to sticky parent (which may be moving).
-    if (this.stickyParent) {
+    if (this.state !== OBJECT_HELD && this.stickyParent) {
 
       const object = this.el.object3D;
       const tiedTo = this.stickyParent.object3D;
@@ -280,8 +296,17 @@ AFRAME.registerComponent('movement', {
     }
     else {
       if (this.physicsStarting) {
-        // In thr first frame after becoming a loose object, we calculate prior velocity & apply it to
+        // In the first frame after becoming a loose object, we calculate prior velocity & apply it to
         // the object...
+
+        /* Alternative Implementation - we might be able to read linear & angular velocities
+           directly from AMmo using
+           this.el.body.getLinearVelocity(ammoVelocityVector);
+           and
+           this.el.body.getAngularVelocity(ammoVelocityVector);
+
+           Not tried/tested that yet.
+        */
 
         // we extract the velocity from the last 2 frames.
         // historyPointer always indicates the older time interval.
@@ -293,20 +318,6 @@ AFRAME.registerComponent('movement', {
         this.velocity.multiplyScalar(2000 / (timeDelta + this.lastTimeDeltas[1 - this.historyPointer]));
         console.log("initial velocity:");
         console.log(this.velocity);
-
-        if (Ammo.asm.$) {
-          // convert velocity to world co-ordinates.
-          this.velocity.applyMatrix4(this.el.object3D.parent.matrixWorld);
-
-          const ammoVelocity = new Ammo.btVector3(0, 0, 0);
-          ammoVelocity.x = this.velocity.x;
-          ammoVelocity.y = this.velocity.y;
-          ammoVelocity.z = this.velocity.z;
-          console.log("Initial ammo velocity on release:")
-          console.log(ammoVelocity)
-          this.el.body.setLinearVelocity(ammoVelocity);
-          Ammo.destroy(ammoVelocity);
-        }
 
         /* Old code for rotation - we don't seem to need this...
         // Similar exercise with rotation, which we store as an axis/angle,
@@ -325,9 +336,18 @@ AFRAME.registerComponent('movement', {
         const rotationAngle = this.lastQuaternions[this.historyPointer].angleTo(this.el.object3D.quaternion);
         this.rotationSpeed = rotationAngle * (2000 / (timeDelta + this.lastTimeDeltas[1 - this.historyPointer]));
         */
+      }
 
-        // let the physics engine take it from here...
-        this.physicsStarting = false;
+      if (this.runHomemadePhysics) {
+        this.velocity.y -= this.data.gravity * timeDelta / 1000;
+        this.velocityDelta.copy(this.velocity);
+        this.velocityDelta.multiplyScalar(timeDelta / 1000);
+        this.el.object3D.position.add(this.velocityDelta);
+
+        // apply rotation.
+        const angle = this.rotationSpeed * timeDelta / 1000;
+        this.tempQuaternion.setFromAxisAngle(this.rotationAxis, angle);
+        this.el.object3D.quaternion.multiply(this.tempQuaternion);
       }
     }
   }

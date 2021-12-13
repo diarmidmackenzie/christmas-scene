@@ -92,3 +92,18 @@ We'll call this rewrite "phase 3" - I want to preserve "phase 2" for demos etc.
 
 For simplicity & consistency, ammo-shape is always defined externally to this component.
 
+
+
+
+
+Migrating phase 2 to phase 3:
+
+sticky-object -> movement="type:static; stickiness:sticky"  + define ammo shape externally.
+
+sticky object -> movement="type:static; stickiness:sticky"  + define ammo shape externally.
+
+
+
+movable-object -> movement="type:grabbable; stickiness:stickable" + define ammo shape externally.
+
+*don't* define shape in mixins (unreliable, or maybe doesn't work at all?)
