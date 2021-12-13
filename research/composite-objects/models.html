@@ -35,6 +35,14 @@
                  material="color:yellow; metalness: 0.8; roughness:0.2"
                  geometry="primitive:star; innerRadius:0.05;outerRadius:0.15;points:5;depth:0.01">
         </a-mixin>
+        <a-mixin id="ribbon"
+                 material="color:red"
+                 geometry="primitive:ribbon;height: 0.5; depth:0.5; width:0.5; ribbon:0.1">
+        </a-mixin>
+        <a-mixin id="present"
+                 material="color:blue"
+                 geometry="primitive:box;height: 0.5; depth:0.5; width:0.5">
+        </a-mixin>
       </a-assets>
 
       <a-entity id="play-area">
@@ -52,10 +60,11 @@
         <a-entity id="icicle-entity" mixin="icicle"  position="1.9 1.2 -1.5"  scale ="1.2 1.2 1.2">
         </a-entity>
 
-        <a-entity id="star" mixin="star" position="0 2 -1.5">
+        <a-entity id="star" mixin="star" position="0 2 -1.5"></a-entity>
+
+        <a-entity id="present1" mixin="present" position="-2 1 -1.5">
+          <a-entity id="ribbon1" mixin="ribbon"></a-entity>
         </a-entity>
-
-
       </a-entity>
     </a-scene>
   </body>
