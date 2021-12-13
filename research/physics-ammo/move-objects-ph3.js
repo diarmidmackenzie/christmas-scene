@@ -94,8 +94,6 @@ AFRAME.registerComponent('movement', {
     this.tempMatrix = new THREE.Matrix4();
     this.lockTransformMatrix = new THREE.Matrix4();
 
-    // tick throttling for testing...
-    this.tick = AFRAME.utils.throttleTick(this.tick, 200, this);
   },
 
   initOnceBodyLoaded() {
@@ -319,7 +317,6 @@ AFRAME.registerComponent('movement', {
         console.log("initial velocity:");
         console.log(this.velocity);
 
-        /* Old code for rotation - we don't seem to need this...
         // Similar exercise with rotation, which we store as an axis/angle,
         // for easy scalar multiplication.
         // Getting rotation axis from Quaternion is simply a matter of normalizing the (x, y, z)
@@ -335,14 +332,17 @@ AFRAME.registerComponent('movement', {
                               this.tempQuaternion.z).normalize();
         const rotationAngle = this.lastQuaternions[this.historyPointer].angleTo(this.el.object3D.quaternion);
         this.rotationSpeed = rotationAngle * (2000 / (timeDelta + this.lastTimeDeltas[1 - this.historyPointer]));
-        */
+
+        this.physicsStarting = false;
       }
 
       if (this.runHomemadePhysics) {
-        this.velocity.y -= this.data.gravity * timeDelta / 1000;
         this.velocityDelta.copy(this.velocity);
         this.velocityDelta.multiplyScalar(timeDelta / 1000);
         this.el.object3D.position.add(this.velocityDelta);
+
+        // Apply gravity to velocity for next tick.
+        this.velocity.y -= this.data.gravity * timeDelta / 1000;
 
         // apply rotation.
         const angle = this.rotationSpeed * timeDelta / 1000;
