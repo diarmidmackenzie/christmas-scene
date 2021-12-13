@@ -20,6 +20,11 @@
                 geometry="primitive:cone;height:0.2;radius-bottom:0.025; radius-top:0.005"
                 movement="type:grabbable; stickiness:stickable;gravity:1">
        </a-mixin>
+       <a-mixin id="present"
+                material="color:red"
+                geometry="primitive:box;height:0.2;width:0.2;depth:0.2"
+                movement="type:grabbable; stickiness:none;gravity:1;initialState:dynamic">
+       </a-mixin>
      </a-assets>
      <a-entity id="physics-wrapper">
 
@@ -33,6 +38,7 @@
         </a-box>
          <a-entity id="snowman-head" mixin="snowball" scale="0.7 0.7 0.7" position="-0.5 1.5 -1" ammo-shape="type:sphere;fit:manual;sphereRadius:0.35"></a-entity>
          <a-entity id="carrot-nose" mixin="carrot" rotation="0 0 -90" position="-0.1 1.5 -1" ammo-shape="type:hull"></a-entity>
+         <a-entity id="present1" mixin="present" position="0.5 1.5 -1" ammo-shape="type:hull"></a-entity>
          <a-box id="floor-plane"
                 width = "20" height = "1" depth = "20"
                 movement="type:static; stickiness:sticky"
@@ -51,7 +57,8 @@
         O & P to rotate CCW & CW (must be gripped to affect object)<br>
         To test conservation of velocity / rotation on release, hold the direction or rotation key down while releasing teh grip<br>
         WASD and mouse also move view as usual.<br>
-        Gravity is artificially low, to make behaviour on release easier to ovbserve.<br>
+        Gravity is artificially low, to make behaviour on release easier to observe.<br>
+        Note that one side effect of low gravity is that objects my go to sleep (freeze) sooner than you would expect.<br>
       </p>
     </div>
   </body>
