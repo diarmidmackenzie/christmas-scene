@@ -5,7 +5,7 @@ TYPE_STATIC = 'static';
 
 AFRAME.registerComponent('movement', {
   schema: {
-    type: {type: 'string', default: 'grabbable', oneOf: ['static', 'grabbable']},
+    type: {type: 'string', default: 'grabbable', oneOf: ['static', 'grabbable', 'dynamic']},
     stickiness: {type: 'string', default: 'stickable', oneOf: ['sticky', 'stickable', 'none']},
     gravity: {type: 'number', default: 9.8},
     initialState: {type: 'string', default: 'kinematic'},
@@ -15,18 +15,6 @@ AFRAME.registerComponent('movement', {
   },
 
   init() {
-
-    if (this.data.stickiness === 'sticky') {
-      this.el.setAttribute('sticky')
-    }
-
-    if (this.data.stickiness === 'stickable') {
-      this.el.setAttribute('stickable')
-    }
-
-    if (this.data.type === 'grabbable') {
-      this.el.setAttribute('grabbable')
-    }
 
     if (this.data.type === 'static') {
       // setup for static objects is very simple.
@@ -91,7 +79,34 @@ AFRAME.registerComponent('movement', {
     this.tempMatrix = new THREE.Matrix4();
     this.lockTransformMatrix = new THREE.Matrix4();
 
+    this.throwaway = new THREE.Vector3();
   },
+
+  update() {
+    if (this.data.stickiness === 'sticky') {
+      this.el.setAttribute('sticky')
+    }
+    else {
+      this.el.removeAttribute('sticky')
+      this.stickyOverlaps = [];
+    }
+
+    if (this.data.stickiness === 'stickable') {
+      this.el.setAttribute('stickable')
+    }
+    else {
+      this.el.removeAttribute('stickable')
+      this.stickyOverlaps = [];
+    }
+
+    if (this.data.type === 'grabbable') {
+      this.el.setAttribute('grabbable')
+    }
+    else {
+      this.el.removeAttribute('grabbable')
+    }
+  },
+
 
   initOnceBodyLoaded() {
     setTimeout(() => {
@@ -175,7 +190,6 @@ AFRAME.registerComponent('movement', {
   },
 
   shouldStickToTarget(targetEl) {
-
 
     if (this.el.hasAttribute('stickable') &&
         targetEl.hasAttribute('sticky')) return true;
@@ -277,8 +291,9 @@ AFRAME.registerComponent('movement', {
       // ... and now in the object's parents's co-ordinates.
       object.matrix.premultiply(this.tempMatrix);
 
-      // apply matrix to object.
-      object.matrix.decompose(object.position, object.quaternion, object.scale);
+      // apply matrix to object.  But don't apply scale, as not needed,
+      // and interferes with snowball growth on roll.
+      object.matrix.decompose(object.position, object.quaternion, this.throwaway);
       object.matrixWorldNeedsUpdate = true;
     }
 
@@ -378,6 +393,8 @@ AFRAME.registerComponent('hand', {
 
     this.lockTransformMatrix = new THREE.Matrix4();
     this.newMatrix = new THREE.Matrix4();
+
+    this.throwaway = new THREE.Vector3();
   },
 
   gripDown() {
@@ -507,6 +524,13 @@ AFRAME.registerComponent('hand', {
     //if (this.awaitingNewElement) return;
 
     if (this.lockedObject) {
+
+      if (!this.lockedObject.el.hasAttribute('grabbable')) {
+        // object has stopped being grabbable - e.g.a growing snowball.
+        this.releaseObject(this.lockedObject.el)
+        return;
+      }
+
       // locked Object position should be set to lockTransformMatrix, in lockedToObject's space.
       // but we need to represent this in its parent's space.
       const object = this.lockedObject;
@@ -521,7 +545,7 @@ AFRAME.registerComponent('hand', {
       this.lockedObject.matrix.premultiply(this.lockedToObject.matrixWorld);
       this.lockedObject.matrix.premultiply(this.tempMatrix);
 
-      object.matrix.decompose(object.position, object.quaternion, object.scale);
+      object.matrix.decompose(object.position, object.quaternion, this.throwaway);
       object.matrixWorldNeedsUpdate = true;
     }
   }

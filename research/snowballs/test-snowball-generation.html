@@ -16,6 +16,11 @@
                 geometry="primitive:sphere;segments-height:7;segments-width:13;radius:0.5"
                 movement="type:grabbable;stickiness:sticky">
        </a-mixin>
+       <a-mixin id="carrot"
+                material="color:orange"
+                geometry="primitive:cone;height:0.2;radius-bottom:0.025; radius-top:0.005"
+                movement="type:grabbable;stickiness:stickable;gravity:0.1">
+       </a-mixin>
      </a-assets>
      <a-entity id="physics-wrapper">
         <a-box id="lhand" hand
@@ -27,9 +32,12 @@
                snowball-generator="heightLevel:2.0"
                position="0.2 1.5 -1">
         </a-box>
+        <a-entity id="carrot-nose" mixin="carrot" rotation="0 0 -90" position="-0.1 1.5 -1"
+                  ammo-shape="type:cone;fit:manual;halfExtents:0.025 0.11 0.025"></a-entity>
          <a-box id="floor-plane"
                 width = "20" height = "1" depth = "20"
-                sticky-object
+                movement="type:static;stickiness:sticky"
+                ammo-shape
                 color="blue"
                 position = "0 -0.5 0">
          </a-box>
