@@ -45,6 +45,31 @@ Here's the features I have added so far.
 
 - Added a calendar and Christmas countdown.
 
+**10 December**
+
+- Added a star on top of the Christmas Tree
+
+**11 December**
+
+- Updated physics - hat is now hollow, and you can put objects inside it
+- Added a giant marble run
+
+**12 December**
+
+- Snowballs!  Pick them up from anywhere on the snowy ground.
+
+**13 December**
+
+- Added various different sized presents under and around the tree.
+
+**14 December**
+
+- Make snowballs bigger by rolling them around on the snowy ground.
+
+**15 December**
+
+- Make marble run ramps adjustable, so they can accommodate various sizes of snowball.
+
 ### Credits
 
 
@@ -52,13 +77,11 @@ Xylophone sounds by DANMITCH3LL, via freesound.org, under CC BY 3.0 license.
 
 https://freesound.org/people/DANMITCH3LL/packs/14220/
 
-
-
 Built using [A-Frame](https://aframe.io/) and [THREE.js](https://threejs.org/)
 
 Environment from [A-Frame Environment Component](https://github.com/supermedium/aframe-environment-component)
 
-Particles from 
+Particles (snow) from [A-Frame Particle System](https://github.com/IdeaSpaceVR/aframe-particle-system-component) 
 
 Collisions & physics uses [A-Frame Physics System](https://github.com/n5ro/aframe-physics-system) and [Ammo.js](https://github.com/kripken/ammo.js/)
 

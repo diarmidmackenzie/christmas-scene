@@ -349,6 +349,8 @@ AFRAME.registerComponent('calendar', {
     this.box.setAttribute('width', this.data.width);
     this.box.setAttribute('depth', this.data.depth);
     this.box.setAttribute('color', '#f88');
+    this.box.setAttribute('movement', 'type:static;stickness:none');
+    this.box.setAttribute('ammo-shape', 'type:box');
     this.el.appendChild(this.box);
 
     this.day = document.createElement('a-text');
@@ -408,6 +410,8 @@ AFRAME.registerComponent('xmas-counter', {
     this.box.setAttribute('width', this.data.width);
     this.box.setAttribute('depth', this.data.depth);
     this.box.setAttribute('color', '#8f8');
+    this.box.setAttribute('movement', 'type:static;stickness:none');
+    this.box.setAttribute('ammo-shape', 'type:box');
     this.el.appendChild(this.box);
 
     this.day = document.createElement('a-text');

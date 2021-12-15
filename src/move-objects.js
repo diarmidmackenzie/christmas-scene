@@ -6,7 +6,7 @@ TYPE_STATIC = 'static';
 AFRAME.registerComponent('movement', {
   schema: {
     type: {type: 'string', default: 'grabbable', oneOf: ['static', 'grabbable', 'dynamic']},
-    stickiness: {type: 'string', default: 'stickable', oneOf: ['sticky', 'stickable', 'none']},
+    stickiness: {type: 'string', default: 'stickable', oneOf: ['sticky', 'stickable', 'sticky2', 'stickable2', 'none']},
     gravity: {type: 'number', default: 9.8},
     initialState: {type: 'string', default: 'kinematic'},
     // how long we run "homegrown" (gravity-only physics, before switching on full collision physics)
@@ -91,11 +91,27 @@ AFRAME.registerComponent('movement', {
       this.stickyOverlaps = [];
     }
 
+    if (this.data.stickiness === 'sticky2') {
+      this.el.setAttribute('sticky2')
+    }
+    else {
+      this.el.removeAttribute('sticky2')
+      this.stickyOverlaps = [];
+    }
+
     if (this.data.stickiness === 'stickable') {
       this.el.setAttribute('stickable')
     }
     else {
       this.el.removeAttribute('stickable')
+      this.stickyOverlaps = [];
+    }
+
+    if (this.data.stickiness === 'stickable2') {
+      this.el.setAttribute('stickable2')
+    }
+    else {
+      this.el.removeAttribute('stickable2')
       this.stickyOverlaps = [];
     }
 
@@ -196,6 +212,12 @@ AFRAME.registerComponent('movement', {
 
     if (this.el.hasAttribute('sticky') &&
         targetEl.hasAttribute('stickable')) return true;
+
+    if (this.el.hasAttribute('stickable2') &&
+        targetEl.hasAttribute('sticky2')) return true;
+
+    if (this.el.hasAttribute('sticky2') &&
+        targetEl.hasAttribute('stickable2')) return true;
 
     return false;
 
