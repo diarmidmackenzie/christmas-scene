@@ -43,6 +43,11 @@
                  material="color:blue"
                  geometry="primitive:box;height: 0.5; depth:0.5; width:0.5">
         </a-mixin>
+
+        <a-mixin id="penguin"
+                 penguin
+                 scale="0.1 0.1 0.1">
+        </a-mixin>
       </a-assets>
 
       <a-entity id="play-area">
@@ -60,11 +65,15 @@
         <a-entity id="icicle-entity" mixin="icicle"  position="1.9 1.2 -1.5"  scale ="1.2 1.2 1.2">
         </a-entity>
 
-        <a-entity id="star" mixin="star" position="0 2 -1.5"></a-entity>
+        <a-entity id="star" mixin="star" position="-2 2 -1.5"></a-entity>
 
         <a-entity id="present1" mixin="present" position="-2 1 -1.5">
           <a-entity id="ribbon1" mixin="ribbon"></a-entity>
         </a-entity>
+
+        <a-entity id="penguin" mixin="penguin" position="0 1.5 -1.5"></a-entity>
+
+
       </a-entity>
     </a-scene>
   </body>

@@ -224,3 +224,95 @@ AFRAME.registerGeometry('ribbon', {
     //recenterGeometry(this.geometry);
   }
 });
+
+AFRAME.registerGeometry('penguin', {
+  schema: {
+  },
+
+  init: function (data) {
+    //radiusTop, radiusBottom, height, radialSegments
+    const geometriesBlack = [];
+    //head
+    geometriesBlack.push(new THREE.SphereGeometry(1, 8, 6, -7*Math.PI/6, 4*Math.PI/3));
+    //body
+    geometriesBlack.push(new THREE.SphereGeometry(1, 8, 6, -7*Math.PI/6, 4*Math.PI/3));
+    geometriesBlack[1].translate(0, -1, 0);
+    geometriesBlack[1].scale(1, 2, 1);
+    //top of head
+    geometriesBlack.push(new THREE.SphereGeometry(1.0001, 12, 2, 0, 2*Math.PI, 0, Math.PI/3));
+
+    //left wing
+    geometriesBlack.push(new THREE.SphereGeometry(1, 12, 6));
+    geometriesBlack[3].translate(-2.5, -2, 0);
+    geometriesBlack[3].scale(0.3, 1, 0.3)
+    geometriesBlack[3].rotateZ(-0.2)
+
+    //right wing
+    geometriesBlack.push(new THREE.SphereGeometry(1, 12, 6));
+    geometriesBlack[4].translate(2.5, -2, 0);
+    geometriesBlack[4].scale(0.3, 1, 0.3)
+    geometriesBlack[4].rotateZ(0.2)
+
+    // left eye
+    geometriesBlack.push(new THREE.SphereGeometry(0.2, 12, 6));
+    geometriesBlack[5].translate(-0.5, 0.2, 0.75);
+
+    // right eye
+    geometriesBlack.push(new THREE.SphereGeometry(0.2, 12, 6));
+    geometriesBlack[6].translate(0.5, 0.2, 0.75);
+
+    this.geometryBlack = THREE.BufferGeometryUtils.mergeBufferGeometries(geometriesBlack);
+
+    const geometriesWhite = [];
+    //face
+    geometriesWhite.push(new THREE.SphereGeometry(1, 4, 4, Math.PI/6, 2*Math.PI/3, Math.PI/3, 2*Math.PI/3));
+    //body
+    geometriesWhite.push(new THREE.SphereGeometry(1, 8, 6, Math.PI/6, 2*Math.PI/3));
+    geometriesWhite[1].translate(0, -1, 0);
+    geometriesWhite[1].scale(1, 2, 1);
+    this.geometryWhite = THREE.BufferGeometryUtils.mergeBufferGeometries(geometriesWhite);
+
+    const geometriesOrange = [];
+
+    //left foot
+    geometriesOrange.push(new THREE.CylinderGeometry(0.3, 0.5, 0.3, 3, 1));
+    geometriesOrange[0].rotateY(Math.PI);
+    geometriesOrange[0].scale(1, 1, 2.5);
+    geometriesOrange[0].translate(-0.5, -3.75, 0.2);
+
+    //right foot
+    geometriesOrange.push(new THREE.CylinderGeometry(0.3, 0.5, 0.3, 3, 1));
+    geometriesOrange[1].rotateY(Math.PI);
+    geometriesOrange[1].scale(1, 1, 2.5);
+    geometriesOrange[1].translate(0.5, -3.75, 0.2);
+
+    geometriesOrange.push(new THREE.CylinderGeometry(0, 0.5, 0.5, 3, 1));
+    geometriesOrange[2].rotateX(Math.PI/2);
+    geometriesOrange[2].translate(0, -0.1, 1);
+
+    this.geometryOrange = THREE.BufferGeometryUtils.mergeBufferGeometries(geometriesOrange);
+
+    this.geometry = THREE.BufferGeometryUtils.mergeBufferGeometries([this.geometryBlack,
+                                                                     this.geometryWhite,
+                                                                     this.geometryOrange],
+                                                                     true);
+    recenterGeometry(this.geometry);
+  }
+});
+
+AFRAME.registerComponent('penguin', {
+
+  init () {
+    var materials = [new THREE.MeshBasicMaterial({
+                          color: 'black'
+                     }), new THREE.MeshBasicMaterial({
+                          color: 'white'
+                     }), new THREE.MeshBasicMaterial({
+                          color: 'orange'
+                     })]
+
+    this.el.setAttribute('geometry','primitive:penguin');
+    const mesh = this.el.getObject3D('mesh');
+    mesh.material = materials;
+  }
+});
