@@ -3,10 +3,36 @@ OBJECT_HELD = 2;
 OBJECT_LOOSE = 3;
 TYPE_STATIC = 'static';
 
+const GLOBAL_DATA = {
+  tempMatrix: new THREE.Matrix4(),
+}
+
+const GLOBAL_FUNCS = {
+  reparent : function (object, oldParent, newParent) {
+
+  if (object.parent === newParent) {
+    return;
+  }
+
+  oldParent.updateMatrixWorld();
+  oldParent.updateMatrix();
+  object.updateMatrix();
+  newParent.updateMatrixWorld();
+  newParent.updateMatrix();
+
+  GLOBAL_DATA.tempMatrix.copy(newParent.matrixWorld).invert();
+  object.matrix.premultiply(oldParent.matrixWorld);
+  object.matrix.premultiply(GLOBAL_DATA.tempMatrix);
+  object.matrix.decompose(object.position, object.quaternion, object.scale);
+  object.matrixWorldNeedsUpdate = true;
+  newParent.add(object);
+},
+};
+
 AFRAME.registerComponent('movement', {
   schema: {
     type: {type: 'string', default: 'grabbable', oneOf: ['static', 'grabbable', 'dynamic']},
-    stickiness: {type: 'string', default: 'stickable', oneOf: ['sticky', 'stickable', 'none']},
+    stickiness: {type: 'string', default: 'stickable', oneOf: ['sticky', 'stickable', 'sticky2', 'stickable2', 'none']},
     gravity: {type: 'number', default: 9.8},
     initialState: {type: 'string', default: 'kinematic'},
     // how long we run "homegrown" (gravity-only physics, before switching on full collision physics)
@@ -91,11 +117,27 @@ AFRAME.registerComponent('movement', {
       this.stickyOverlaps = [];
     }
 
+    if (this.data.stickiness === 'sticky2') {
+      this.el.setAttribute('sticky2')
+    }
+    else {
+      this.el.removeAttribute('sticky2')
+      this.stickyOverlaps = [];
+    }
+
     if (this.data.stickiness === 'stickable') {
       this.el.setAttribute('stickable')
     }
     else {
       this.el.removeAttribute('stickable')
+      this.stickyOverlaps = [];
+    }
+
+    if (this.data.stickiness === 'stickable2') {
+      this.el.setAttribute('stickable2')
+    }
+    else {
+      this.el.removeAttribute('stickable2')
       this.stickyOverlaps = [];
     }
 
@@ -174,19 +216,25 @@ AFRAME.registerComponent('movement', {
 
   attachToStickyParent(stickyParent) {
 
-    // sets up thisl.lockTransformMatrix to represent the objects position
-    // (which should now be fixed), from the perspective of the sticky parent.
-    this.stickyParent = stickyParent;
-    this.lockTransformMatrix.copy(this.el.object3D.matrixWorld);
-    this.tempMatrix.copy(stickyParent.object3D.matrixWorld).invert();
-    this.lockTransformMatrix.premultiply(this.tempMatrix)
+    if (!this.originalParent) {
+      this.originalParent = this.el.object3D.parent;
+    }
+
+    GLOBAL_FUNCS.reparent(this.el.object3D,
+                          this.el.object3D.parent,
+                          stickyParent.object3D);
   },
 
   detachFromStickyParent() {
 
-    // sets up thisl.lockTransformMatrix to represent the objects position
-    // (which should now be fixed), from the perspective of the sticky parent.
-    this.stickyParent = null;
+    var newParent = this.originalParent ? this.originalParent : this.el.sceneEl.object3D;
+
+    GLOBAL_FUNCS.reparent(this.el.object3D,
+                          this.el.object3D.parent,
+                          newParent);
+
+    this.originalParent = null;
+
   },
 
   shouldStickToTarget(targetEl) {
@@ -196,6 +244,12 @@ AFRAME.registerComponent('movement', {
 
     if (this.el.hasAttribute('sticky') &&
         targetEl.hasAttribute('stickable')) return true;
+
+    if (this.el.hasAttribute('stickable2') &&
+        targetEl.hasAttribute('sticky2')) return true;
+
+    if (this.el.hasAttribute('sticky2') &&
+        targetEl.hasAttribute('stickable2')) return true;
 
     return false;
 
@@ -270,6 +324,7 @@ AFRAME.registerComponent('movement', {
 
     if (this.data.type === 'static') return;
 
+    /*
     // tie object to sticky parent (which may be moving).
     if (this.state !== OBJECT_HELD && this.stickyParent) {
 
@@ -295,7 +350,7 @@ AFRAME.registerComponent('movement', {
       // and interferes with snowball growth on roll.
       object.matrix.decompose(object.position, object.quaternion, this.throwaway);
       object.matrixWorldNeedsUpdate = true;
-    }
+    }*/
 
     // Track velocity state, in case the object gets released to dynamic physics
     // - in that case we want to initialze velocity
@@ -501,22 +556,25 @@ AFRAME.registerComponent('hand', {
 
   setConstraint(fromEl, toEl) {
 
-    // fix the transform of fromEl in toEl's world space.
-    this.lockTransformMatrix.copy(fromEl.object3D.matrixWorld);
-    this.tempMatrix.copy(toEl.object3D.matrixWorld).invert();
-    this.lockTransformMatrix.premultiply(this.tempMatrix)
+    if (!this.originalParent) {
+      this.originalParent = fromEl.object3D.parent;
+    }
 
-    // lockTransform represents fromEl's current position in toEl's world space.
-    // we keep this fixed - see tick() function.
-    this.lockedObject = fromEl.object3D;
-    this.lockedToObject = toEl.object3D;
+    GLOBAL_FUNCS.reparent(fromEl.object3D,
+                          fromEl.object3D.parent,
+                          toEl.object3D);
+
   },
 
   removeConstraint(fromEl) {
 
-    this.lockedObject = null;
-    this.lockedToObject = null;
+    var newParent = this.originalParent ? this.originalParent : this.el.SceneEl.object3D;
 
+    GLOBAL_FUNCS.reparent(fromEl.object3D,
+                          fromEl.object3D.parent,
+                          newParent);
+
+    this.originalParent = null;
   },
 
   tick() {
