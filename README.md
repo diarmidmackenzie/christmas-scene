@@ -78,6 +78,11 @@ Here's the features I have added so far.
 
 - Added background music.
 
+**18 December**
+
+- Added volume control to turn the background music down.
+  
+
 ### Credits
 
 Music is "Christmas Magic" by AShamaluevMusic
@@ -99,4 +104,6 @@ Particles (snow) from [A-Frame Particle System](https://github.com/IdeaSpaceVR/a
 Collisions & physics uses [A-Frame Physics System](https://github.com/n5ro/aframe-physics-system) and [Ammo.js](https://github.com/kripken/ammo.js/)
 
 Teleportation uses [A-Frame Teleport Controls](https://github.com/fernandojsg/aframe-teleport-controls)
+
+The volume control for the music is a modified version of the dial control from [A-Frame UI Widgets](https://github.com/caseyyee/aframe-ui-widgets)
 
