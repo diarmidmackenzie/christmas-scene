@@ -187,16 +187,48 @@ AFRAME.registerComponent('movement', {
     console.log("set to kinematic")
     this.el.setAttribute('ammo-body', 'type: kinematic');
 
+    // re-instate collisions on descandants that may have been disabled.
+    // use a timer to avoid race conditions around dynamic->kinematic switch.
+    setTimeout(() => this.enableCollisionOnDescendants(this.el.object3D), 100);
+
   },
 
   setDynamic() {
+
+    // first check for any children that are colliding with this element.
+    // disable collisions for them - else they will exert forces on this
+    // body when it becomes dynamic, resulting in crazy runaway acceleration
+    // (since they are fixed to this object!)
+    this.suppressCollisionsOnOverlappingDescendants(this.el.object3D);
     // set object to dynamic.
     console.log("set to dynamic")
     this.el.setAttribute('ammo-body', 'type: dynamic');
 
-    // set initial velocity & rotation based on prior movement.
-    // To Do...
+  },
 
+  enableCollisionOnDescendants(object) {
+
+    if (object.el) {
+          object.el.setAttribute('ammo-body', 'disableCollision:false');
+        }
+
+    object.children.forEach((o) => {
+      this.enableCollisionOnDescendants(o)
+    });
+
+  },
+
+  suppressCollisionsOnOverlappingDescendants(object) {
+
+    if (object.el &&
+        object.el !== this.el &&
+        this.stickyOverlaps.includes(object.el)) {
+          object.el.setAttribute('ammo-body', 'disableCollision:true');
+        }
+
+    object.children.forEach((o) => {
+      this.suppressCollisionsOnOverlappingDescendants(o)
+    });
   },
 
   // collideStart & collideEnd used to track overlaps with static objects, to
@@ -297,7 +329,7 @@ AFRAME.registerComponent('movement', {
       this.attachToStickyParent(this.stickyOverlaps[0]);
     }
     else {
-      this.detachFromStickyParent(this.stickyOverlaps[0]);
+      this.detachFromStickyParent();
     }
   },
 
@@ -309,32 +341,40 @@ AFRAME.registerComponent('movement', {
     console.log(this.el);
   },
 
+  nonChildStickyOverlap() {
+    // is there a sticky overlap that is not a child of ours?
+
+    var nonChldStickyOverlap = null;
+
+    this.stickyOverlaps.forEach((el) => {
+
+      if (!this.isMyDescendent(el.object3D)) {
+        nonChldStickyOverlap = el;
+      }
+    });
+
+    return nonChldStickyOverlap;
+  },
+
   released() {
-    if ((this.stickyOverlaps.length > 0)) {
-      // parented to a sticky object.
-      console.log("released - re-attach to static object")
+
+    toStickTo = this.nonChildStickyOverlap()
+
+    if (toStickTo) {
+
+      // sticky object to parent to.
+      console.log("released - re-attach to a parent object")
       this.setKinematic();
       this.state = OBJECT_FIXED;
-      this.attachToStickyParent(this.stickyOverlaps[0]);
+      this.attachToStickyParent(toStickTo);
 
-      // But did we actually attach to sticky Parent?
-      // If the only thing we are stuck to is actually our child, then
-      // we won't have parented to it.  And we should become a dynamic object.
-      if (this.stickyOverlaps[0].object3D !== this.el.object3D.parent) {
-        this.state = OBJECT_LOOSE;
-        this.runHomemadePhysics = true;
-        setTimeout(() => {
-          this.setDynamic();
-          this.runHomemadePhysics = false;
-        }, this.data.releaseTimer);
-      }
     }
     else {
       // become a dynamic object.
       console.log("released - becomes loose dynamic object")
 
       this.state = OBJECT_LOOSE;
-      this.detachFromStickyParent(this.stickyOverlaps[0]);
+      this.detachFromStickyParent();
 
       // We run "homemade" physics for a short period, before Ammo dynamic physics
       // take over.
