@@ -74,14 +74,21 @@ Here's the features I have added so far.
 
 - Penguin bowling game, and left-hand teleporting, so you can stand the penguins up again.
 
+**17 December**
 
+- Added background music.
 
 ### Credits
 
+Music is "Christmas Magic" by AShamaluevMusic
+
+https://soundcloud.com/ashamaluevmusic/christmas-magic
 
 Xylophone sounds by DANMITCH3LL, via freesound.org, under CC BY 3.0 license.
 
 https://freesound.org/people/DANMITCH3LL/packs/14220/
+
+
 
 Built using [A-Frame](https://aframe.io/) and [THREE.js](https://threejs.org/)
 
@@ -90,4 +97,6 @@ Environment from [A-Frame Environment Component](https://github.com/supermedium/
 Particles (snow) from [A-Frame Particle System](https://github.com/IdeaSpaceVR/aframe-particle-system-component) 
 
 Collisions & physics uses [A-Frame Physics System](https://github.com/n5ro/aframe-physics-system) and [Ammo.js](https://github.com/kripken/ammo.js/)
+
+Teleportation uses [A-Frame Teleport Controls](https://github.com/fernandojsg/aframe-teleport-controls)
 
