@@ -62,8 +62,10 @@ AFRAME.registerComponent('movement', {
     this.visible = this.el.object3D.visible;
     this.el.object3D.visible = false;
 
-    this.position = new THREE.Vector3();
-    this.position.copy(this.el.object3D.position)
+    // Save off world position, so we can undo any dynamic movement that happens
+    // while initializing objects (even kinetic objects are initially created as dynamic).
+    this.worldPosition = new THREE.Vector3();
+    this.el.object3D.getWorldPosition(this.worldPosition)
 
     // Basic logic of this element:
     // When held, kinematic, move anywhere.
@@ -156,9 +158,12 @@ AFRAME.registerComponent('movement', {
       this.el.setAttribute('ammo-body', 'type:dynamic');
       this.el.setAttribute('ammo-body', {type : this.data.initialState});
 
-      // reset position if kinematic.
+      // reset position to saved world position if kinematic.
       if (this.data.initialState === 'kinematic') {
-        this.el.object3D.position.copy(this.position)
+
+        GLOBAL_DATA.tempMatrix.copy(this.el.object3D.parent.matrixWorld).invert();
+        this.worldPosition.applyMatrix4(GLOBAL_DATA.tempMatrix);
+        this.el.object3D.position.copy(this.worldPosition);
       }
       // and make visible again (if appropriate).
       this.el.object3D.visible = this.visible;
@@ -223,6 +228,7 @@ AFRAME.registerComponent('movement', {
     GLOBAL_FUNCS.reparent(this.el.object3D,
                           this.el.object3D.parent,
                           stickyParent.object3D);
+
   },
 
   detachFromStickyParent() {
@@ -556,25 +562,39 @@ AFRAME.registerComponent('hand', {
 
   setConstraint(fromEl, toEl) {
 
+    // fix the transform of fromEl in toEl's world space.
+    this.lockTransformMatrix.copy(fromEl.object3D.matrixWorld);
+    this.tempMatrix.copy(toEl.object3D.matrixWorld).invert();
+    this.lockTransformMatrix.premultiply(this.tempMatrix)
+
+    // lockTransform represents fromEl's current position in toEl's world space.
+    // we keep this fixed - see tick() function.
+    this.lockedObject = fromEl.object3D;
+    this.lockedToObject = toEl.object3D;
+
+    /* Parenting - maybe in future
     if (!this.originalParent) {
       this.originalParent = fromEl.object3D.parent;
     }
 
     GLOBAL_FUNCS.reparent(fromEl.object3D,
                           fromEl.object3D.parent,
-                          toEl.object3D);
+                          toEl.object3D); */
 
   },
 
   removeConstraint(fromEl) {
 
-    var newParent = this.originalParent ? this.originalParent : this.el.SceneEl.object3D;
+    this.lockedObject = null;
+    this.lockedToObject = null;
+
+    /*var newParent = this.originalParent ? this.originalParent : this.el.SceneEl.object3D;
 
     GLOBAL_FUNCS.reparent(fromEl.object3D,
                           fromEl.object3D.parent,
                           newParent);
 
-    this.originalParent = null;
+    this.originalParent = null;*/
   },
 
   tick() {
