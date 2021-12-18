@@ -225,10 +225,20 @@ AFRAME.registerComponent('movement', {
       this.originalParent = this.el.object3D.parent;
     }
 
+    // Never reparent to our own child (causes infinite stack errors!)
+    if (this.isMyDescendent(stickyParent.object3D)) return;
+
     GLOBAL_FUNCS.reparent(this.el.object3D,
                           this.el.object3D.parent,
                           stickyParent.object3D);
 
+  },
+
+  isMyDescendent(object) {
+    if (!object.parent) return false;
+    if (object.parent === this.el.object3D) return true;
+
+    return (this.isMyDescendent(object.parent));
   },
 
   detachFromStickyParent() {
@@ -249,13 +259,15 @@ AFRAME.registerComponent('movement', {
         targetEl.hasAttribute('sticky')) return true;
 
     if (this.el.hasAttribute('sticky') &&
-        targetEl.hasAttribute('stickable')) return true;
+        (targetEl.hasAttribute('stickable') ||
+         targetEl.hasAttribute('sticky'))) return true;
 
     if (this.el.hasAttribute('stickable2') &&
         targetEl.hasAttribute('sticky2')) return true;
 
     if (this.el.hasAttribute('sticky2') &&
-        targetEl.hasAttribute('stickable2')) return true;
+        (targetEl.hasAttribute('stickable2') ||
+         targetEl.hasAttribute('sticky2'))) return true;
 
     return false;
 

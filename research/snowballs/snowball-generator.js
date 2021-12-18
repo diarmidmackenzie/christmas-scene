@@ -95,11 +95,14 @@ AFRAME.registerComponent('snowball-grow-on-roll', {
     this.currentWorldPosition = new THREE.Vector3()
     this.currentWorldQuaternion = new THREE.Quaternion()
     this.distanceMoved = new THREE.Vector3()
+
+    this.scaleVector = new THREE.Vector3();
   },
 
   setRadius() {
 
-    this.radius = this.geometryRadius * this.el.object3D.scale.x;
+    this.el.object3D.getWorldScale(this.scaleVector)
+    this.radius = this.geometryRadius * this.scaleVector.x;
     this.maxHeight = this.radius + this.data.heightDelta;
 
     /*if (this.radius > this.data.maxGrabbableRadius) {
