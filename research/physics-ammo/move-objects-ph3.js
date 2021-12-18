@@ -5,6 +5,7 @@ TYPE_STATIC = 'static';
 
 const GLOBAL_DATA = {
   tempMatrix: new THREE.Matrix4(),
+  tempQuaternion: new THREE.Quaternion(),
 }
 
 const GLOBAL_FUNCS = {
@@ -66,6 +67,8 @@ AFRAME.registerComponent('movement', {
     // while initializing objects (even kinetic objects are initially created as dynamic).
     this.worldPosition = new THREE.Vector3();
     this.el.object3D.getWorldPosition(this.worldPosition)
+
+    this.worldQuaternion = new THREE.Quaternion();
 
     // Basic logic of this element:
     // When held, kinematic, move anywhere.
@@ -161,9 +164,7 @@ AFRAME.registerComponent('movement', {
       // reset position to saved world position if kinematic.
       if (this.data.initialState === 'kinematic') {
 
-        GLOBAL_DATA.tempMatrix.copy(this.el.object3D.parent.matrixWorld).invert();
-        this.worldPosition.applyMatrix4(GLOBAL_DATA.tempMatrix);
-        this.el.object3D.position.copy(this.worldPosition);
+        this.setWorldPosition(this.el.object3D, this.worldPosition);
       }
       // and make visible again (if appropriate).
       this.el.object3D.visible = this.visible;
@@ -309,12 +310,24 @@ AFRAME.registerComponent('movement', {
   },
 
   released() {
-    if (this.stickyOverlaps.length > 0) {
-      // overlaps with a static object.
+    if ((this.stickyOverlaps.length > 0)) {
+      // parented to a sticky object.
       console.log("released - re-attach to static object")
       this.setKinematic();
       this.state = OBJECT_FIXED;
       this.attachToStickyParent(this.stickyOverlaps[0]);
+
+      // But did we actually attach to sticky Parent?
+      // If the only thing we are stuck to is actually our child, then
+      // we won't have parented to it.  And we should become a dynamic object.
+      if (this.stickyOverlaps[0].object3D !== this.el.object3D.parent) {
+        this.state = OBJECT_LOOSE;
+        this.runHomemadePhysics = true;
+        setTimeout(() => {
+          this.setDynamic();
+          this.runHomemadePhysics = false;
+        }, this.data.releaseTimer);
+      }
     }
     else {
       // become a dynamic object.
@@ -373,8 +386,8 @@ AFRAME.registerComponent('movement', {
     // Track velocity state, in case the object gets released to dynamic physics
     // - in that case we want to initialze velocity
     if (this.state !== OBJECT_LOOSE) {
-      this.lastPositions[this.historyPointer].copy(this.el.object3D.position);
-      this.lastQuaternions[this.historyPointer].copy(this.el.object3D.quaternion);
+      this.el.object3D.getWorldPosition(this.lastPositions[this.historyPointer]);
+      this.el.object3D.getWorldQuaternion(this.lastQuaternions[this.historyPointer]);
       this.lastTimeDeltas[this.historyPointer] = timeDelta;
       this.historyPointer = 1 - this.historyPointer;
       this.physicsStarting = true;
@@ -397,7 +410,8 @@ AFRAME.registerComponent('movement', {
         // historyPointer always indicates the older time interval.
         // for TimeDelta, we take the other slot, which tells us the elapsed time *after* that
         // measurement to the newer measurement.
-        this.velocity.subVectors(this.el.object3D.position, this.lastPositions[this.historyPointer]);
+        this.el.object3D.getWorldPosition(this.worldPosition)
+        this.velocity.subVectors(this.worldPosition, this.lastPositions[this.historyPointer]);
         // For reasons I don't yet understand, boosting velocity by a factor of 2
         // makes it feel much more realistic.
         this.velocity.multiplyScalar(2000 / (timeDelta + this.lastTimeDeltas[1 - this.historyPointer]));
@@ -410,9 +424,9 @@ AFRAME.registerComponent('movement', {
         // components, interpreted as a vector.
         // http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToAngle/index.htm
         this.lastQuaternions[this.historyPointer]
-        this.el.object3D.quaternion
+        this.el.object3D.getWorldQuaternion(this.worldQuaternion);
         this.tempQuaternion.copy(this.lastQuaternions[this.historyPointer]).invert();
-        this.tempQuaternion.multiply(this.el.object3D.quaternion)
+        this.tempQuaternion.multiply(this.worldQuaternion)
 
         this.rotationAxis.set(this.tempQuaternion.x,
                               this.tempQuaternion.y,
@@ -426,7 +440,10 @@ AFRAME.registerComponent('movement', {
       if (this.runHomemadePhysics) {
         this.velocityDelta.copy(this.velocity);
         this.velocityDelta.multiplyScalar(timeDelta / 1000);
-        this.el.object3D.position.add(this.velocityDelta);
+
+        this.el.object3D.getWorldPosition(this.worldPosition);
+        this.worldPosition.add(this.velocityDelta);
+        this.setWorldPosition(this.el.object3D, this.worldPosition);
 
         // Apply gravity to velocity for next tick.
         this.velocity.y -= this.data.gravity * timeDelta / 1000;
@@ -434,10 +451,29 @@ AFRAME.registerComponent('movement', {
         // apply rotation.
         const angle = this.rotationSpeed * timeDelta / 1000;
         this.tempQuaternion.setFromAxisAngle(this.rotationAxis, angle);
-        this.el.object3D.quaternion.multiply(this.tempQuaternion);
+
+        this.el.object3D.getWorldQuaternion(this.worldQuaternion)
+        this.worldQuaternion.multiply(this.tempQuaternion);
+        this.setWorldQuaternion(this.el.object3D, this.worldQuaternion);
       }
     }
-  }
+  },
+
+  setWorldPosition(object, position) {
+
+    GLOBAL_DATA.tempMatrix.copy(object.parent.matrixWorld).invert();
+    position.applyMatrix4(GLOBAL_DATA.tempMatrix);
+    this.el.object3D.position.copy(position);
+  },
+
+  setWorldQuaternion(object, quaternion) {
+
+    object.parent.getWorldQuaternion(GLOBAL_DATA.tempQuaternion);
+    GLOBAL_DATA.tempQuaternion.invert();
+    quaternion.multiply(GLOBAL_DATA.tempQuaternion);
+    this.el.object3D.quaternion.copy(quaternion);
+  },
+
 });
 
 // Add to a controller, to allow it to manipulate grabbable objects
