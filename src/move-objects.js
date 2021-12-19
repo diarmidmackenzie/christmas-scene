@@ -75,7 +75,7 @@ AFRAME.registerComponent('movement', {
     if (this.el.sceneEl.hasLoaded) {
       this.el.object3D.parent.updateMatrixWorld();
       this.el.object3D.getWorldPosition(this.worldPosition);
-      this.el.object3D.getWorldQuaternion(this.worldQuaternion);      
+      this.el.object3D.getWorldQuaternion(this.worldQuaternion);
     }
     else {
       this.el.sceneEl.addEventListener('loaded', () => {
@@ -225,7 +225,8 @@ AFRAME.registerComponent('movement', {
 
   enableCollisionOnDescendants(object) {
 
-    if (object.el) {
+    if ((object.el) &&
+        (object.el.hasAttribute('ammo-body')))  {
           object.el.setAttribute('ammo-body', 'disableCollision:false');
         }
 
