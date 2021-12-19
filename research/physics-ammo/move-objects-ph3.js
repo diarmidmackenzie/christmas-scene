@@ -52,6 +52,8 @@ AFRAME.registerComponent('movement', {
       return;
     }
 
+    this.playArea = document.getElementById("play-area");
+
     // set up for dynamic objects is more complex.
 
     // must start as dynamic of ever to become dynamic (Ammo.js bug).
@@ -298,7 +300,7 @@ AFRAME.registerComponent('movement', {
 
   detachFromStickyParent() {
 
-    var newParent = this.originalParent ? this.originalParent : this.el.sceneEl.object3D;
+    var newParent = this.originalParent ? this.originalParent : this.playArea.object3D;
 
     GLOBAL_FUNCS.reparent(this.el.object3D,
                           this.el.object3D.parent,
