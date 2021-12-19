@@ -15,6 +15,8 @@ const GLOBAL_FUNCS = {
     return;
   }
 
+  console.log(`Reparenting ${object.el.id} from ${oldParent.el ? oldParent.el.id : "unknown"} to ${newParent.el ? newParent.el.id : "unknown"}`);
+
   oldParent.updateMatrixWorld();
   oldParent.updateMatrix();
   object.updateMatrix();
@@ -110,7 +112,7 @@ AFRAME.registerComponent('movement', {
     this.tempMatrix = new THREE.Matrix4();
     this.lockTransformMatrix = new THREE.Matrix4();
 
-    this.throwaway = new THREE.Vector3();
+    this.throwaway = new THREE.Vector3();    
   },
 
   update() {
@@ -236,7 +238,13 @@ AFRAME.registerComponent('movement', {
   collideStart(event) {
 
     targetEl = event.detail.targetEl;
-    console.log(`object starts collide with object ${targetEl.id}`)
+
+    if (targetEl === event.currentTarget) {
+      console.log(`Ignore collision with self on ${targetEl.id}`)
+      return;
+    }
+
+    console.log(`${event.currentTarget.id} object starts collide with object ${targetEl.id}`)
 
     if (this.shouldStickToTarget(targetEl)) {
       console.log(`add sticky Overlap with ${targetEl.id}`);
@@ -308,8 +316,13 @@ AFRAME.registerComponent('movement', {
 
   collideEnd(event) {
 
+    if (targetEl === event.currentTarget) {
+      console.log(`Ignore collision end with self on ${targetEl.id}`)
+      return;
+    }
+
     targetEl = event.detail.targetEl;
-    console.log(`object ends collide with object ${targetEl.id}`)
+    console.log(`${event.currentTarget.id} object ends collide with object ${targetEl.id}`)
 
     if (this.shouldStickToTarget(targetEl)) {
       const index = this.stickyOverlaps.indexOf(targetEl)
