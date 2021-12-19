@@ -67,10 +67,14 @@ AFRAME.registerComponent('movement', {
 
     // Save off world position, so we can undo any dynamic movement that happens
     // while initializing objects (even kinetic objects are initially created as dynamic).
-    this.worldPosition = new THREE.Vector3();
-    this.el.object3D.getWorldPosition(this.worldPosition)
 
+    this.worldPosition = new THREE.Vector3();
     this.worldQuaternion = new THREE.Quaternion();
+    this.el.sceneEl.addEventListener('loaded', () => {
+      this.el.object3D.parent.updateMatrixWorld();
+      this.el.object3D.getWorldPosition(this.worldPosition);
+      this.el.object3D.getWorldQuaternion(this.worldQuaternion);
+    });
 
     // Basic logic of this element:
     // When held, kinematic, move anywhere.
@@ -167,6 +171,7 @@ AFRAME.registerComponent('movement', {
       if (this.data.initialState === 'kinematic') {
 
         this.setWorldPosition(this.el.object3D, this.worldPosition);
+        this.setWorldQuaternion(this.el.object3D, this.worldQuaternion);
       }
       // and make visible again (if appropriate).
       this.el.object3D.visible = this.visible;
@@ -348,14 +353,7 @@ AFRAME.registerComponent('movement', {
       }
     }
 
-    const toStickTo = this.nonChildStickyOverlap()
-
-    if (toStickTo) {
-      this.attachToStickyParent(toStickTo);
-    }
-    else {
-      this.detachFromStickyParent();
-    }
+    this.release();
   },
 
   grabbed() {
@@ -535,7 +533,7 @@ AFRAME.registerComponent('movement', {
 
     object.parent.getWorldQuaternion(GLOBAL_DATA.tempQuaternion);
     GLOBAL_DATA.tempQuaternion.invert();
-    quaternion.multiply(GLOBAL_DATA.tempQuaternion);
+    quaternion.premultiply(GLOBAL_DATA.tempQuaternion);
     this.el.object3D.quaternion.copy(quaternion);
   },
 
