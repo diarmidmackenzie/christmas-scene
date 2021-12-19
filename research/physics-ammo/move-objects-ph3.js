@@ -112,7 +112,7 @@ AFRAME.registerComponent('movement', {
     this.tempMatrix = new THREE.Matrix4();
     this.lockTransformMatrix = new THREE.Matrix4();
 
-    this.throwaway = new THREE.Vector3();    
+    this.throwaway = new THREE.Vector3();
   },
 
   update() {
@@ -248,14 +248,23 @@ AFRAME.registerComponent('movement', {
 
     if (this.shouldStickToTarget(targetEl)) {
       console.log(`add sticky Overlap with ${targetEl.id}`);
-      this.stickyOverlaps.push(targetEl);
+
+      // add to stickyOverlaps, but avoid duplicates.
+      if (!this.stickyOverlaps.includes(targetEl)) {
+        this.stickyOverlaps.push(targetEl);
+      }
+
       console.log(`${this.stickyOverlaps.length} sticky overlaps in total`);
 
-      if (this.state !== OBJECT_HELD) {
-         console.log("not held, and collided with sticky object - add constraint.")
+      if (this.state === OBJECT_LOOSE) {
+         console.log("Loose, and collided with sticky object - add constraint.")
 
-         this.setKinematic();
-         this.attachToStickyParent(this.stickyOverlaps[0]);
+         const toStickTo = this.nonChildStickyOverlap()
+
+         if (toStickTo) {
+           this.setKinematic();
+           this.attachToStickyParent(toStickTo);
+         }
       }
     }
   },
@@ -338,8 +347,10 @@ AFRAME.registerComponent('movement', {
       }
     }
 
-    if (this.stickyOverlaps.length > 0) {
-      this.attachToStickyParent(this.stickyOverlaps[0]);
+    const toStickTo = this.nonChildStickyOverlap()
+
+    if (toStickTo) {
+      this.attachToStickyParent(toStickTo);
     }
     else {
       this.detachFromStickyParent();
