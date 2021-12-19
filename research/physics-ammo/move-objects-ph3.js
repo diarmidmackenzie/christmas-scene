@@ -239,12 +239,12 @@ AFRAME.registerComponent('movement', {
 
     targetEl = event.detail.targetEl;
 
-    if (targetEl === event.currentTarget) {
+    if (targetEl === this.el) {
       console.log(`Ignore collision with self on ${targetEl.id}`)
       return;
     }
 
-    console.log(`${event.currentTarget.id} object starts collide with object ${targetEl.id}`)
+    console.log(`${this.el.id} object starts collide with object ${targetEl.id}`)
 
     if (this.shouldStickToTarget(targetEl)) {
       console.log(`add sticky Overlap with ${targetEl.id}`);
@@ -325,13 +325,14 @@ AFRAME.registerComponent('movement', {
 
   collideEnd(event) {
 
-    if (targetEl === event.currentTarget) {
+    targetEl = event.detail.targetEl;
+
+    if (targetEl === this.el) {
       console.log(`Ignore collision end with self on ${targetEl.id}`)
       return;
     }
 
-    targetEl = event.detail.targetEl;
-    console.log(`${event.currentTarget.id} object ends collide with object ${targetEl.id}`)
+    console.log(`${this.el.id} object ends collide with object ${targetEl.id}`)
 
     if (this.shouldStickToTarget(targetEl)) {
       const index = this.stickyOverlaps.indexOf(targetEl)
