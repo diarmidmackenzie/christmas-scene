@@ -11,7 +11,7 @@
     <!-- <script src="https://unpkg.com/aframe-particle-system-component@1.0.x/dist/aframe-particle-system-component.min.js"></script>-->
     <script src="./lib/aframe-particle-system-component.js"></script>
     <script src="https://mixedreality.mozilla.org/ammo.js/builds/ammo.wasm.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/diarmidmackenzie/aframe-physics-system@latest/dist/aframe-physics-system.min.js"></script>
+    <script src="./lib/aframe-physics-system.js"></script>
     <script src="./src/move-objects.js"></script>
     <script src="./src/christmas-utils.js"></script>
 
@@ -47,7 +47,7 @@
         <a-mixin id="snowball"
                  material="color:white"
                  geometry="primitive:sphere;segments-height:7;segments-width:13;radius:0.5"
-                 movement="type:grabbable; stickiness:stickable">
+                 movement="type:grabbable; stickiness:sticky">
         </a-mixin>
         <a-mixin id="coal"
                  material="color:black"
@@ -379,8 +379,8 @@
                width = "100" height = "1" depth = "100"
                movement="type:static; stickiness:sticky"
                ammo-shape="type:box"
-               position = "0 -0.5 0"
-               visible = false>
+               position = "0 -0.499 0"
+               visible = true>
         </a-box>
       </a-entity>
     </a-scene>

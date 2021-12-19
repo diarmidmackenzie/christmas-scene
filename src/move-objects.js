@@ -3,6 +3,35 @@ OBJECT_HELD = 2;
 OBJECT_LOOSE = 3;
 TYPE_STATIC = 'static';
 
+const GLOBAL_DATA = {
+  tempMatrix: new THREE.Matrix4(),
+  tempQuaternion: new THREE.Quaternion(),
+}
+
+const GLOBAL_FUNCS = {
+  reparent : function (object, oldParent, newParent) {
+
+  if (object.parent === newParent) {
+    return;
+  }
+
+  console.log(`Reparenting ${object.el.id} from ${oldParent.el ? oldParent.el.id : "unknown"} to ${newParent.el ? newParent.el.id : "unknown"}`);
+
+  oldParent.updateMatrixWorld();
+  oldParent.updateMatrix();
+  object.updateMatrix();
+  newParent.updateMatrixWorld();
+  newParent.updateMatrix();
+
+  GLOBAL_DATA.tempMatrix.copy(newParent.matrixWorld).invert();
+  object.matrix.premultiply(oldParent.matrixWorld);
+  object.matrix.premultiply(GLOBAL_DATA.tempMatrix);
+  object.matrix.decompose(object.position, object.quaternion, object.scale);
+  object.matrixWorldNeedsUpdate = true;
+  newParent.add(object);
+},
+};
+
 AFRAME.registerComponent('movement', {
   schema: {
     type: {type: 'string', default: 'grabbable', oneOf: ['static', 'grabbable', 'dynamic']},
@@ -23,6 +52,8 @@ AFRAME.registerComponent('movement', {
       return;
     }
 
+    this.playArea = document.getElementById("play-area");
+
     // set up for dynamic objects is more complex.
 
     // must start as dynamic of ever to become dynamic (Ammo.js bug).
@@ -36,8 +67,24 @@ AFRAME.registerComponent('movement', {
     this.visible = this.el.object3D.visible;
     this.el.object3D.visible = false;
 
-    this.position = new THREE.Vector3();
-    this.position.copy(this.el.object3D.position)
+    // Save off world position, so we can undo any dynamic movement that happens
+    // while initializing objects (even kinetic objects are initially created as dynamic).
+
+    this.worldPosition = new THREE.Vector3();
+    this.worldQuaternion = new THREE.Quaternion();
+    if (this.el.sceneEl.hasLoaded) {
+      this.el.object3D.parent.updateMatrixWorld();
+      this.el.object3D.getWorldPosition(this.worldPosition);
+      this.el.object3D.getWorldQuaternion(this.worldQuaternion);      
+    }
+    else {
+      this.el.sceneEl.addEventListener('loaded', () => {
+        this.el.object3D.parent.updateMatrixWorld();
+        this.el.object3D.getWorldPosition(this.worldPosition);
+        this.el.object3D.getWorldQuaternion(this.worldQuaternion);
+      });
+    }
+
 
     // Basic logic of this element:
     // When held, kinematic, move anywhere.
@@ -130,9 +177,11 @@ AFRAME.registerComponent('movement', {
       this.el.setAttribute('ammo-body', 'type:dynamic');
       this.el.setAttribute('ammo-body', {type : this.data.initialState});
 
-      // reset position if kinematic.
+      // reset position to saved world position if kinematic.
       if (this.data.initialState === 'kinematic') {
-        this.el.object3D.position.copy(this.position)
+
+        this.setWorldPosition(this.el.object3D, this.worldPosition);
+        this.setWorldQuaternion(this.el.object3D, this.worldQuaternion);
       }
       // and make visible again (if appropriate).
       this.el.object3D.visible = this.visible;
@@ -155,16 +204,48 @@ AFRAME.registerComponent('movement', {
     console.log("set to kinematic")
     this.el.setAttribute('ammo-body', 'type: kinematic');
 
+    // re-instate collisions on descandants that may have been disabled.
+    // use a timer to avoid race conditions around dynamic->kinematic switch.
+    setTimeout(() => this.enableCollisionOnDescendants(this.el.object3D), 100);
+
   },
 
   setDynamic() {
+
+    // first check for any children that are colliding with this element.
+    // disable collisions for them - else they will exert forces on this
+    // body when it becomes dynamic, resulting in crazy runaway acceleration
+    // (since they are fixed to this object!)
+    this.suppressCollisionsOnOverlappingDescendants(this.el.object3D);
     // set object to dynamic.
     console.log("set to dynamic")
     this.el.setAttribute('ammo-body', 'type: dynamic');
 
-    // set initial velocity & rotation based on prior movement.
-    // To Do...
+  },
 
+  enableCollisionOnDescendants(object) {
+
+    if (object.el) {
+          object.el.setAttribute('ammo-body', 'disableCollision:false');
+        }
+
+    object.children.forEach((o) => {
+      this.enableCollisionOnDescendants(o)
+    });
+
+  },
+
+  suppressCollisionsOnOverlappingDescendants(object) {
+
+    if (object.el &&
+        object.el !== this.el &&
+        this.stickyOverlaps.includes(object.el)) {
+          object.el.setAttribute('ammo-body', 'disableCollision:true');
+        }
+
+    object.children.forEach((o) => {
+      this.suppressCollisionsOnOverlappingDescendants(o)
+    });
   },
 
   // collideStart & collideEnd used to track overlaps with static objects, to
@@ -172,37 +253,69 @@ AFRAME.registerComponent('movement', {
   collideStart(event) {
 
     targetEl = event.detail.targetEl;
-    console.log(`object starts collide with object ${targetEl.id}`)
+
+    if (targetEl === this.el) {
+      console.log(`Ignore collision with self on ${targetEl.id}`)
+      return;
+    }
+
+    console.log(`${this.el.id} object starts collide with object ${targetEl.id}`)
 
     if (this.shouldStickToTarget(targetEl)) {
       console.log(`add sticky Overlap with ${targetEl.id}`);
-      this.stickyOverlaps.push(targetEl);
+
+      // add to stickyOverlaps, but avoid duplicates.
+      if (!this.stickyOverlaps.includes(targetEl)) {
+        this.stickyOverlaps.push(targetEl);
+      }
+
       console.log(`${this.stickyOverlaps.length} sticky overlaps in total`);
 
-      if (this.state !== OBJECT_HELD) {
-         console.log("not held, and collided with sticky object - add constraint.")
+      if (this.state === OBJECT_LOOSE) {
+         console.log("Loose, and collided with sticky object - add constraint.")
 
-         this.setKinematic();
-         this.attachToStickyParent(this.stickyOverlaps[0]);
+         const toStickTo = this.nonChildStickyOverlap()
+
+         if (toStickTo) {
+           this.setKinematic();
+           this.attachToStickyParent(toStickTo);
+         }
       }
     }
   },
 
   attachToStickyParent(stickyParent) {
 
-    // sets up thisl.lockTransformMatrix to represent the objects position
-    // (which should now be fixed), from the perspective of the sticky parent.
-    this.stickyParent = stickyParent;
-    this.lockTransformMatrix.copy(this.el.object3D.matrixWorld);
-    this.tempMatrix.copy(stickyParent.object3D.matrixWorld).invert();
-    this.lockTransformMatrix.premultiply(this.tempMatrix)
+    if (!this.originalParent) {
+      this.originalParent = this.el.object3D.parent;
+    }
+
+    // Never reparent to our own child (causes infinite stack errors!)
+    if (this.isMyDescendent(stickyParent.object3D)) return;
+
+    GLOBAL_FUNCS.reparent(this.el.object3D,
+                          this.el.object3D.parent,
+                          stickyParent.object3D);
+
+  },
+
+  isMyDescendent(object) {
+    if (!object.parent) return false;
+    if (object.parent === this.el.object3D) return true;
+
+    return (this.isMyDescendent(object.parent));
   },
 
   detachFromStickyParent() {
 
-    // sets up thisl.lockTransformMatrix to represent the objects position
-    // (which should now be fixed), from the perspective of the sticky parent.
-    this.stickyParent = null;
+    var newParent = this.originalParent ? this.originalParent : this.playArea.object3D;
+
+    GLOBAL_FUNCS.reparent(this.el.object3D,
+                          this.el.object3D.parent,
+                          newParent);
+
+    this.originalParent = null;
+
   },
 
   shouldStickToTarget(targetEl) {
@@ -211,13 +324,15 @@ AFRAME.registerComponent('movement', {
         targetEl.hasAttribute('sticky')) return true;
 
     if (this.el.hasAttribute('sticky') &&
-        targetEl.hasAttribute('stickable')) return true;
+        (targetEl.hasAttribute('stickable') ||
+         targetEl.hasAttribute('sticky'))) return true;
 
     if (this.el.hasAttribute('stickable2') &&
         targetEl.hasAttribute('sticky2')) return true;
 
     if (this.el.hasAttribute('sticky2') &&
-        targetEl.hasAttribute('stickable2')) return true;
+        (targetEl.hasAttribute('stickable2') ||
+         targetEl.hasAttribute('sticky2'))) return true;
 
     return false;
 
@@ -226,7 +341,13 @@ AFRAME.registerComponent('movement', {
   collideEnd(event) {
 
     targetEl = event.detail.targetEl;
-    console.log(`object ends collide with object ${targetEl.id}`)
+
+    if (targetEl === this.el) {
+      console.log(`Ignore collision end with self on ${targetEl.id}`)
+      return;
+    }
+
+    console.log(`${this.el.id} object ends collide with object ${targetEl.id}`)
 
     if (this.shouldStickToTarget(targetEl)) {
       const index = this.stickyOverlaps.indexOf(targetEl)
@@ -242,12 +363,7 @@ AFRAME.registerComponent('movement', {
       }
     }
 
-    if (this.stickyOverlaps.length > 0) {
-      this.attachToStickyParent(this.stickyOverlaps[0]);
-    }
-    else {
-      this.detachFromStickyParent(this.stickyOverlaps[0]);
-    }
+    this.release();
   },
 
   grabbed() {
@@ -258,20 +374,40 @@ AFRAME.registerComponent('movement', {
     console.log(this.el);
   },
 
+  nonChildStickyOverlap() {
+    // is there a sticky overlap that is not a child of ours?
+
+    var nonChldStickyOverlap = null;
+
+    this.stickyOverlaps.forEach((el) => {
+
+      if (!this.isMyDescendent(el.object3D)) {
+        nonChldStickyOverlap = el;
+      }
+    });
+
+    return nonChldStickyOverlap;
+  },
+
   released() {
-    if (this.stickyOverlaps.length > 0) {
-      // overlaps with a static object.
-      console.log("released - re-attach to static object")
+
+    toStickTo = this.nonChildStickyOverlap()
+
+    if (toStickTo) {
+
+      // sticky object to parent to.
+      console.log("released - re-attach to a parent object")
       this.setKinematic();
       this.state = OBJECT_FIXED;
-      this.attachToStickyParent(this.stickyOverlaps[0]);
+      this.attachToStickyParent(toStickTo);
+
     }
     else {
       // become a dynamic object.
       console.log("released - becomes loose dynamic object")
 
       this.state = OBJECT_LOOSE;
-      this.detachFromStickyParent(this.stickyOverlaps[0]);
+      this.detachFromStickyParent();
 
       // We run "homemade" physics for a short period, before Ammo dynamic physics
       // take over.
@@ -292,6 +428,7 @@ AFRAME.registerComponent('movement', {
 
     if (this.data.type === 'static') return;
 
+    /*
     // tie object to sticky parent (which may be moving).
     if (this.state !== OBJECT_HELD && this.stickyParent) {
 
@@ -317,13 +454,13 @@ AFRAME.registerComponent('movement', {
       // and interferes with snowball growth on roll.
       object.matrix.decompose(object.position, object.quaternion, this.throwaway);
       object.matrixWorldNeedsUpdate = true;
-    }
+    }*/
 
     // Track velocity state, in case the object gets released to dynamic physics
     // - in that case we want to initialze velocity
     if (this.state !== OBJECT_LOOSE) {
-      this.lastPositions[this.historyPointer].copy(this.el.object3D.position);
-      this.lastQuaternions[this.historyPointer].copy(this.el.object3D.quaternion);
+      this.el.object3D.getWorldPosition(this.lastPositions[this.historyPointer]);
+      this.el.object3D.getWorldQuaternion(this.lastQuaternions[this.historyPointer]);
       this.lastTimeDeltas[this.historyPointer] = timeDelta;
       this.historyPointer = 1 - this.historyPointer;
       this.physicsStarting = true;
@@ -346,7 +483,8 @@ AFRAME.registerComponent('movement', {
         // historyPointer always indicates the older time interval.
         // for TimeDelta, we take the other slot, which tells us the elapsed time *after* that
         // measurement to the newer measurement.
-        this.velocity.subVectors(this.el.object3D.position, this.lastPositions[this.historyPointer]);
+        this.el.object3D.getWorldPosition(this.worldPosition)
+        this.velocity.subVectors(this.worldPosition, this.lastPositions[this.historyPointer]);
         // For reasons I don't yet understand, boosting velocity by a factor of 2
         // makes it feel much more realistic.
         this.velocity.multiplyScalar(2000 / (timeDelta + this.lastTimeDeltas[1 - this.historyPointer]));
@@ -359,9 +497,9 @@ AFRAME.registerComponent('movement', {
         // components, interpreted as a vector.
         // http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToAngle/index.htm
         this.lastQuaternions[this.historyPointer]
-        this.el.object3D.quaternion
+        this.el.object3D.getWorldQuaternion(this.worldQuaternion);
         this.tempQuaternion.copy(this.lastQuaternions[this.historyPointer]).invert();
-        this.tempQuaternion.multiply(this.el.object3D.quaternion)
+        this.tempQuaternion.multiply(this.worldQuaternion)
 
         this.rotationAxis.set(this.tempQuaternion.x,
                               this.tempQuaternion.y,
@@ -375,7 +513,10 @@ AFRAME.registerComponent('movement', {
       if (this.runHomemadePhysics) {
         this.velocityDelta.copy(this.velocity);
         this.velocityDelta.multiplyScalar(timeDelta / 1000);
-        this.el.object3D.position.add(this.velocityDelta);
+
+        this.el.object3D.getWorldPosition(this.worldPosition);
+        this.worldPosition.add(this.velocityDelta);
+        this.setWorldPosition(this.el.object3D, this.worldPosition);
 
         // Apply gravity to velocity for next tick.
         this.velocity.y -= this.data.gravity * timeDelta / 1000;
@@ -383,10 +524,29 @@ AFRAME.registerComponent('movement', {
         // apply rotation.
         const angle = this.rotationSpeed * timeDelta / 1000;
         this.tempQuaternion.setFromAxisAngle(this.rotationAxis, angle);
-        this.el.object3D.quaternion.multiply(this.tempQuaternion);
+
+        this.el.object3D.getWorldQuaternion(this.worldQuaternion)
+        this.worldQuaternion.multiply(this.tempQuaternion);
+        this.setWorldQuaternion(this.el.object3D, this.worldQuaternion);
       }
     }
-  }
+  },
+
+  setWorldPosition(object, position) {
+
+    GLOBAL_DATA.tempMatrix.copy(object.parent.matrixWorld).invert();
+    position.applyMatrix4(GLOBAL_DATA.tempMatrix);
+    this.el.object3D.position.copy(position);
+  },
+
+  setWorldQuaternion(object, quaternion) {
+
+    object.parent.getWorldQuaternion(GLOBAL_DATA.tempQuaternion);
+    GLOBAL_DATA.tempQuaternion.invert();
+    quaternion.premultiply(GLOBAL_DATA.tempQuaternion);
+    this.el.object3D.quaternion.copy(quaternion);
+  },
+
 });
 
 // Add to a controller, to allow it to manipulate grabbable objects
@@ -532,6 +692,16 @@ AFRAME.registerComponent('hand', {
     // we keep this fixed - see tick() function.
     this.lockedObject = fromEl.object3D;
     this.lockedToObject = toEl.object3D;
+
+    /* Parenting - maybe in future
+    if (!this.originalParent) {
+      this.originalParent = fromEl.object3D.parent;
+    }
+
+    GLOBAL_FUNCS.reparent(fromEl.object3D,
+                          fromEl.object3D.parent,
+                          toEl.object3D); */
+
   },
 
   removeConstraint(fromEl) {
@@ -539,6 +709,13 @@ AFRAME.registerComponent('hand', {
     this.lockedObject = null;
     this.lockedToObject = null;
 
+    /*var newParent = this.originalParent ? this.originalParent : this.el.SceneEl.object3D;
+
+    GLOBAL_FUNCS.reparent(fromEl.object3D,
+                          fromEl.object3D.parent,
+                          newParent);
+
+    this.originalParent = null;*/
   },
 
   tick() {
