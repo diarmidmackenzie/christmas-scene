@@ -72,11 +72,19 @@ AFRAME.registerComponent('movement', {
 
     this.worldPosition = new THREE.Vector3();
     this.worldQuaternion = new THREE.Quaternion();
-    this.el.sceneEl.addEventListener('loaded', () => {
+    if (this.el.sceneEl.hasLoaded) {
       this.el.object3D.parent.updateMatrixWorld();
       this.el.object3D.getWorldPosition(this.worldPosition);
-      this.el.object3D.getWorldQuaternion(this.worldQuaternion);
-    });
+      this.el.object3D.getWorldQuaternion(this.worldQuaternion);      
+    }
+    else {
+      this.el.sceneEl.addEventListener('loaded', () => {
+        this.el.object3D.parent.updateMatrixWorld();
+        this.el.object3D.getWorldPosition(this.worldPosition);
+        this.el.object3D.getWorldQuaternion(this.worldQuaternion);
+      });
+    }
+
 
     // Basic logic of this element:
     // When held, kinematic, move anywhere.
