@@ -545,6 +545,8 @@ AFRAME.registerComponent('snowball-generator', {
     this.timePassed = 0;
     this.el.addEventListener("gripdown", this.gripDown.bind(this));
     this.el.addEventListener("gripup", this.gripUp.bind(this));
+
+    this.playArea = document.getElementById("play-area");
   },
 
 
@@ -589,10 +591,11 @@ AFRAME.registerComponent('snowball-generator', {
     snowball.setAttribute('mixin', this.data.mixin)
     const radius = snowball.mixinEls[0].componentCache.geometry.radius;
     snowball.setAttribute('ammo-shape', `type:sphere; fit:manual; sphereRadius:${radius * this.data.scale}`)
+    snowball.setAttribute('id', `snowball-${Math.random().toFixed(4)}`)
     snowball.object3D.scale.set(this.data.scale, this.data.scale, this.data.scale);
     this.el.object3D.getWorldPosition(snowball.object3D.position);
     snowball.setAttribute('snowball-grow-on-roll', "");
-    this.el.sceneEl.appendChild(snowball);
+    this.playArea.appendChild(snowball);
   }
 });
 
