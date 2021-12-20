@@ -316,3 +316,64 @@ AFRAME.registerComponent('penguin', {
     mesh.material = materials;
   }
 });
+
+
+AFRAME.registerGeometry('paintbrush', {
+  schema: {
+  },
+
+  init: function (data) {
+    //radiusTop, radiusBottom, height, radialSegments
+    const geometriesBrush = [];
+    //tip of brush
+    geometriesBrush.push(new THREE.ConeGeometry(0.5, 1, 8));
+    //body of brush
+    geometriesBrush.push(new THREE.SphereGeometry(0.5, 8, 8, 0, 2*Math.PI, 0, Math.PI/2));
+    geometriesBrush[1].translate(0, 0.5, 0);
+    geometriesBrush[1].rotateX(Math.PI);
+
+    this.geometryBrush = THREE.BufferGeometryUtils.mergeBufferGeometries(geometriesBrush);
+
+    //neck of brush
+    const geometryNeck = new THREE.CylinderGeometry(0.2, 0.2, 0.2, 8, 1);
+    geometryNeck.translate(0, -1, 0);
+
+    // Handle of brush
+    const geometriesHandle = []
+    geometriesHandle.push(new THREE.CylinderGeometry(0.2, 0.3, 0.5, 8, 1));
+    geometriesHandle[0].translate(0, -1.4, 0);
+
+    geometriesHandle.push(new THREE.CylinderGeometry(0.3, 0.2, 3.8, 8, 1));
+    geometriesHandle[1].translate(0, -3.5, 0);
+
+    this.geometryHandle = THREE.BufferGeometryUtils.mergeBufferGeometries(geometriesHandle);
+
+    this.geometry = THREE.BufferGeometryUtils.mergeBufferGeometries([this.geometryBrush,
+                                                                     geometryNeck,
+                                                                     this.geometryHandle],
+                                                                     true);
+    recenterGeometry(this.geometry);
+  }
+});
+
+
+AFRAME.registerComponent('paintbrush', {
+
+  schema: {
+    color: {default: 'blue'}
+  },
+
+  init () {
+    var materials = [new THREE.MeshBasicMaterial({
+                          color: this.data.color
+                     }), new THREE.MeshBasicMaterial({
+                          color: 'silver'
+                     }), new THREE.MeshBasicMaterial({
+                          color: 'brown'
+                     })]
+
+    this.el.setAttribute('geometry','primitive:paintbrush');
+    const mesh = this.el.getObject3D('mesh');
+    mesh.material = materials;
+  }
+});
