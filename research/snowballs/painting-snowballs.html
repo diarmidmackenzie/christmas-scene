@@ -1,0 +1,67 @@
+<html>
+  <head>
+    <title>Moving Objects with Ammo.js</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://mixedreality.mozilla.org/ammo.js/builds/ammo.wasm.js"></script>
+    <script src="../physics-ammo/modded-physics/aframe-physics-system.js"></script>
+    <script src="../../src/move-objects.js"></script>
+    <script src="../../src/christmas-utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/diarmidmackenzie/key-bindings@v0.3-alpha/key-bindings.min.js"></script>
+  </head>
+  <body>
+    <a-scene debug physics="driver: ammo; debug: true; debugDrawMode: 1;" >
+     <a-assets>
+       <a-mixin id="snowbase"
+                material="color:gray; opacity:0.5"
+                paintable
+                geometry="primitive:sphere;segments-height:7;segments-width:13;radius:0.5"
+                movement="type:static; stickiness:sticky">
+       </a-mixin>
+       <a-mixin id="snowball"
+                material="color:gray; opacity:0.5"
+                paintable
+                geometry="primitive:sphere;segments-height:7;segments-width:13;radius:0.5"
+                movement="type:grabbable; stickiness:sticky">
+       </a-mixin>
+       <a-mixin id="paintbrush"
+                paintbrush="color:blue"
+                scale="0.05 0.05 0.05">
+       </a-mixin>
+
+     </a-assets>
+     <a-entity id="physics-wrapper">
+
+        <a-box id="lhand" hand
+               material="color:red;opacity:0.5"
+               width="0.1" depth="0.1" height="0.1"
+               key-bindings="bindings:KeyI=up,KeyK=down,KeyJ=left,KeyL=right,
+                             ShiftLeft=togglegrip,KeyO=turnCCW,KeyP=turnCW,KeyT=toggletrigger"
+               hand-keyboard-controls
+               position="0.2 1.5 -1">
+        </a-box>
+         <a-entity id="snowman-head" mixin="snowbase" scale="0.7 0.7 0.7" position="-0.5 1.5 -1" ammo-shape="type:sphere;fit:manual;sphereRadius:0.35"></a-entity>
+         <a-entity id="paintbrush" mixin="paintbrush" rotation="0 0 -90" position="0.2 1.5 -1"></a-entity>
+
+         <a-box id="floor-plane"
+                width = "20" height = "1" depth = "20"
+                movement="type:static; stickiness:sticky"
+                ammo-shape="fit:hull"
+                position = "0 0.8 0"
+                visible = true>
+         </a-box>
+      </a-entity>
+    </a-scene>
+    <div style ="position:fixed;top:20px;left:20px">
+      <p>
+        Basic 2D simulation of pinting a snowball.<br>
+        Keyboard Controls:<br>
+        IJKL (like WASD) to move the pink block (which represents a hand)<br>
+        Left Shift to grip (must be gripped to affect object).  Pink block becomes more transparent on grip.<br>
+        T to toggle trigger - used to change paintbrush color.
+        O & P to rotate CCW & CW (must be gripped to affect object)<br>
+        Gravity is artificially low, to make behaviour on release easier to observe.<br>
+        Note that one side effect of low gravity is that objects my go to sleep (freeze) sooner than you would expect.<br>
+      </p>
+    </div>
+  </body>
+</html>

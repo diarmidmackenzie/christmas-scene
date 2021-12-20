@@ -41,11 +41,13 @@
 
         <a-mixin id="snowbase"
                  material="color:white"
+                 paintable
                  geometry="primitive:sphere;segments-height:7;segments-width:13;radius:0.5"
                  movement="type:static; stickiness:sticky">
         </a-mixin>
         <a-mixin id="snowball"
                  material="color:white"
+                 paintable
                  geometry="primitive:sphere;segments-height:7;segments-width:13;radius:0.5"
                  movement="type:grabbable; stickiness:sticky">
         </a-mixin>
@@ -133,6 +135,10 @@
                  scale="0.1 0.1 0.1"
                  movement="type:grabbable; stickiness:stickable; initialState:dynamic">
         </a-mixin>
+        <a-mixin id="paintbrush"
+                 paintbrush="color:blue"
+                 scale="0.05 0.05 0.05">
+        </a-mixin>
 
         <!-- env-map dosesn't seem to work when deployed via mix-ins, hence no mixin for baubles-->
       </a-assets>
@@ -203,6 +209,9 @@
         <a-entity id="tree-2nd-tier" mixin="tree-tier" position="1.5 1.05 0"
                   ammo-shape="type:hull">
         </a-entity>
+
+        <a-entity id="paintbrush" mixin="paintbrush" rotation="45 0 0" position="1.2 0.9 0.3"></a-entity>
+
         <a-entity position="1.5 1.05 0" rotation="0 90 0">
           <a-sphere color="blue" cylindrical-position="height: -0.1; radius:0.33; angle:45" mixin="bauble"
                     env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>

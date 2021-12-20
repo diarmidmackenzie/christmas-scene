@@ -52,8 +52,6 @@ AFRAME.registerComponent('movement', {
       return;
     }
 
-    this.playArea = document.getElementById("play-area");
-
     // set up for dynamic objects is more complex.
 
     // must start as dynamic of ever to become dynamic (Ammo.js bug).
@@ -76,12 +74,14 @@ AFRAME.registerComponent('movement', {
       this.el.object3D.parent.updateMatrixWorld();
       this.el.object3D.getWorldPosition(this.worldPosition);
       this.el.object3D.getWorldQuaternion(this.worldQuaternion);
+      this.playArea = document.getElementById("play-area");
     }
     else {
       this.el.sceneEl.addEventListener('loaded', () => {
         this.el.object3D.parent.updateMatrixWorld();
         this.el.object3D.getWorldPosition(this.worldPosition);
         this.el.object3D.getWorldQuaternion(this.worldQuaternion);
+        this.playArea = document.getElementById("play-area");
       });
     }
 
@@ -363,8 +363,6 @@ AFRAME.registerComponent('movement', {
         console.log(`${this.stickyOverlaps} sticky overlaps in total`);
       }
     }
-
-    this.release();
   },
 
   grabbed() {
@@ -653,7 +651,7 @@ AFRAME.registerComponent('hand', {
     this.setConstraint(el, this.collider);
     this.grabbedEl = el;
     // signal to element it has been grabbed.
-    el.emit("grabbed")
+    el.emit("grabbed", {hand: this.el})
   },
 
   releaseObject(el) {
@@ -662,7 +660,7 @@ AFRAME.registerComponent('hand', {
     this.grabbedEl = null;
 
     // signal to element it has been released.
-    el.emit("released")
+    el.emit("released", {hand: this.el})
 
   },
   // Could be useful in future for handling dynamic objects.
@@ -756,6 +754,7 @@ AFRAME.registerComponent('hand-keyboard-controls', {
 
   init() {
     this.gripDown = false;
+    this.triggerDown = false;
     this.el.addEventListener('up', () => this.el.object3D.position.y += 0.01)
     this.el.addEventListener('down', () => this.el.object3D.position.y -= 0.01)
     this.el.addEventListener('left', () => this.el.object3D.position.x -= 0.01)
@@ -772,6 +771,16 @@ AFRAME.registerComponent('hand-keyboard-controls', {
         this.gripDown = false;
         this.el.emit("gripup");
         this.el.setAttribute('color','red');
+      }
+    });
+    this.el.addEventListener('toggletrigger', () => {
+      if (!this.triggerDown) {
+        this.triggerDown = true;
+        this.el.emit("triggerdown");
+      }
+      else {
+        this.triggerDown = false;
+        this.el.emit("triggerup");        
       }
     });
   }
