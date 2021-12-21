@@ -62,3 +62,32 @@ Implications:
   - Hooray for sticky snow!
 - Nothing else (other than reducing overall scene complexity) is likely to make much difference - e.g. modelling penguins as cylinders rather than convex hulls is unlikely to move the needle very far at all.
 
+
+
+### Some more notes on HACD snowman's hat
+
+Looking at overall scene physics ttick time on Oculus Quest 2...
+
+- Reducing hat geometry from 10 sides to 4 sides, with HACD gets us from 26msecs to ~18msecs.
+- Making the hat 10 sided, non-hollow, with HACD also gets ups to ~18 msecs (since the brim sticks out, HACD still has a bunch of work to do for the outside of the hat)
+- Making the hat 10-sides non-hollow with a convex hull shape gets us down to ~12 msecs.
+
+I don't really care about the non-convex exterior of the hull.  A convex wrap would be fine for that.  But I would like the hat to still have a hollow interior.
+
+- Not sure whether that can be achieved...  Segmenting the hat into a set of radial segments, each given a convex wrap, and kept rigidly in formation with parent-child relationships, would work as long as the object is kinematic, but things will fall apart badly as soon as all those objects become dynamic.
+
+- A hat without a brim might be a lot simpler...
+
+- Or maybe I could have the brim as a separate child object that is decorative only, with no collision physics on it (like I have done with the ribbons on the presents)...
+
+  
+
+
+
+Further update on the HACD hat...
+
+- After adding 50 fence posts around the perimeter of the scene, the impact of the HACD hat has become much worse.
+  - Without the HACD hat, physics tick processing is now ~9msecs (yes, it's gone down as a result of adding more physics objects, that doesn't make much sense but it seems to have hapened)
+  - With the HACD hat, physics tick processing is now ~35msecs (way up vs. before).
+- So the HACD hat has to go.
+  - One idea I have had is to have the hat track its orientation, and switch from hull shape to HACD shape only when upside down.  If I can make the switchover clean, that might get me the best of both worlds...
