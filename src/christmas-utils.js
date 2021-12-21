@@ -306,11 +306,11 @@ AFRAME.registerGeometry('penguin', {
 AFRAME.registerComponent('penguin', {
 
   init () {
-    var materials = [new THREE.MeshBasicMaterial({
+    var materials = [new THREE.MeshStandardMaterial({
                           color: 'black'
-                     }), new THREE.MeshBasicMaterial({
+                     }), new THREE.MeshStandardMaterial({
                           color: 'white'
-                     }), new THREE.MeshBasicMaterial({
+                     }), new THREE.MeshStandardMaterial({
                           color: 'orange'
                      })]
 
@@ -326,6 +326,7 @@ AFRAME.registerComponent('cylindrical-position', {
     radius: {type: 'number', default: 1},
     angle: {type: 'number', default: 0},
     faceInward: {type: 'boolean', default: true},
+    randomOrientation: {type: 'boolean', default: false},
   },
 
   update() {
@@ -336,7 +337,12 @@ AFRAME.registerComponent('cylindrical-position', {
     this.el.object3D.position.z = -this.data.radius * Math.cos(radians)
 
     this.el.object3D.rotation.x = 0
-    this.el.object3D.rotation.y = -radians + (this.data.faceInward ? 0 : Math.PI)
+    if (this.data.randomOrientation) {
+      this.el.object3D.rotation.y = Math.random() * Math.PI * 2;
+    }
+    else {
+      this.el.object3D.rotation.y = -radians + (this.data.faceInward ? 0 : Math.PI)
+    }
     this.el.object3D.rotation.z = 0
   },
 });
@@ -843,11 +849,11 @@ AFRAME.registerComponent('paintbrush', {
   },
 
   init () {
-    var materials = [new THREE.MeshBasicMaterial({
+    var materials = [new THREE.MeshStandardMaterial({
                           color: this.data.color
-                     }), new THREE.MeshBasicMaterial({
+                     }), new THREE.MeshStandardMaterial({
                           color: 'silver'
-                     }), new THREE.MeshBasicMaterial({
+                     }), new THREE.MeshStandardMaterial({
                           color: 'brown'
                      })]
 
@@ -951,5 +957,30 @@ AFRAME.registerComponent('paintable', {
     this.color.b = 0.5 + (this.color.b/2);
 
     return(this.color);
+  }
+});
+
+
+AFRAME.registerComponent('perimeter-fence', {
+
+  schema: {
+    radius: {type: 'number', default: 10},
+    posts: {type: 'number', default: 50}
+  },
+
+  init() {
+    for (ii = 0; ii < this.data.posts; ii++) {
+
+        const branch = document.createElement('a-entity');
+        branch.setAttribute("mixin", "branch");
+        branch.setAttribute('scale', "0.3 0.3 0.3")
+        branch.setAttribute("cylindrical-position",
+                            `height:0.4;
+                             radius:${this.data.radius};
+                             angle:${ii * 360 / this.data.posts};
+                             randomOrientation: true`);
+        branch.setAttribute("ammo-shape", "type:hull");
+        this.el.appendChild(branch);
+    }
   }
 });
