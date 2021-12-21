@@ -187,10 +187,12 @@
         <a-entity id="snowman-mouth3" mixin="coal" position="0 1 -1.2" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
         <a-entity id="snowman-mouth4" mixin="coal" position="0.05  1 -1.2" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
         <a-entity id="snowman-mouth5" mixin="coal" position="0.1 1.02 -1.21" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
-        <a-entity id="snowman-hat" mixin="hat" position="0 1.56 -1.5" ammo-shape="type:hacd">
+        <a-entity id="snowman-hat" mixin="hat" position="0 1.56 -1.5" ammo-shape="type:hull">
         </a-entity>
         <a-entity id="snowman-l-arm" mixin="branch" rotation="0 0 80" position="-0.6 0.7 -1.5" ammo-shape="type:hull"></a-entity>
         <a-entity id="snowman-r-arm" mixin="branch" rotation="0 0 -100" position="0.6 0.7 -1.5" ammo-shape="type:hull"></a-entity>
+
+        <a-entity perimeter-fence position = "3 0 -3"></a-entity>
 
         <a-entity id="tree-trunk" mixin="trunk" position="1.5 0.25 0"></a-entity>
         <!-- in the past, bables have worked better *not* as children of tree.
@@ -242,26 +244,26 @@
         <a-entity id="present2" mixin="present-medium" position="1.6 0.1 -0.7"
                   ammo-shape="type:box"
                   rotation="0 -10 0">
-          <a-entity id="ribbon1" mixin="ribbon-medium ribbon-gold"></a-entity>
+          <a-entity id="ribbon2" mixin="ribbon-medium ribbon-gold"></a-entity>
         </a-entity>
         <a-entity id="present3" mixin="present-small" position="1.3 0.05 -0.5"
                   ammo-shape="type:box"
                   rotation="0 30 0">
-          <a-entity id="ribbon1" mixin="ribbon-small ribbon-green"></a-entity>
+          <a-entity id="ribbon3" mixin="ribbon-small ribbon-green"></a-entity>
         </a-entity>
-        <a-entity id="present3" mixin="present-medium" position="1.3 0.1 0.5"
+        <a-entity id="present4" mixin="present-medium" position="1.3 0.1 0.5"
                   ammo-shape="type:box"
                   rotation="0 0 0">
-          <a-entity id="ribbon1" mixin="ribbon-medium ribbon-green"></a-entity>
+          <a-entity id="ribbon4" mixin="ribbon-medium ribbon-green"></a-entity>
         </a-entity>
-        <a-entity id="present3" mixin="present-medium" position="1.1 0.1 -0.2"
+        <a-entity id="present5" mixin="present-medium" position="1.1 0.1 -0.2"
                   ammo-shape="type:box"
                   rotation="0 -30 0">
-          <a-entity id="ribbon1" mixin="ribbon-medium ribbon-red"></a-entity>
+          <a-entity id="ribbon5" mixin="ribbon-medium ribbon-red"></a-entity>
         </a-entity>
-        <a-entity id="present3" mixin="present-small" position="1.1 0.05 0.2"
+        <a-entity id="present6" mixin="present-small" position="1.1 0.05 0.2"
                   ammo-shape="type:box">
-          <a-entity id="ribbon1" mixin="ribbon-small ribbon-gold"></a-entity>
+          <a-entity id="ribbon6" mixin="ribbon-small ribbon-gold"></a-entity>
         </a-entity>
 
         <!--frame for icicle xylophone-->
