@@ -16,10 +16,11 @@
     <script src="../research/physics-ammo/move-objects-ph3.js"></script>
     <script src="../src/christmas-utils.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/kylebakerio/vr-super-stats@1.5.0/vr-super-stats.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/diarmidmackenzie/instanced-mesh@v0.5.0/src/instanced-mesh.js"></script>
 
   </head>
   <body>
-    <a-scene vr-super-stats stats physics="driver: ammo"><!--; debug: true; debugDrawMode: 1">-->
+    <a-scene vr-super-stats stats physics="driver: ammo"><!--; debug: true; debugDrawMode: 1">
       <a-assets>
         <a-cubemap id="env">
           <img src="../assets/environment-left.png">
@@ -130,6 +131,13 @@
         <a-mixin id="ribbon-red"
                  material="color:red; metalness: 0.5; roughness:0.2">
         </a-mixin>
+        <!-- for instanced mesh
+        <a-mixin id="penguin"
+                 instanced-mesh-member="mesh:#mesh-penguin"
+                 scale="0.1 0.1 0.1"
+                 movement="type:grabbable; stickiness:stickable; initialState:dynamic">
+        </a-mixin>
+        -->
         <a-mixin id="penguin"
                  penguin
                  scale="0.1 0.1 0.1"
@@ -169,6 +177,14 @@
                   hand-controls="hand: left">
         </a-entity>
       </a-entity>
+      <!-- for instanced mesh.
+      <a-entity id="mesh-penguin"
+          penguin
+          instanced-mesh="positioning:world">
+      </a-entity>
+      -->
+      <!--geometry="primitive:penguin"
+      material="color:black"-->
       <a-entity id="play-area">
         <!-- Bowling alley-->
         <a-box id="bowling-alley"
@@ -199,16 +215,17 @@
             rotation = "0 0 -45">
           </a-box>
           <!--penguin bowling pins-->
-          <a-entity position="-0.6 0.3 -4.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
-          <a-entity position="-0.2 0.3 -4.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
-          <a-entity position="0.2 0.3 -4.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
-          <a-entity position="0.6 0.3 -4.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
-          <a-entity position="-0.4 0.3 -4" mixin="penguin" ammo-shape="type:hull"></a-entity>
-          <a-entity position="0 0.3 -4" mixin="penguin" ammo-shape="type:hull"></a-entity>
-          <a-entity position="0.4 0.3 -4" mixin="penguin" ammo-shape="type:hull"></a-entity>
-          <a-entity position="-0.2 0.3 -3.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
-          <a-entity position="0.2 0.3 -3.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
-          <a-entity position="0 0.3 -3" mixin="penguin" ammo-shape="type:hull"></a-entity>
+          <!-- alternative: "type:cylinder;fit:manual;halfExtents:0.1 0.25 0.1"-->
+          <a-entity id="penguin1" position="-0.6 0.3 -4.5" mixin="penguin" ammo-shape="type:cylinder;fit:manual;halfExtents:0.1 0.25 0.1"></a-entity>
+          <a-entity id="penguin2" position="-0.2 0.3 -4.5" mixin="penguin" ammo-shape="type:cylinder;fit:manual;halfExtents:0.1 0.25 0.1"></a-entity>
+          <a-entity id="penguin3" position="0.2 0.3 -4.5" mixin="penguin" ammo-shape="type:cylinder;fit:manual;halfExtents:0.1 0.25 0.1"></a-entity>
+          <a-entity id="penguin4" position="0.6 0.3 -4.5" mixin="penguin" ammo-shape="type:cylinder;fit:manual;halfExtents:0.1 0.25 0.1"></a-entity>
+          <a-entity id="penguin5" position="-0.4 0.3 -4" mixin="penguin" ammo-shape="type:cylinder;fit:manual;halfExtents:0.1 0.25 0.1"></a-entity>
+          <a-entity id="penguin6" position="0 0.3 -4" mixin="penguin" ammo-shape="type:cylinder;fit:manual;halfExtents:0.1 0.25 0.1"></a-entity>
+          <a-entity id="penguin7" position="0.4 0.3 -4" mixin="penguin" ammo-shape="type:cylinder;fit:manual;halfExtents:0.1 0.25 0.1"></a-entity>
+          <a-entity id="penguin8" position="-0.2 0.3 -3.5" mixin="penguin" ammo-shape="type:cylinder;fit:manual;halfExtents:0.1 0.25 0.1"></a-entity>
+          <a-entity id="penguin9" position="0.2 0.3 -3.5" mixin="penguin" ammo-shape="type:cylinder;fit:manual;halfExtents:0.1 0.25 0.1"></a-entity>
+          <a-entity id="penguin10" position="0 0.3 -3" mixin="penguin" ammo-shape="type:cylinder;fit:manual;halfExtents:0.1 0.25 0.1"></a-entity>
         </a-box>
 
         <a-box id="floor-plane"
