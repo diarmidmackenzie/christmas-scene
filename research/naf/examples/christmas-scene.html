@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Winter Wonderland Christmas Playground</title>
+    <meta name="description" content="Merry Christmas 2021!">
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.slim.js"></script>
+    <script src="/easyrtc/easyrtc.js"></script>
+    <script src="https://unpkg.com/networked-aframe@0.8.3/dist/networked-aframe.min.js"></script>
+    <script src="https://unpkg.com/aframe-environment-component@1.2.0/dist/aframe-environment-component.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/fernandojsg/aframe-teleport-controls@master/dist/aframe-teleport-controls.min.js"></script>
+    <!-- unpkg version of particle system hits shader compile errors -->
+    <!-- <script src="https://unpkg.com/aframe-particle-system-component@1.0.x/dist/aframe-particle-system-component.min.js"></script>-->
+    <script src="../../lib/aframe-particle-system-component.js"></script>
+    <script src="https://mixedreality.mozilla.org/ammo.js/builds/ammo.wasm.js"></script>
+    <script src="../../lib/aframe-physics-system.js"></script>
+    <script src="../../src/move-objects.js"></script>
+    <script src="../../src/christmas-utils.js"></script>
+
+  </head>
+  <body>
+    <a-scene physics="driver: ammo">
+      <a-assets>
+        <a-cubemap id="env">
+          <img src="../../assets/environment-left.png">
+          <img src="../../assets/environment-left.png">
+          <img src="../../assets/environment-top.png">
+          <img src="../../assets/environment-bottom.png">
+          <img src="../../assets/environment-back.png">
+          <img src="../../assets/environment-back.png">
+        </a-cubemap>
+
+        <audio id="xC" src="../../assets/xylophone/xC.wav"></audio>
+        <audio id="xD" src="../../assets/xylophone/xD.wav"></audio>
+        <audio id="xE" src="../../assets/xylophone/xE.wav"></audio>
+        <audio id="xF" src="../../assets/xylophone/xF.wav"></audio>
+        <audio id="xG" src="../../assets/xylophone/xG.wav"></audio>
+        <audio id="xA" src="../../assets/xylophone/xA.wav"></audio>
+        <audio id="xB" src="../../assets/xylophone/xB.wav"></audio>
+        <audio id="xC2" src="../../assets/xylophone/xC2.wav"></audio>
+
+        <audio id="background-music" src="../../assets/music/christmas-magic.mp3"></audio>
+
+        <a-mixin id="snowbase"
+                 material="color:white"
+                 paintable
+                 geometry="primitive:sphere;segments-height:7;segments-width:13;radius:0.5"
+                 movement="type:static; stickiness:sticky">
+        </a-mixin>
+        <a-mixin id="snowball"
+                 material="color:white"
+                 paintable
+                 geometry="primitive:sphere;segments-height:7;segments-width:13;radius:0.5"
+                 movement="type:grabbable; stickiness:sticky">
+        </a-mixin>
+        <a-mixin id="coal"
+                 material="color:black"
+                 geometry="primitive:sphere;segments-height:7;segments-width:13;radius:0.04"
+                 movement="type:grabbable; stickiness:stickable">
+        </a-mixin>
+        <a-mixin id="carrot"
+                 material="color:orange"
+                 geometry="primitive:cone;height:0.2;radius-bottom:0.025; radius-top:0.005"
+                 movement="type:grabbable; stickiness:stickable">
+        </a-mixin>
+        <a-mixin id="hat"
+                 material="color:black"
+                 geometry="primitive:tophat-hollow"
+                 movement="type:grabbable; stickiness:stickable">
+        </a-mixin>
+        <a-mixin id="branch"
+                 material="color:#5C4033"
+                 geometry="primitive:branch"
+                 scale="0.2 0.2 0.2"
+                 movement="type:grabbable; stickiness:stickable">
+        </a-mixin>
+        <a-mixin id="tree-tier"
+                 material="color:green"
+                 geometry="primitive:cone;height:0.5;radius-bottom:0.5;segments-height:1;segments-radial:9"
+                 movement="type:static; stickiness:sticky">
+        </a-mixin>
+        <a-mixin id="trunk"
+                 material="color:#5C4033"
+                 geometry="primitive:cylinder;height:0.5;radius:0.1;">
+        </a-mixin>
+        <a-mixin id="star"
+                 material="color:yellow; metalness: 0.8; roughness:0.2"
+                 geometry="primitive:star; innerRadius:0.04;outerRadius:0.12;points:5;depth:0.01"
+                 movement="type:grabbable; stickiness:stickable">
+        </a-mixin>
+        <a-mixin id="bauble"
+                 movement="type:grabbable; stickiness:stickable">
+        </a-mixin>
+        <a-mixin id="marble-run-base"
+                 material="color:brown; metalness: 0.5; roughness:0.2"
+                 movement="type:static; stickiness:sticky2">
+        </a-mixin>
+        <a-mixin id="marble-run-ramp"
+                 material="color:orange; metalness: 0.5; roughness:0.2"
+                 movement="type:grabbable; stickiness:stickable2">
+        </a-mixin>
+        <a-mixin id="ribbon-large"
+                 geometry="primitive:ribbon;height: 0.4; depth:0.5; width:0.5; ribbon:0.06">
+        </a-mixin>
+        <a-mixin id="present-large"
+                 geometry="primitive:box;height: 0.4; depth:0.5; width:0.5"
+                 movement="type:grabbable; stickiness:none; initialState:dynamic">
+        </a-mixin>
+        <a-mixin id="ribbon-medium"
+                 geometry="primitive:ribbon;height: 0.2; depth:0.3; width:0.2; ribbon:0.05">
+        </a-mixin>
+        <a-mixin id="present-medium"
+                 geometry="primitive:box;height: 0.2; depth:0.3; width:0.2"
+                 movement="type:grabbable; stickiness:none; initialState:dynamic">
+        </a-mixin>
+        <a-mixin id="ribbon-small"
+                 geometry="primitive:ribbon;height: 0.1; depth:0.2; width:0.1; ribbon:0.04">
+        </a-mixin>
+        <a-mixin id="present-small"
+                 geometry="primitive:box;height: 0.1; depth:0.2; width:0.1"
+                 movement="type:grabbable; stickiness:none; initialState:dynamic">
+        </a-mixin>
+        <a-mixin id="ribbon-gold"
+                 material="color:yellow; metalness: 0.5; roughness:0.2">
+        </a-mixin>
+        <a-mixin id="ribbon-green"
+                 material="color:green; metalness: 0.5; roughness:0.2">
+        </a-mixin>
+        <a-mixin id="ribbon-blue"
+                 material="color:green; metalness: 0.5; roughness:0.2">
+        </a-mixin>
+        <a-mixin id="ribbon-red"
+                 material="color:red; metalness: 0.5; roughness:0.2">
+        </a-mixin>
+        <a-mixin id="penguin"
+                 penguin
+                 scale="0.1 0.1 0.1"
+                 movement="type:grabbable; stickiness:stickable; initialState:dynamic">
+        </a-mixin>
+        <a-mixin id="paintbrush"
+                 paintbrush="color:blue"
+                 scale="0.05 0.05 0.05">
+        </a-mixin>
+
+        <template id="avatar-template">
+           <a-sphere></a-sphere>
+        </template>
+
+        <!-- env-map dosesn't seem to work when deployed via mix-ins, hence no mixin for baubles-->
+      </a-assets>
+      <a-sound id="music" position="0 10 0" src="#background-music"
+               autoplay="true" loop="true" volume="0.5"></a-sound>
+      <a-entity environment="groundColor: #ffffff;
+                             groundColor2: #eeeeee;
+                             ground: noise;
+                             groundYScale: 4;
+                             groundTexture: walkernoise;
+                             dressing: trees;
+                             dressingAmount: 50;
+                             dressingColor: #ffffff;
+                             dressingScale: 1;
+                             lighting: distant
+                              "></a-entity>
+      <a-entity position="0 12 0" particle-system="preset: snow;
+                                                  size: 0.1;
+                                                  velocityValue: 0 2 0;
+                                                  positionSpread: 20 2 20;
+                                                  maxAge: 6;
+                                                  velocitySpread: 1 0 1;
+                                                  particleCount: 15000"></a-entity>
+      <a-entity id="rig">
+        <a-camera id="player" networked="template:#avatar-template;attachTemplateToLocal:false;" position="0 1.6 0"></a-camera>
+        <a-entity id="rhand" hand
+                  snowball-generator
+                  hand-controls="hand: right">
+        </a-entity>
+        <a-entity id="lhand" hand
+                  teleport-controls="cameraRig: #rig; teleportOrigin: #camera; button: trigger"
+                  snowball-generator
+                  hand-controls="hand: left">
+        </a-entity>
+      </a-entity>
+      <a-entity id="play-area">
+        <a-entity id="snowman-base" mixin="snowbase" position="0 0.4 -1.5"
+                  ammo-shape="type:hull"></a-entity>
+        <a-entity id="snowman-head" mixin="snowbase" scale="0.7 0.7 0.7" position="0 1.1 -1.5"
+                  ammo-shape="type:hull"></a-entity>
+        <a-entity id="snowman-nose" mixin="carrot" rotation="90 0 0" position="0 1.1 -1.1"  ammo-shape="type:cone;fit:manual;halfExtents:0.025 0.11 0.025"></a-entity>
+        <a-entity id="snowman-l-eye" mixin="coal" position="-0.1 1.2 -1.2" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
+        <a-entity id="snowman-r-eye" mixin="coal" position="0.1 1.2 -1.2" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
+        <a-entity id="snowman-mouth1" mixin="coal" position="-0.1 1.02 -1.21" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
+        <a-entity id="snowman-mouth2" mixin="coal" position="-0.05 1 -1.2" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
+        <a-entity id="snowman-mouth3" mixin="coal" position="0 1 -1.2" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
+        <a-entity id="snowman-mouth4" mixin="coal" position="0.05  1 -1.2" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
+        <a-entity id="snowman-mouth5" mixin="coal" position="0.1 1.02 -1.21" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
+        <a-entity id="snowman-hat" mixin="hat" position="0 1.56 -1.5" ammo-shape="type:hacd">
+        </a-entity>
+        <a-entity id="snowman-l-arm" mixin="branch" rotation="0 0 80" position="-0.6 0.7 -1.5" ammo-shape="type:hull"></a-entity>
+        <a-entity id="snowman-r-arm" mixin="branch" rotation="0 0 -100" position="0.6 0.7 -1.5" ammo-shape="type:hull"></a-entity>
+
+        <a-entity id="tree-trunk" mixin="trunk" position="1.5 0.25 0"></a-entity>
+        <!-- in the past, bables have worked better *not* as children of tree.
+             unclear if that's still true, but keeping things as consistent as possible for now-->
+        <a-entity id="tree-base-tier" mixin="tree-tier" scale="1.2 1.2 1.2" position="1.5 0.75 0"
+                  ammo-shape="type:hull">
+        </a-entity>
+        <a-entity position="1.5 0.75 0" rotation="0 90 0">
+          <a-sphere color="red" cylindrical-position="height: -0.12; radius:0.396; angle:45" mixin="bauble"
+                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
+          <a-sphere color="yellow" cylindrical-position="height: -0.12; radius:0.396; angle:0" mixin="bauble"
+                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
+          <a-sphere color="green" cylindrical-position="height: -0.12; radius:0.396; angle:-45" mixin="bauble"
+                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
+        </a-entity>
+        <a-entity id="tree-2nd-tier" mixin="tree-tier" position="1.5 1.05 0"
+                  ammo-shape="type:hull">
+        </a-entity>
+
+        <a-entity id="paintbrush" mixin="paintbrush" rotation="45 0 0" position="1.2 0.9 0.3"></a-entity>
+
+        <a-entity position="1.5 1.05 0" rotation="0 90 0">
+          <a-sphere color="blue" cylindrical-position="height: -0.1; radius:0.33; angle:45" mixin="bauble"
+                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
+          <a-sphere color="silver" cylindrical-position="height: -0.1; radius:0.33; angle:0" mixin="bauble"
+                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
+          <a-sphere color="red" cylindrical-position="height: -0.1; radius:0.33; angle:-45" mixin="bauble"
+                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
+        </a-entity>
+        <a-entity id="tree-3rd-tier" mixin="tree-tier" scale="0.8 0.8 0.8" position="1.5 1.35 0"
+                  ammo-shape="type:hull">
+        </a-entity>
+        <a-entity position="1.5 1.35 0" rotation="0 90 0">
+          <a-sphere color="yellow" cylindrical-position="height: -0.08; radius:0.264; angle:45" mixin="bauble"
+                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
+          <a-sphere color="green" cylindrical-position="height: -0.08; radius:0.264; angle:0" mixin="bauble"
+                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
+          <a-sphere color="blue" cylindrical-position="height: -0.08; radius:0.264; angle:-45" mixin="bauble"
+                    env-map="#env" metalness="1.0" roughness="0.0" radius="0.04" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-sphere>
+        </a-entity>
+        <a-entity id="star" mixin="star" rotation="0 90 0" position="1.45 1.6 0" ammo-shape="type:hull" material="envMap:#env">
+        </a-entity>
+
+        <a-entity id="present1" mixin="present-large" position="1.5 0.2 1"
+                  ammo-shape="type:box"
+                  rotation="0 20 0">
+          <a-entity id="ribbon1" mixin="ribbon-red ribbon-large"></a-entity>
+        </a-entity>
+        <a-entity id="present2" mixin="present-medium" position="1.6 0.1 -0.7"
+                  ammo-shape="type:box"
+                  rotation="0 -10 0">
+          <a-entity id="ribbon1" mixin="ribbon-medium ribbon-gold"></a-entity>
+        </a-entity>
+        <a-entity id="present3" mixin="present-small" position="1.3 0.05 -0.5"
+                  ammo-shape="type:box"
+                  rotation="0 30 0">
+          <a-entity id="ribbon1" mixin="ribbon-small ribbon-green"></a-entity>
+        </a-entity>
+        <a-entity id="present3" mixin="present-medium" position="1.3 0.1 0.5"
+                  ammo-shape="type:box"
+                  rotation="0 0 0">
+          <a-entity id="ribbon1" mixin="ribbon-medium ribbon-green"></a-entity>
+        </a-entity>
+        <a-entity id="present3" mixin="present-medium" position="1.1 0.1 -0.2"
+                  ammo-shape="type:box"
+                  rotation="0 -30 0">
+          <a-entity id="ribbon1" mixin="ribbon-medium ribbon-red"></a-entity>
+        </a-entity>
+        <a-entity id="present3" mixin="present-small" position="1.1 0.05 0.2"
+                  ammo-shape="type:box">
+          <a-entity id="ribbon1" mixin="ribbon-small ribbon-gold"></a-entity>
+        </a-entity>
+
+        <!--frame for icicle xylophone-->
+        <a-box position="0.5 0.9 1.5" color="#5C4033" width="0.1" depth="0.2" height="1.8"
+               movement="type: static; stickiness: none" ammo-shape="type:box"></a-box>
+        <a-box position="-0.5 0.9 1.5" color="#5C4033" width="0.1" depth="0.2" height="1.8"
+               movement="type: static; stickiness: none" ammo-shape="type:box"></a-box>
+        <a-box position="0 1.81 1.5" color="#5C4033" width="1.1" depth="0.2" height="0.02"
+               movement="type: static; stickiness: none" ammo-shape="type:box"></a-box>
+        <a-entity position="-0.55 1.1 1.5" rotation="90 0 90" scale="0.6 0.6 0.6"
+                  ui-rotary
+                  volume-control></a-entity>
+
+        <!--and the xylophone itself-->
+        <a-entity id="xylophone" position="0 1.8 1.5" xylophone="count:8;width:0.9"></a-entity>
+
+        <!-- calendar positioned above-->
+        <a-entity id="calendar" calendar="width:0.4; height:0.4" rotation = "0 180 0" position="0.2 2.02 1.5"></a-entity>
+        <a-entity id="xmas-counter" xmas-counter="width:0.4; height:0.4" rotation = "0 180 0" position="-0.2 2.02 1.5"></a-entity>
+
+        <!--marble run-->
+        <a-box width="1.5" height = "2" depth = "0.5"
+               position="-2 0.7 0.2"
+               rotation="-45 90 0"
+               mixin="marble-run-base"
+               ammo-shape="type:box;fit:manual;half-extents:0.75 1 0.25">
+               <a-entity geometry="primitive:box; width:1.3; height: 0.01; depth:0.1"
+                      position="0.1 0.7 0.3"
+                      rotation="0 0 10"
+                      mixin="marble-run-ramp"
+                      ammo-shape="type:box;fit:manual;half-extents:0.65 0.005 0.05">
+               </a-entity>
+               <a-box width="1.3" height = "0.01" depth = "0.1"
+                      position="-0.1 0.4 0.3"
+                      rotation="0 0 -10"
+                      mixin="marble-run-ramp"
+                      ammo-shape="type:box;fit:manual;half-extents:0.65 0.005 0.05">
+               </a-box>
+               <a-box width="1.3" height = "0.01" depth = "0.1"
+                      position="0.1 0.1 0.3"
+                      rotation="0 0 10"
+                      mixin="marble-run-ramp"
+                      ammo-shape="type:box;fit:manual;half-extents:0.65 0.005 0.05">
+               </a-box>
+               <a-box width="1.3" height = "0.01" depth = "0.1"
+                      position="-0.1 -0.2 0.3"
+                      rotation="0 0 -10"
+                      mixin="marble-run-ramp"
+                      ammo-shape="type:box;fit:manual;half-extents:0.65 0.005 0.05">
+               </a-box>
+               <a-box width="1.3" height = "0.01" depth = "0.1"
+                      position="0.1 -0.5 0.3"
+                      rotation="0 0 10"
+                      mixin="marble-run-ramp"
+                      ammo-shape="type:box;fit:manual;half-extents:0.65 0.005 0.05">
+               </a-box>
+               <a-box width="1.3" height = "0.01" depth = "0.1"
+                      position="-0.1 -0.8 0.3"
+                      rotation="0 0 -10"
+                      mixin="marble-run-ramp"
+                      ammo-shape="type:box;fit:manual;half-extents:0.65 0.005 0.05">
+               </a-box>
+               <!-- sides-->
+               <a-box width="0.01" height = "2" depth = "0.1"
+                      position="-0.745 0 0.3"
+                      mixin="marble-run-base"
+                      ammo-shape="type:box;fit:manual;half-extents:0.005 1 0.05">
+               </a-box>
+               <a-box width="0.01" height = "2" depth = "0.1"
+                      position="0.745 0 0.3"
+                      mixin="marble-run-base"
+                      ammo-shape="type:box;fit:manual;half-extents:0.005 1 0.05">
+               </a-box>
+               <!--post that "holds it up"-->
+               <a-box width="0.1" height = "0.1" depth = "2"
+                      position="0 0.95 -1"
+                      mixin="marble-run-base"
+                      ammo-shape="type:box;fit:manual;half-extents:0.05 0.05 1">
+               </a-box>
+        </a-box>
+
+        <!-- Bowling alley-->
+        <a-box id="bowling-alley"
+          width = "2" height = "1" depth = "10"
+          movement="type:static; stickiness:none"
+          ammo-shape="type:box"
+          color="white"
+          env-map="#env" metalness="0.8" roughness="0.2"
+          position = "5 -0.4 -5"
+          rotation = "0 -45 0">
+          <!-- sides-->
+          <a-box id="bowling-alley"
+            width = "0.4" height = "0.1" depth = "10"
+            movement="type:static; stickiness:none"
+            ammo-shape="type:box"
+            color="white"
+            env-map="#env" metalness="0.8" roughness="0.2"
+            position = "1.1 0.6 0"
+            rotation = "0 0 45">
+          </a-box>
+          <a-box id="bowling-alley"
+            width = "0.4" height = "0.1" depth = "10"
+            movement="type:static; stickiness:none"
+            ammo-shape="type:box"
+            color="white"
+            env-map="#env" metalness="0.8" roughness="0.2"
+            position = "-1.1 0.6 0"
+            rotation = "0 0 -45">
+          </a-box>
+          <!--penguin bowling pins-->
+          <a-entity position="-0.6 0.3 -4.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
+          <a-entity position="-0.2 0.3 -4.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
+          <a-entity position="0.2 0.3 -4.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
+          <a-entity position="0.6 0.3 -4.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
+          <a-entity position="-0.4 0.3 -4" mixin="penguin" ammo-shape="type:hull"></a-entity>
+          <a-entity position="0 0.3 -4" mixin="penguin" ammo-shape="type:hull"></a-entity>
+          <a-entity position="0.4 0.3 -4" mixin="penguin" ammo-shape="type:hull"></a-entity>
+          <a-entity position="-0.2 0.3 -3.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
+          <a-entity position="0.2 0.3 -3.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
+          <a-entity position="0 0.3 -3" mixin="penguin" ammo-shape="type:hull"></a-entity>
+        </a-box>
+
+        <a-box id="floor-plane"
+               width = "100" height = "1" depth = "100"
+               movement="type:static; stickiness:sticky"
+               ammo-shape="type:box"
+               position = "0 -0.499 0"
+               visible = true>
+        </a-box>
+      </a-entity>
+    </a-scene>
+  </body>
+</html>
