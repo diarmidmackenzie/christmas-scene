@@ -43,7 +43,10 @@
 
   </head>
   <body>
-    <a-scene physics="driver: ammo">
+    <a-scene  networked-scene="
+      room: dev;
+      debug: true;
+      adapter: wseasyrtc;" physics="driver: ammo">
       <a-assets>
         <a-cubemap id="env">
           <img src="./assets/environment-left.png">
