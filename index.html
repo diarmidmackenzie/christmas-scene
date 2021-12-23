@@ -133,7 +133,7 @@
         <a-mixin id="penguin"
                  penguin
                  scale="0.1 0.1 0.1"
-                 movement="type:grabbable; stickiness:nonne; initialState:dynamic">
+                 movement="type:grabbable; stickiness:none; initialState:dynamic">
         </a-mixin>
         <a-mixin id="paintbrush"
                  paintbrush="color:blue"
@@ -175,22 +175,21 @@
         </a-entity>
       </a-entity>
       <a-entity id="play-area">
-        <a-entity id="snowman-base" mixin="snowbase" position="0 0.4 -1.5"
-                  ammo-shape="type:hull"></a-entity>
-        <a-entity id="snowman-head" mixin="snowbase" scale="0.7 0.7 0.7" position="0 1.1 -1.5"
-                  ammo-shape="type:hull"></a-entity>
-        <a-entity id="snowman-nose" mixin="carrot" rotation="90 0 0" position="0 1.1 -1.1"  ammo-shape="type:cone;fit:manual;halfExtents:0.025 0.11 0.025"></a-entity>
-        <a-entity id="snowman-l-eye" mixin="coal" position="-0.1 1.2 -1.2" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
-        <a-entity id="snowman-r-eye" mixin="coal" position="0.1 1.2 -1.2" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
-        <a-entity id="snowman-mouth1" mixin="coal" position="-0.1 1.02 -1.21" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
-        <a-entity id="snowman-mouth2" mixin="coal" position="-0.05 1 -1.2" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
-        <a-entity id="snowman-mouth3" mixin="coal" position="0 1 -1.2" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
-        <a-entity id="snowman-mouth4" mixin="coal" position="0.05  1 -1.2" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
-        <a-entity id="snowman-mouth5" mixin="coal" position="0.1 1.02 -1.21" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
-        <a-entity id="snowman-hat" mixin="hat" position="0 1.56 -1.5" ammo-shape="type:hull">
-        </a-entity>
-        <a-entity id="snowman-l-arm" mixin="branch" rotation="0 0 80" position="-0.6 0.7 -1.5" ammo-shape="type:hull"></a-entity>
-        <a-entity id="snowman-r-arm" mixin="branch" rotation="0 0 -100" position="0.6 0.7 -1.5" ammo-shape="type:hull"></a-entity>
+        <a-entity id="snowman-base" mixin="snowbase" position="-0.5 0.4 -1.5"
+                 ammo-shape="type:hull"></a-entity>
+        <a-entity id="snowman-head" mixin="snowbase" scale="0.7 0.7 0.7" position="-0.5 1.1 -1.5"
+                 ammo-shape="type:hull"></a-entity>
+        <a-entity id="snowman-nose" mixin="carrot" rotation="90 0 0" position="-0.5 1.1 -1.1"  ammo-shape="type:cone;fit:manual;halfExtents:0.025 0.11 0.025"></a-entity>
+        <a-entity id="snowman-l-eye" mixin="coal" position="-0.6 1.2 -1.2" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
+        <a-entity id="snowman-r-eye" mixin="coal" position="-0.4 1.2 -1.2" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
+        <a-entity id="snowman-mouth1" mixin="coal" position="-0.6 1.02 -1.21" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
+        <a-entity id="snowman-mouth2" mixin="coal" position="-0.55 1 -1.2" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
+        <a-entity id="snowman-mouth3" mixin="coal" position="-0.5 1 -1.2" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
+        <a-entity id="snowman-mouth4" mixin="coal" position="-0.45  1 -1.2" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
+        <a-entity id="snowman-mouth5" mixin="coal" position="-0.4 1.02 -1.21" ammo-shape="type:sphere;fit:manual;sphereRadius:0.04"></a-entity>
+        <a-entity id="snowman-hat" mixin="hat" position="-0.5 1.56 -1.5" ammo-shape="type:hull"></a-entity>
+        <a-entity id="snowman-l-arm" mixin="branch" rotation="0 0 80" position="-1.1 0.7 -1.5" ammo-shape="type:hull"></a-entity>
+        <a-entity id="snowman-r-arm" mixin="branch" rotation="0 0 -100" position="0.1 0.7 -1.5" ammo-shape="type:hull"></a-entity>
 
         <a-entity perimeter-fence position = "3 0 -3"></a-entity>
 
@@ -347,16 +346,16 @@
 
         <!-- Bowling alley-->
         <a-box id="bowling-alley"
-          width = "2" height = "1" depth = "10"
+          width = "2" height = "1" depth = "12"
           movement="type:static; stickiness:none"
           ammo-shape="type:box"
           color="white"
           env-map="#env" metalness="0.8" roughness="0.2"
-          position = "5 -0.4 -5"
+          position = "5.7 -0.4 -5.7"
           rotation = "0 -45 0">
           <!-- sides-->
           <a-box id="bowling-alley"
-            width = "0.4" height = "0.1" depth = "10"
+            width = "0.4" height = "0.1" depth = "12"
             movement="type:static; stickiness:none"
             ammo-shape="type:box"
             color="white"
@@ -365,7 +364,7 @@
             rotation = "0 0 45">
           </a-box>
           <a-box id="bowling-alley"
-            width = "0.4" height = "0.1" depth = "10"
+            width = "0.4" height = "0.1" depth = "12"
             movement="type:static; stickiness:none"
             ammo-shape="type:box"
             color="white"
@@ -374,35 +373,47 @@
             rotation = "0 0 -45">
           </a-box>
           <!--penguin bowling pins-->
-          <a-entity id="penguin1" position="-0.6 0.3 -4.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
-          <a-entity id="penguin2" position="-0.2 0.3 -4.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
-          <a-entity id="penguin3" position="0.2 0.3 -4.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
-          <a-entity id="penguin4" position="0.6 0.3 -4.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
-          <a-entity id="penguin5" position="-0.4 0.3 -4" mixin="penguin" ammo-shape="type:hull"></a-entity>
-          <a-entity id="penguin6" position="0 0.3 -4" mixin="penguin" ammo-shape="type:hull"></a-entity>
-          <a-entity id="penguin7" position="0.4 0.3 -4" mixin="penguin" ammo-shape="type:hull"></a-entity>
-          <a-entity id="penguin8" position="-0.2 0.3 -3.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
-          <a-entity id="penguin9" position="0.2 0.3 -3.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
-          <a-entity id="penguin10" position="0 0.3 -3" mixin="penguin" ammo-shape="type:hull"></a-entity>
-          <!--prototyping this - not ready yet-->
-          <!--<a-entity id="bowling-alley-scoreboard" position="0 3 -5" bowling-alley-scoreboard></a-entity>-->
+          <a-entity id="penguin1" position="-0.6 0.8 -3.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
+          <a-entity id="penguin2" position="-0.2 0.8 -3.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
+          <a-entity id="penguin3" position="0.2 0.8 -3.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
+          <a-entity id="penguin4" position="0.6 0.8 -3.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
+          <a-entity id="penguin5" position="-0.4 0.8 -3" mixin="penguin" ammo-shape="type:hull"></a-entity>
+          <a-entity id="penguin6" position="0 0.8 -3" mixin="penguin" ammo-shape="type:hull"></a-entity>
+          <a-entity id="penguin7" position="0.4 0.8 -3" mixin="penguin" ammo-shape="type:hull"></a-entity>
+          <a-entity id="penguin8" position="-0.2 0.8 -2.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
+          <a-entity id="penguin9" position="0.2 0.8 -2.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
+          <a-entity id="penguin10" position="0 0.8 -2" mixin="penguin" ammo-shape="type:hull"></a-entity>
+
+          <a-entity id="bowling-alley-scoreboard" position="0 3 -6" bowling-alley-scoreboard></a-entity>
+          <a-cylinder id="bowling-alley-sweeper" rotation = "0 0 90" height="2" radius = "0.2"
+                      bowling-alley-sweeper
+                      position="0 0 6.2"
+                      ammo-body="type:kinematic"
+                      material="color:brown" ammo-shape="type:hull">
+          </a-cylinder>
+
+          <a-box position="-1.1 0.5 6.2" color="#5C4033" width="0.3" depth="0.3" height="1.1"
+                 movement="type: static; stickiness: none" ammo-shape="type:box">
+             <a-entity id="bowling-alley-reset" position="0 0.58 0" ui-button bowling-alley-reset>
+             </a-entity>
+          </a-box>
         </a-box>
 
         <a-entity position = "-4 0 -4" rotation = "0 45 0">
-          <a-entity letters-block="letters:CDEFAB;color:red" position = "-1.4 0.15 0"></a-entity>
-          <a-entity letters-block="letters:HIJKLG;color:green" position = "-1.05.15 0"></a-entity>
-          <a-entity letters-block="letters:RMNOPQ;color:blue" position = "-0.7 0.15 0"></a-entity>
-          <a-entity letters-block="letters:IJKLGH;color:green" position = "-0.35 0.15 0"></a-entity>
-          <a-entity letters-block="letters:STUVWX;color:orange" position = "0 0.15 0"></a-entity>
-          <a-entity letters-block="letters:TUVWXS;color:orange" position = "0.35 0.15 0"></a-entity>
-          <a-entity letters-block="letters:MNOPQR;color:blue" position = "0.7 0.15 0"></a-entity>
-          <a-entity letters-block="letters:ABCDEF;color:red" position = "1.05 0.15 0"></a-entity>
-          <a-entity letters-block="letters:STUVWX;color:orange" position = "1.4 0.15 0"></a-entity>
-          <a-entity letters-block="letters:MNOPQR;color:blue" position = "-0.9 0.45 0"></a-entity>
-          <a-entity letters-block="letters:EFABCD;color:red" position = "-0.55 0.45 0"></a-entity>
-          <a-entity letters-block="letters:RMNOPQ;color:blue" position = "-0.2 0.45 0"></a-entity>
-          <a-entity letters-block="letters:RMNOPQ;color:blue" position = "0.15 0.45 0"></a-entity>
-          <a-entity letters-block="letters:YZ1234;color:purple" position = "0.5 0.45 0"></a-entity>
+          <a-entity id="letter-block1" letters-block="letters:CDEFAB;color:red" position = "-1.4 0.15 0"></a-entity>
+          <a-entity id="letter-block2" letters-block="letters:HIJKLG;color:green" position = "-1.05.15 0"></a-entity>
+          <a-entity id="letter-block3" letters-block="letters:RMNOPQ;color:blue" position = "-0.7 0.15 0"></a-entity>
+          <a-entity id="letter-block4" letters-block="letters:IJKLGH;color:green" position = "-0.35 0.15 0"></a-entity>
+          <a-entity id="letter-block5" letters-block="letters:STUVWX;color:orange" position = "0 0.15 0"></a-entity>
+          <a-entity id="letter-block6" letters-block="letters:TUVWXS;color:orange" position = "0.35 0.15 0"></a-entity>
+          <a-entity id="letter-block7" letters-block="letters:MNOPQR;color:blue" position = "0.7 0.15 0"></a-entity>
+          <a-entity id="letter-block8" letters-block="letters:ABCDEF;color:red" position = "1.05 0.15 0"></a-entity>
+          <a-entity id="letter-block9" letters-block="letters:STUVWX;color:orange" position = "1.4 0.15 0"></a-entity>
+          <a-entity id="letter-block10" letters-block="letters:MNOPQR;color:blue" position = "-0.9 0.45 0"></a-entity>
+          <a-entity id="letter-block11" letters-block="letters:EFABCD;color:red" position = "-0.55 0.45 0"></a-entity>
+          <a-entity id="letter-block12" letters-block="letters:RMNOPQ;color:blue" position = "-0.2 0.45 0"></a-entity>
+          <a-entity id="letter-block13" letters-block="letters:RMNOPQ;color:blue" position = "0.15 0.45 0"></a-entity>
+          <a-entity id="letter-block14" letters-block="letters:YZ1234;color:purple" position = "0.5 0.45 0"></a-entity>
         </a-entity>
 
         <a-box id="floor-plane"

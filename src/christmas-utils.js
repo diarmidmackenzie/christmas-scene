@@ -309,6 +309,11 @@ AFRAME.registerGeometry('penguin', {
 AFRAME.registerComponent('penguin', {
 
   init () {
+
+    this.initialPosition = new THREE.Vector3();
+    this.initialParent = this.el.object3D.parent;
+    this.initialPosition.copy(this.el.object3D.position);
+
     var materials = [new THREE.MeshStandardMaterial({
                           color: 'black'
                      }), new THREE.MeshStandardMaterial({
@@ -327,11 +332,63 @@ AFRAME.registerComponent('penguin', {
 
     this.defaultYAxis = new THREE.Vector3(0, 1, 0);
 
-    this.el.addEventListener("collidestart", this.onCollide.bind(this));
+    //this.el.addEventListener("collidestart", this.onCollide.bind(this));
+
+    this.el.addEventListener("resetPin", this.resetPin.bind(this));
 
     this.scoreboard = document.getElementById("bowling-alley-scoreboard");
   },
 
+  resetPin() {
+
+    this.el.setAttribute('ammo-body', 'type:kinematic')
+
+    // must be child of bowling alley for repositioning to work.
+    GLOBAL_FUNCS.reparent(this.el.object3D,
+                          this.el.object3D.parent,
+                          this.initialParent);
+
+    const pos = this.el.object3D.position;
+    const ipos = this.initialPosition
+
+    //lift it up by 1m.
+    this.el.removeAttribute("animation__reset");
+    this.el.removeAttribute("animation__resetRotation");
+
+    this.el.setAttribute("animation__reset",
+                         `property: position;
+                          to: ${pos.x} ${pos.y + 1} ${pos.z}
+                          dur: 1000`);
+    this.el.setAttribute("animation__resetRotation",
+                         `property: rotation;
+                          to: 0 0 0; dur: 1000`);
+
+    // hover over initial posiiton.
+
+
+
+    setTimeout(() => {
+      this.el.setAttribute("animation__reset",
+                           `property: position;
+                            to: ${ipos.x} ${ipos.y + 1} ${ipos.z}
+                            dur: 3000`);
+    }, 1200);
+
+    // lower down
+    setTimeout(() => {
+      this.el.setAttribute("animation__reset",
+                           `property: position;
+                            to: ${ipos.x} ${ipos.y} ${ipos.z};
+                            dur: 1000`);
+    }, 4500);
+
+    // set back to dynamic
+    setTimeout(() => {
+      this.el.setAttribute('ammo-body', 'type:dynamic')
+    }, 6000);
+  },
+
+/*
   onCollide(event) {
 
     if (event.detail.targetEl.id === "bowling-alley") {
@@ -343,24 +400,25 @@ AFRAME.registerComponent('penguin', {
       }
     }
   },
-
+*/
   // monitor whether knocked over (not held) in bowling pin area.
   tick() {
 
     this.el.object3D.matrix.extractBasis ( this.xAxis, this.yAxis, this.zAxis);
 
-    if (this.yAxis.angleTo(this.defaultYAxis) < 0.3) {
+    if (this.yAxis.angleTo(this.defaultYAxis) < 0.5) {
       // upright
       this.upright = true;
-      this.toppled = false;
+      //this.toppled = false;
     }
     else {
       if (this.upright) {
-        // just fallen over.  Set toppled state for 500 msecs.
+        // just fallen over.  Generate pin-down event.
         this.upright = false;
-        this.toppled = true;
+        //this.toppled = true;
+        this.scoreboard.emit("pin-down");
 
-        setTimeout(() => this.toppled = false, 500);
+        //setTimeout(() => this.toppled = false, 500);
       }
     }
   }
@@ -392,7 +450,7 @@ AFRAME.registerComponent('bowling-alley-scoreboard', {
       this.pinCount = 1;
       this.countingFallenPins = true;
 
-      setTimeout(() => this.displayScore(), 1000)
+      setTimeout(() => this.displayScore(), 2000)
     }
     else {
       this.pinCount += 1;
@@ -402,6 +460,7 @@ AFRAME.registerComponent('bowling-alley-scoreboard', {
   displayScore() {
 
     var scoreText
+    this.countingFallenPins = false;
 
     if (this.pinCount === 10) {
       scoreText = "X"
@@ -413,7 +472,8 @@ AFRAME.registerComponent('bowling-alley-scoreboard', {
       scoreText = this.pinCount;
     }
 
-    this.text.setAttribute('value', scoreText);
+    // Don't do this yet  - not reliable enough.
+    //this.text.setAttribute('value', scoreText);
 
     if (this.clearTimer) {
       // reset scoreboard clearing timer.
@@ -431,6 +491,68 @@ AFRAME.registerComponent('bowling-alley-scoreboard', {
   }
 
 });
+
+AFRAME.registerComponent('bowling-alley-sweeper', {
+
+  init() {
+    this.el.addEventListener("sweep", this.sweep.bind(this));
+    this.el.addEventListener("resetPins", this.resetPins.bind(this));
+  },
+
+  sweep() {
+
+    // raise it up.
+    this.el.removeAttribute("animation__sweep");
+    this.el.setAttribute("animation__sweep",
+                         "property: position; to: 0 0.7 6.2; dur: 1000");
+
+    // sweep
+    setTimeout(() => {
+      this.el.setAttribute("animation__sweep",
+                           "property: position; to: 0 0.7 -6.2; dur: 4000");
+    }, 1200);
+
+    // put away
+    setTimeout(() => {
+      this.el.setAttribute("animation__sweep",
+                           "property: position; to: 0 0 -6.2; dur: 1000");
+    }, 5500);
+
+    // bring back to start
+    setTimeout(() => {
+      this.el.setAttribute("position", "0 0 6.2");
+    }, 7000);
+  },
+
+  resetPins() {
+    penguins = document.querySelectorAll('[penguin]')
+
+    penguins.forEach((el) => {
+      el.emit("resetPin");
+    })
+  }
+});
+
+AFRAME.registerComponent('bowling-alley-reset', {
+
+  init() {
+    this.el.addEventListener('pressed', this.buttonPressed.bind(this));
+
+    this.sweeper = document.getElementById('bowling-alley-sweeper')
+
+  },
+
+  buttonPressed() {
+
+    this.sweeper.emit("sweep");
+    // this.sweeper.emit("resetPins"); // to do at same time...
+
+    setTimeout(() => {
+      this.sweeper.emit("resetPins")
+    }, 7000); // to do in sequence (more fun cos penguins go flying? :-)
+  }
+});
+
 
 AFRAME.registerComponent('cylindrical-position', {
   schema: {
@@ -898,6 +1020,174 @@ AFRAME.registerComponent('ui-rotary', {
     }
   }
 
+});
+
+/* This component is a modified version of:
+   https://github.com/caseyyee/aframe-ui-widgets/blob/master/src/button.js */
+AFRAME.registerComponent('ui-button', {
+  schema: {
+    size: { type: 'number', default: 0.1 },
+    color: { type: 'color', default: '#960960' },
+    pressedColor: { type: 'color', default: '#FC2907' },
+    baseColor: {type: 'color', default: '#618EFF'},
+    topY: { type: 'number', default: 0.02 },
+    pressedY: { type: 'number', default: 0.012 },
+    base: { type: 'array' },    /* specify mixin for button base */
+    top: { type: 'array' },     /* specify mixin for button top */
+    pressed: {type: 'array' }   /* add mixin for button when pressed */
+  },
+
+  multiple: true,
+
+  init: function () {
+    var self = this;
+    var top = document.createElement('a-entity');
+    if (this.data.top.length > 0) {
+      top.setAttribute('mixin', this.data.top.join(' '));
+    } else {
+      // default style
+      top.setAttribute('geometry', {
+        primitive: 'cylinder',
+        radius: 0.1,
+        height: 0.025,
+        segmentsHeight: 1
+      });
+      top.setAttribute('position', { x: 0, y: this.data.topY, z: 0 });
+      top.setAttribute('material', { color: this.data.color });
+    }
+    this.top = top;
+    this.el.appendChild(top);
+
+    var base = document.createElement('a-entity');
+    if (this.data.base.length > 0) {
+      base.setAttribute('mixin', this.data.base.join(' '));
+    } else {
+      // default style
+      base.setAttribute('geometry', {
+        primitive: 'cone',
+        radiusTop: 0.12,
+        radiusBottom: 0.15,
+        height: 0.02,
+        segmentsHeight: 1
+      });
+      base.setAttribute('material', { color: this.data.baseColor });
+    }
+    this.el.appendChild(base);
+
+    var controllers = document.querySelectorAll('a-entity[hand-controls]');
+    this.controllers = Array.prototype.slice.call(controllers);
+
+    this.pressed = false;
+    this.interval = null;
+    this.lastTime = 0;
+  },
+
+  play: function () {
+    var el = this.el;
+    // cursor controls
+    el.addEventListener('mousedown', this.onButtonDown.bind(this));
+    el.addEventListener('mouseup', this.onButtonUp.bind(this));
+    el.addEventListener('mouseleave', this.onMouseLeave.bind(this));
+    // motion controls
+    el.addEventListener('hit', this.onHit);
+    el.addEventListener('touchdown', this.onButtonDown.bind(this));
+    el.addEventListener('touchup', this.onButtonUp.bind(this));
+  },
+
+  pause: function () {
+    var el = this.el;
+    el.removeEventListener('mousedown', this.onButtonDown.bind(this));
+    el.removeEventListener('mouseup', this.onButtonUp.bind(this));
+    el.removeEventListener('mouseleave', this.onButtonUp.bind(this));
+    el.removeEventListener('hit', this.onHit);
+    el.removeEventListener('touchdown', this.onButtonDown.bind(this));
+    el.removeEventListener('touchup', this.onButtonUp.bind(this));
+  },
+
+  onButtonDown: function () {
+    var top = this.top;
+    var el = this.el;
+    if (this.data.top.length > 0 && this.data.pressed.length > 0) {
+      var mixin = this.data.top.join(' ') + ' ' + this.data.pressed.join(' ');
+      top.setAttribute('mixin', mixin);
+    } else {
+      top.setAttribute('position',{ x: 0, y: this.data.pressedY, z: 0 });
+      top.setAttribute('material', { color: this.data.pressedColor });
+    }
+    this.pressed = true;
+    el.emit('buttondown');
+  },
+
+  resetButton: function() {
+    var top = this.top;
+    // top.setAttribute('position',{ x: 0, y: this.topOrigin.y, z: 0});
+    if (this.data.top.length > 0) {
+      var mixin = this.data.top.join(' ');
+      top.setAttribute('mixin', mixin);
+    } else {
+      top.setAttribute('position', { x: 0, y: this.data.topY, z: 0 });
+      top.setAttribute('material', { color: this.data.color });
+    }
+  },
+
+  onButtonUp: function (e) {
+    if (this.pressed) {
+      var el = this.el;
+      this.resetButton();
+      this.pressed = false;
+      el.emit('buttonup');
+      el.emit('pressed');
+    }
+  },
+
+  onMouseLeave: function() {
+    if (this.pressed) {
+      this.resetButton();
+      this.pressed = false;
+    }
+  },
+
+  // handles hand controller collisions
+  onHit: function (evt) {
+    var threshold = 30;
+    if (!this.pressed) {
+      this.pressed = true;
+      this.emit('touchdown');
+      var self = this;
+      this.interval = setInterval(function() {
+        var delta = performance.now() - self.lastTime;
+        if (delta > threshold) {
+          self.pressed = false;
+          self.lastTime = 0;
+          self.emit('touchup');
+          clearInterval(self.interval);
+        }
+      }, threshold);
+    }
+    this.lastTime = performance.now();
+  },
+
+  update: function () {
+    this.el.setAttribute('cursor-listener','');
+  },
+
+  tick: function () {
+    var self = this;
+    var mesh = this.top.getObject3D('mesh');
+    if (!mesh) {
+      console.log('no mesh!');
+      return
+    }
+    var topBB = new THREE.Box3().setFromObject(mesh);
+    this.controllers.forEach(function(controller) {
+      var controllerBB = new THREE.Box3().setFromObject(controller.object3D);
+      var collision = topBB.intersectsBox(controllerBB);
+
+      if (collision) {
+        self.el.emit('hit');
+      }
+    });
+  }
 });
 
 AFRAME.registerComponent('volume-control', {
