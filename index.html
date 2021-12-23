@@ -133,7 +133,7 @@
         <a-mixin id="penguin"
                  penguin
                  scale="0.1 0.1 0.1"
-                 movement="type:grabbable; stickiness:stickable; initialState:dynamic">
+                 movement="type:grabbable; stickiness:nonne; initialState:dynamic">
         </a-mixin>
         <a-mixin id="paintbrush"
                  paintbrush="color:blue"
@@ -374,17 +374,36 @@
             rotation = "0 0 -45">
           </a-box>
           <!--penguin bowling pins-->
-          <a-entity position="-0.6 0.3 -4.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
-          <a-entity position="-0.2 0.3 -4.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
-          <a-entity position="0.2 0.3 -4.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
-          <a-entity position="0.6 0.3 -4.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
-          <a-entity position="-0.4 0.3 -4" mixin="penguin" ammo-shape="type:hull"></a-entity>
-          <a-entity position="0 0.3 -4" mixin="penguin" ammo-shape="type:hull"></a-entity>
-          <a-entity position="0.4 0.3 -4" mixin="penguin" ammo-shape="type:hull"></a-entity>
-          <a-entity position="-0.2 0.3 -3.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
-          <a-entity position="0.2 0.3 -3.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
-          <a-entity position="0 0.3 -3" mixin="penguin" ammo-shape="type:hull"></a-entity>
+          <a-entity id="penguin1" position="-0.6 0.3 -4.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
+          <a-entity id="penguin2" position="-0.2 0.3 -4.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
+          <a-entity id="penguin3" position="0.2 0.3 -4.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
+          <a-entity id="penguin4" position="0.6 0.3 -4.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
+          <a-entity id="penguin5" position="-0.4 0.3 -4" mixin="penguin" ammo-shape="type:hull"></a-entity>
+          <a-entity id="penguin6" position="0 0.3 -4" mixin="penguin" ammo-shape="type:hull"></a-entity>
+          <a-entity id="penguin7" position="0.4 0.3 -4" mixin="penguin" ammo-shape="type:hull"></a-entity>
+          <a-entity id="penguin8" position="-0.2 0.3 -3.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
+          <a-entity id="penguin9" position="0.2 0.3 -3.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
+          <a-entity id="penguin10" position="0 0.3 -3" mixin="penguin" ammo-shape="type:hull"></a-entity>
+          <!--prototyping this - not ready yet-->
+          <!--<a-entity id="bowling-alley-scoreboard" position="0 3 -5" bowling-alley-scoreboard></a-entity>-->
         </a-box>
+
+        <a-entity position = "-4 0 -4" rotation = "0 45 0">
+          <a-entity letters-block="letters:CDEFAB;color:red" position = "-1.4 0.15 0"></a-entity>
+          <a-entity letters-block="letters:HIJKLG;color:green" position = "-1.05.15 0"></a-entity>
+          <a-entity letters-block="letters:RMNOPQ;color:blue" position = "-0.7 0.15 0"></a-entity>
+          <a-entity letters-block="letters:IJKLGH;color:green" position = "-0.35 0.15 0"></a-entity>
+          <a-entity letters-block="letters:STUVWX;color:orange" position = "0 0.15 0"></a-entity>
+          <a-entity letters-block="letters:TUVWXS;color:orange" position = "0.35 0.15 0"></a-entity>
+          <a-entity letters-block="letters:MNOPQR;color:blue" position = "0.7 0.15 0"></a-entity>
+          <a-entity letters-block="letters:ABCDEF;color:red" position = "1.05 0.15 0"></a-entity>
+          <a-entity letters-block="letters:STUVWX;color:orange" position = "1.4 0.15 0"></a-entity>
+          <a-entity letters-block="letters:MNOPQR;color:blue" position = "-0.9 0.45 0"></a-entity>
+          <a-entity letters-block="letters:EFABCD;color:red" position = "-0.55 0.45 0"></a-entity>
+          <a-entity letters-block="letters:RMNOPQ;color:blue" position = "-0.2 0.45 0"></a-entity>
+          <a-entity letters-block="letters:RMNOPQ;color:blue" position = "0.15 0.45 0"></a-entity>
+          <a-entity letters-block="letters:YZ1234;color:purple" position = "0.5 0.45 0"></a-entity>
+        </a-entity>
 
         <a-box id="floor-plane"
                width = "100" height = "1" depth = "100"

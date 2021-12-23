@@ -303,6 +303,9 @@ AFRAME.registerGeometry('penguin', {
   }
 });
 
+// Penguin bowling pin.
+// Emits "pin-down" event if it falls onto the bowling alley within 500msecs of
+// being toppled from vertical.
 AFRAME.registerComponent('penguin', {
 
   init () {
@@ -317,7 +320,116 @@ AFRAME.registerComponent('penguin', {
     this.el.setAttribute('geometry','primitive:penguin');
     const mesh = this.el.getObject3D('mesh');
     mesh.material = materials;
+
+    this.xAxis = new THREE.Vector3();
+    this.yAxis = new THREE.Vector3();
+    this.zAxis = new THREE.Vector3();
+
+    this.defaultYAxis = new THREE.Vector3(0, 1, 0);
+
+    this.el.addEventListener("collidestart", this.onCollide.bind(this));
+
+    this.scoreboard = document.getElementById("bowling-alley-scoreboard");
+  },
+
+  onCollide(event) {
+
+    if (event.detail.targetEl.id === "bowling-alley") {
+      // fallen onto bowling alley.
+      if (this.toppled) {
+        // just fell over
+        this.scoreboard.emit("pin-down");
+        this.toppled = false;
+      }
+    }
+  },
+
+  // monitor whether knocked over (not held) in bowling pin area.
+  tick() {
+
+    this.el.object3D.matrix.extractBasis ( this.xAxis, this.yAxis, this.zAxis);
+
+    if (this.yAxis.angleTo(this.defaultYAxis) < 0.3) {
+      // upright
+      this.upright = true;
+      this.toppled = false;
+    }
+    else {
+      if (this.upright) {
+        // just fallen over.  Set toppled state for 500 msecs.
+        this.upright = false;
+        this.toppled = true;
+
+        setTimeout(() => this.toppled = false, 500);
+      }
+    }
   }
+});
+
+AFRAME.registerComponent('bowling-alley-scoreboard', {
+
+  init() {
+    this.text = document.createElement('a-text');
+    this.text.setAttribute('value', '');
+    this.text.setAttribute('wrap-count', '3');
+    this.text.setAttribute('color', 'blue');
+    this.text.setAttribute('width', '2.0');
+    this.text.setAttribute('align', 'center');
+
+    this.el.appendChild(this.text);
+
+    this.el.addEventListener("pin-down", this.pinDown.bind(this));
+
+    this.lastPinCount = 0;
+    this.pinCount = 0;
+    this.countingFallenPins = false;
+  },
+
+  pinDown() {
+
+    if (!this.countingFallenPins) {
+      // First pin down, start counting...
+      this.pinCount = 1;
+      this.countingFallenPins = true;
+
+      setTimeout(() => this.displayScore(), 1000)
+    }
+    else {
+      this.pinCount += 1;
+    }
+  },
+
+  displayScore() {
+
+    var scoreText
+
+    if (this.pinCount === 10) {
+      scoreText = "X"
+    }
+    else if (this.pinCount + this.lastPinCount >= 10) {
+      scoreText = "/"
+    }
+    else {
+      scoreText = this.pinCount;
+    }
+
+    this.text.setAttribute('value', scoreText);
+
+    if (this.clearTimer) {
+      // reset scoreboard clearing timer.
+      clearTimeout(this.clearTimer);
+    }
+    this.clearTimer = setTimeout(() => this.clearScore(), 10000)
+
+    // save pin count for next time.
+    this.lastPinCount = this.pinCount;
+    this.pinCount = 0;
+  },
+
+  clearScore() {
+    this.text.setAttribute('value', "");
+  }
+
 });
 
 AFRAME.registerComponent('cylindrical-position', {
@@ -981,6 +1093,60 @@ AFRAME.registerComponent('perimeter-fence', {
                              randomOrientation: true`);
         branch.setAttribute("ammo-shape", "type:hull");
         this.el.appendChild(branch);
+    }
+  }
+});
+
+AFRAME.registerComponent('letters-block', {
+
+  schema: {
+    letters: {type: 'string', default: "ABCDEF"},
+    color: {type: 'color', default: 'red'},
+    letterColor: {type: 'color', default: 'white'}
+  },
+
+  init() {
+
+    const dim = 0.3;
+
+    const block = document.createElement('a-box');
+    block.setAttribute('height', dim);
+    block.setAttribute('width', dim);
+    block.setAttribute('depth', dim);
+    block.setAttribute('movement', "type:grabbable; stickiness:stickable; initialState:dynamic");
+    block.setAttribute("ammo-shape", "type:box");
+    block.setAttribute("rotation", `0 ${30 * (Math.random() - 0.5)} 0`);
+    block.setAttribute("color", this.data.color);
+    this.el.appendChild(block);
+
+    const positions = [
+      `0 0 ${dim/2}`,
+      `0 0 ${-dim/2}`,
+      `0 ${dim/2} 0`,
+      `0 ${-dim/2} 0`,
+      `${dim/2} 0 0`,
+      `${-dim/2} 0 0`,
+    ]
+
+    const rotations = [
+      "0 0 0",
+      "0 -180 0",
+      "-90 0 0",
+      "90 0 0",
+      "0 90 0",
+      "0 -90 0"
+    ]
+
+    for (ii = 0; ii < 6; ii++) {
+        const text = document.createElement('a-text');
+        text.setAttribute('value', this.data.letters[ii]);
+        text.setAttribute('wrap-count', '2');
+        text.setAttribute('color', this.data.letterColor);
+        text.setAttribute('width', '0.3');
+        text.setAttribute('align', 'center');
+        text.setAttribute('position', positions[ii]);
+        text.setAttribute('rotation', rotations[ii]);
+        block.appendChild(text);
     }
   }
 });

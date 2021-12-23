@@ -81,7 +81,24 @@ Here's the features I have added so far.
 **18 December**
 
 - Added volume control to turn the background music down.
-  
+
+**19 December**
+
+- Sticky snowballs, which enables large constructions
+
+**20 December**
+
+- "Magic paintbrush" can be used to paint snowballs and icicles.
+
+**21 December**
+
+- Perimeter fence - sticks can be used as building material.
+
+**22 December**
+
+- "Merry Christmas" stackable alphabet blocks.
+
+
 
 ### Credits
 
