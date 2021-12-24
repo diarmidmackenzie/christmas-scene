@@ -1,3 +1,4 @@
+
 function recenterGeometry(geometry) {
   geometry.computeBoundingBox();
   const center = new THREE.Vector3();
@@ -375,5 +376,108 @@ AFRAME.registerComponent('paintbrush', {
     this.el.setAttribute('geometry','primitive:paintbrush');
     const mesh = this.el.getObject3D('mesh');
     mesh.material = materials;
+  }
+});
+
+
+AFRAME.registerGeometry('letter-block', {
+  schema: {
+    letters: {type: 'string', default: "ABCDEF"},
+    size: {type: 'number', default: 0.3}
+  },
+
+  init(data) {
+
+    const dim = data.size;
+
+    const geometryBlock = new THREE.BoxGeometry(dim, dim, dim)
+
+    const positions = [
+      `0 0 ${dim/2}`,
+      `0 0 ${-dim/2}`,
+      `0 ${dim/2} 0`,
+      `0 ${-dim/2} 0`,
+      `${dim/2} 0 0`,
+      `${-dim/2} 0 0`,
+    ]
+
+    const rotations = [
+      [0, 0, 0],
+      [0, -Math.PI, 0],
+      [-Math.PI / 2, 0, 0],
+      [Math.PI / 2, 0, 0],
+      [0, Math.PI / 2, 0],
+      [0, -Math.PI / 2, 0],
+    ]
+
+    this.geometries = [];
+    //this.geometries.push(geometryBlock);
+
+    const loader = new THREE.FontLoader();
+    const fontName = 'optimer'; // helvetiker, optimer, gentilis, droid sans, droid serif
+	  const fontWeight = 'bold'; // normal bold
+
+		loader.load( '../../assets/fonts/' + fontName + '_' + fontWeight + '.typeface.json', (response) => {
+
+		  const font = response;
+      for (ii = 0; ii < 6; ii++) {
+          const letter = new THREE.TextGeometry(data.letters[ii], {
+                                                font: font,
+                                                size: dim,
+                                                height: dim,
+                                                curveSegments: 12,
+                                                bevelEnabled: true,
+                                                bevelThickness: 10,
+                                                bevelSize: 8,
+                                                bevelOffset: 0,
+                                                bevelSegments: 5
+                                              });
+
+          letter.translate(...positions[ii].split('/[ ]+/'));
+          letter.rotateX(rotations[ii][0]);
+          letter.rotateY(rotations[ii][1])
+          letter.rotateZ(rotations[ii][2])
+          this.geometries.push(letter)
+          /*const letterIndexed = letter.toIndexed();
+          this.geometries.push(letterIndexed)*/
+      }
+
+      this.geometry = THREE.BufferGeometryUtils.mergeBufferGeometries(this.geometries);
+		});
+  }
+});
+
+
+AFRAME.registerGeometry('text', {
+  schema: {
+    letters: {type: 'string', default: "ABCDEF"},
+    size: {type: 'number', default: 0.3}
+  },
+
+  async init(data) {
+
+    const dim = data.size;
+
+    const loader = new THREE.FontLoader();
+    const fontName = 'optimer'; // helvetiker, optimer, gentilis, droid sans, droid serif
+	  const fontWeight = 'bold'; // normal bold
+
+		loader.load( '../../assets/fonts/' + fontName + '_' + fontWeight + '.typeface.json', (response) => {
+
+		  const font = response;
+      this.geometry = new THREE.TextGeometry(data.letters, {
+                                            font: font,
+                                            size: dim,
+                                            height: dim,
+                                            curveSegments: 12,
+                                            bevelEnabled: true,
+                                            bevelThickness: 10,
+                                            bevelSize: 8,
+                                            bevelOffset: 0,
+                                            bevelSegments: 5
+                                          });
+		});
+
+    //this.geometry = new THREE.BoxGeometry();
   }
 });

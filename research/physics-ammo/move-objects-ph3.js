@@ -1,6 +1,7 @@
 OBJECT_FIXED = 1;
 OBJECT_HELD = 2;
 OBJECT_LOOSE = 3;
+OBJECT_INITIALIZING = 4;
 TYPE_STATIC = 'static';
 
 const GLOBAL_DATA = {
@@ -66,6 +67,7 @@ AFRAME.registerComponent('movement', {
     // of being temporarily dynamic.
     this.visible = this.el.object3D.visible;
     this.el.object3D.visible = false;
+    this.el.emit("object3DUpdated");
 
     // Save off world position, so we can undo any dynamic movement that happens
     // while initializing objects (even kinetic objects are initially created as dynamic).
@@ -75,7 +77,7 @@ AFRAME.registerComponent('movement', {
     if (this.el.sceneEl.hasLoaded) {
       this.el.object3D.parent.updateMatrixWorld();
       this.el.object3D.getWorldPosition(this.worldPosition);
-      this.el.object3D.getWorldQuaternion(this.worldQuaternion);      
+      this.el.object3D.getWorldQuaternion(this.worldQuaternion);
     }
     else {
       this.el.sceneEl.addEventListener('loaded', () => {
@@ -106,7 +108,7 @@ AFRAME.registerComponent('movement', {
       });
     }
 
-    this.state = OBJECT_FIXED;
+    this.state = OBJECT_INITIALIZING;
     this.stickyOverlaps = [];
 
     this.lastPositions = [new THREE.Vector3(),
@@ -185,7 +187,11 @@ AFRAME.registerComponent('movement', {
       }
       // and make visible again (if appropriate).
       this.el.object3D.visible = this.visible;
+
+      this.el.emit("object3DUpdated");
     }, 1);
+
+    setTimeout(() => released(), 100);
   },
 
   remove() {
@@ -204,7 +210,7 @@ AFRAME.registerComponent('movement', {
     console.log("set to kinematic")
     this.el.setAttribute('ammo-body', 'type: kinematic');
 
-    // re-instate collisions on descandants that may have been disabled.
+    // re-instate collisions on descendants that may have been disabled.
     // use a timer to avoid race conditions around dynamic->kinematic switch.
     setTimeout(() => this.enableCollisionOnDescendants(this.el.object3D), 100);
 
@@ -225,9 +231,10 @@ AFRAME.registerComponent('movement', {
 
   enableCollisionOnDescendants(object) {
 
-    if (object.el) {
-          object.el.setAttribute('ammo-body', 'disableCollision:false');
-        }
+    if ((object.el) &&
+        (object.el.hasAttribute('ammo-body'))) {
+      object.el.setAttribute('ammo-body', 'disableCollision:false');
+    }
 
     object.children.forEach((o) => {
       this.enableCollisionOnDescendants(o)
@@ -251,6 +258,8 @@ AFRAME.registerComponent('movement', {
   // collideStart & collideEnd used to track overlaps with static objects, to
   // correctly handle release.
   collideStart(event) {
+
+    if (this.state === OBJECT_INITIALIZING) return;
 
     targetEl = event.detail.targetEl;
 
@@ -299,11 +308,11 @@ AFRAME.registerComponent('movement', {
 
   },
 
-  isMyDescendent(object) {
+  isMyDescendant(object) {
     if (!object.parent) return false;
     if (object.parent === this.el.object3D) return true;
 
-    return (this.isMyDescendent(object.parent));
+    return (this.isMyDescendant(object.parent));
   },
 
   detachFromStickyParent() {
@@ -340,6 +349,8 @@ AFRAME.registerComponent('movement', {
 
   collideEnd(event) {
 
+    if (this.state === OBJECT_INITIALIZING) return;
+
     targetEl = event.detail.targetEl;
 
     if (targetEl === this.el) {
@@ -363,7 +374,11 @@ AFRAME.registerComponent('movement', {
       }
     }
 
-    this.release();
+    // Maybe should have release logic here, but seemes better without...
+    /*
+    if (this.state !== OBJECT_HELD) {
+      this.released();
+    }*/
   },
 
   grabbed() {

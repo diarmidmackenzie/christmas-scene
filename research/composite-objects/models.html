@@ -4,7 +4,10 @@
     <meta charset="utf-8">
     <title>Various Custom Models</title>
     <meta name="description" content="Merry Christmas 2021!">
-    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://aframe.io/releases/1.2.0/aframe.js"></script>
+    <script src="../../lib/FontLoader.js"></script>
+    <script src="../../lib/TextGeometry.js"></script>
+    <script src="../../lib/BufferGeometryToIndexed.js"></script>
     <script src="./custom-geometries.js"></script>
   </head>
   <body>
@@ -54,10 +57,16 @@
                  scale="0.2 0.2 0.2">
         </a-mixin>
 
+        <a-mixin id="letter-block"
+                 geometry="primitive:letter-block;letters:ABCDEF">
+        </a-mixin>
+        <a-mixin id="text"
+                 geometry="primitive:text;letters:ABCDEF">
+        </a-mixin>
       </a-assets>
 
       <a-entity id="play-area">
-
+<!--
         <a-entity id="snowman-arm" mixin="branch"  position="0 1 -1.5">
         </a-entity>
 
@@ -80,7 +89,8 @@
         <a-entity id="penguin" mixin="penguin" position="0 1.5 -1.5"></a-entity>
 
         <a-entity id="paintbrush" mixin="paintbrush" rotation="0 0 90" position="0 2.5 -1.5"></a-entity>
-
+-->
+        <a-entity id="letters-block1" mixin="text" position="0 0 -1.5"></a-entity>
 
       </a-entity>
     </a-scene>
