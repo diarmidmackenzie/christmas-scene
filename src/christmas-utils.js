@@ -675,6 +675,7 @@ AFRAME.registerComponent('musical-note', {
     this.el.components['sound'].playSound();
 
     this.el.sceneEl.emit("task-xylophone");
+    this.el.sceneEl.emit("music-note", {note: this.data.note.id});
   }
 });
 
@@ -1603,6 +1604,8 @@ AFRAME.registerComponent('task-board', {
 
       this.el.sceneEl.addEventListener(task.event, () => this.taskComplete(index));
     })
+
+    this.tasksComplete = 0;
   },
 
   taskComplete(taskNumber) {
@@ -1611,8 +1614,21 @@ AFRAME.registerComponent('task-board', {
     this.checks[taskNumber].object3D.visible = true;
     this.checks[taskNumber].emit("object3DUpdated");
 
-  }
+    this.tasksComplete++;
 
+    if (this.tasksComplete === 23) {
+      this.el.sceneEl.emit("task-all-tasks")
+    }
+
+    if (this.tasksComplete >= 24) {
+
+      // Party time!  Set board to gold.
+      this.board.setAttribute("color", "yellow");
+      this.board.setAttribute("metalness", 0.7);
+      this.board.setAttribute("roughness", 0.3);
+      this.board.setAttribute("material", "envMap:#env");
+    }
+  }
 });
 
 AFRAME.registerGeometry('check', {
@@ -1794,6 +1810,47 @@ AFRAME.registerComponent('carrot-watch', {
        this.el.sceneEl.emit("task-large-carrot")
        this.el.removeAttribute('carrot-watch')
      }
+  }
+
+});
+
+AFRAME.registerComponent('tune-detector', {
+
+  init() {
+    this.tune = [
+      "xC",
+      "xF",
+      "xF",
+      "xG",
+      "xF",
+      "xE",
+      "xD",
+      "xD"
+    ]
+
+    this.el.sceneEl.addEventListener("music-note", this.hearNote.bind(this));
+    this.sequenceNumber = 0;
+  },
+
+  hearNote(event) {
+
+    note = event.detail.note;
+    if (note === this.tune[this.sequenceNumber]) {
+
+      this.sequenceNumber++;
+      if (this.sequenceNumber >= this.tune.length) {
+        this.el.sceneEl.emit("task-merry-christmas")
+      };
+    }
+    else {
+      // out of sequence.  But maybe 1st note of new sequence.
+      if (note === this.tune[0]) {
+        this.sequenceNumber = 1;
+      }
+      else {
+        this.sequenceNumber = 0;
+      }
+    }
   }
 
 });
