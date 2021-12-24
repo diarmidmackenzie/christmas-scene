@@ -1522,7 +1522,7 @@ AFRAME.registerComponent('task-board', {
     {text: "Turn the music volume up or down",
      event: "task-change-volume"
     },
-    {text: "Stick 10 snowballs together",
+    {text: "Make a chain of 10 snowballs",
      event: "task-stick-snowballs"
     },
     {text: "Paint 5 snowballs",
@@ -1634,7 +1634,7 @@ AFRAME.registerGeometry('check', {
   }
 });
 
-AFRAME.registerGeometry('camera-event-watcher', {
+AFRAME.registerComponent('camera-event-watcher', {
 
   init() {
     this.xAxis = new THREE.Vector3();
@@ -1650,7 +1650,7 @@ AFRAME.registerGeometry('camera-event-watcher', {
 
   tick(t, dt) {
 
-    this.el.object3D.matrix.extractBasis(this.xAxis, this.yAxis, this.zAxis);
+    this.el.object3D.matrixWorld.extractBasis(this.xAxis, this.yAxis, this.zAxis);
 
     if (this.zAxis.angleTo(this.defaultYAxis) < 0.3) {
       // looking straight up.
@@ -1680,7 +1680,7 @@ AFRAME.registerGeometry('camera-event-watcher', {
 });
 
 
-AFRAME.registerGeometry('detect-bauble', {
+AFRAME.registerComponent('detect-bauble', {
 
   init() {
     this.el.addEventListener('collidestart', this.onCollide.bind(this));
@@ -1788,9 +1788,8 @@ AFRAME.registerComponent('carrot-watch', {
      if (this.worldScale.x > 3) {
        // carrot grew to 3 foot!
        this.el.sceneEl.emit("task-large-carrot")
+       this.el.removeAttribute('carrot-watch')
      }
-
-     this.el.removeAttribute('carrot-watch')
   }
 
 });
@@ -1823,7 +1822,6 @@ AFRAME.registerComponent('check-for-present-stack', {
     if (stackCount >= 3) {
 
       this.el.sceneEl.emit("task-stack-presents");
-
       this.el.removeAttribute("check-for-present-stack");
     }
   },

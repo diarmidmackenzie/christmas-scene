@@ -302,18 +302,23 @@ AFRAME.registerComponent('movement', {
                           this.el.object3D.parent,
                           stickyParent.object3D);
 
-    // check for 10 snowballs stuck together
-    function countStickySnowballs(el) {
+    // check for a chain of 10 snowballs stuck together
+    function countStickySnowballs(el, child) {
+
+      var stickySnowballs;
 
       if (el.hasAttribute('sticky')) {
 
-        const stickySnowballs = 1 + countStickySnowballs(el.object3D.parent.el)
+         stickySnowballs = 1 + countStickySnowballs(el.object3D.parent.el)
+      }
+      else {
+         stickySnowballs = 0;
       }
 
       return (stickySnowballs);
     }
 
-    if (countStickyParents(this.el) === 10) {
+    if (countStickySnowballs(this.el) >= 10) {
       this.el.sceneEl.emit("task-stick-snowballs");
     }
   },
