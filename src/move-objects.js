@@ -11,25 +11,25 @@ const GLOBAL_DATA = {
 const GLOBAL_FUNCS = {
   reparent : function (object, oldParent, newParent) {
 
-  if (object.parent === newParent) {
-    return;
-  }
+    if (object.parent === newParent) {
+      return;
+    }
 
-  console.log(`Reparenting ${object.el.id} from ${oldParent.el ? oldParent.el.id : "unknown"} to ${newParent.el ? newParent.el.id : "unknown"}`);
+    console.log(`Reparenting ${object.el.id} from ${oldParent.el ? oldParent.el.id : "unknown"} to ${newParent.el ? newParent.el.id : "unknown"}`);
 
-  oldParent.updateMatrixWorld();
-  oldParent.updateMatrix();
-  object.updateMatrix();
-  newParent.updateMatrixWorld();
-  newParent.updateMatrix();
+    oldParent.updateMatrixWorld();
+    oldParent.updateMatrix();
+    object.updateMatrix();
+    newParent.updateMatrixWorld();
+    newParent.updateMatrix();
 
-  GLOBAL_DATA.tempMatrix.copy(newParent.matrixWorld).invert();
-  object.matrix.premultiply(oldParent.matrixWorld);
-  object.matrix.premultiply(GLOBAL_DATA.tempMatrix);
-  object.matrix.decompose(object.position, object.quaternion, object.scale);
-  object.matrixWorldNeedsUpdate = true;
-  newParent.add(object);
-},
+    GLOBAL_DATA.tempMatrix.copy(newParent.matrixWorld).invert();
+    object.matrix.premultiply(oldParent.matrixWorld);
+    object.matrix.premultiply(GLOBAL_DATA.tempMatrix);
+    object.matrix.decompose(object.position, object.quaternion, object.scale);
+    object.matrixWorldNeedsUpdate = true;
+    newParent.add(object);
+  },
 };
 
 AFRAME.registerComponent('movement', {
@@ -40,7 +40,11 @@ AFRAME.registerComponent('movement', {
     initialState: {type: 'string', default: 'kinematic'},
     // how long we run "homegrown" (gravity-only physics, before switching on full collision physics)
     // 150 msecs is enough to fall 11cm, which shuld be enough to clear the hand collider sphere (5cm radius).
-    releaseTimer: {type: 'number', default: 150}
+    releaseTimer: {type: 'number', default: 150},
+    // event to emit on re-attaching.
+    attachEvent: {type: 'string'},
+    // event to emit on releasing.
+    releaseEvent: {type: 'string'}
   },
 
   init() {
@@ -298,6 +302,20 @@ AFRAME.registerComponent('movement', {
                           this.el.object3D.parent,
                           stickyParent.object3D);
 
+    // check for 10 snowballs stuck together
+    function countStickySnowballs(el) {
+
+      if (el.hasAttribute('sticky')) {
+
+        const stickySnowballs = 1 + countStickySnowballs(el.object3D.parent.el)
+      }
+
+      return (stickySnowballs);
+    }
+
+    if (countStickyParents(this.el) === 10) {
+      this.el.sceneEl.emit("task-stick-snowballs");
+    }
   },
 
   isMyDescendent(object) {
@@ -390,6 +408,11 @@ AFRAME.registerComponent('movement', {
 
   released() {
 
+
+    if (this.data.releaseEvent) {
+      this.el.sceneEl.emit(this.data.releaseEvent)
+    }
+
     toStickTo = this.nonChildStickyOverlap()
 
     if (toStickTo) {
@@ -400,6 +423,9 @@ AFRAME.registerComponent('movement', {
       this.state = OBJECT_FIXED;
       this.attachToStickyParent(toStickTo);
 
+      if (this.data.attachEvent) {
+        this.el.sceneEl.emit(this.data.attachEvent)
+      }
     }
     else {
       // become a dynamic object.
@@ -780,7 +806,7 @@ AFRAME.registerComponent('hand-keyboard-controls', {
       }
       else {
         this.triggerDown = false;
-        this.el.emit("triggerup");        
+        this.el.emit("triggerup");
       }
     });
   }

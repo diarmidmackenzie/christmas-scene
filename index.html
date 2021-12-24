@@ -18,7 +18,9 @@
 
   </head>
   <body>
-    <a-scene physics="driver: ammo">
+    <a-scene physics="driver: ammo"
+            count-painted-snowballs
+            check-for-present-stack>
       <a-assets>
         <a-cubemap id="env">
           <img src="./assets/environment-left.png">
@@ -42,13 +44,13 @@
 
         <a-mixin id="snowbase"
                  material="color:white"
-                 paintable
+                 paintable="snowball:true"
                  geometry="primitive:sphere;segments-height:7;segments-width:13;radius:0.5"
                  movement="type:static; stickiness:sticky">
         </a-mixin>
         <a-mixin id="snowball"
                  material="color:white"
-                 paintable
+                 paintable="snowball:true"
                  geometry="primitive:sphere;segments-height:7;segments-width:13;radius:0.5"
                  movement="type:grabbable; stickiness:sticky">
         </a-mixin>
@@ -58,9 +60,10 @@
                  movement="type:grabbable; stickiness:stickable">
         </a-mixin>
         <a-mixin id="carrot"
+                 carrot-watch
                  material="color:orange"
                  geometry="primitive:cone;height:0.2;radius-bottom:0.025; radius-top:0.005"
-                 movement="type:grabbable; stickiness:stickable">
+                 movement="type:grabbable; stickiness:stickable; attachEvent:task-move-nose">
         </a-mixin>
         <a-mixin id="hat"
                  material="color:black"
@@ -73,6 +76,13 @@
                  scale="0.2 0.2 0.2"
                  movement="type:grabbable; stickiness:stickable">
         </a-mixin>
+        <a-mixin id="fence-post"
+                 material="color:#5C4033"
+                 geometry="primitive:branch"
+                 scale="0.3 0.3 0.3"
+                 movement="type:grabbable; stickiness:stickable; attachEvent:task-move-fence-post">
+        </a-mixin>
+
         <a-mixin id="tree-tier"
                  material="color:green"
                  geometry="primitive:cone;height:0.5;radius-bottom:0.5;segments-height:1;segments-radial:9"
@@ -83,25 +93,29 @@
                  geometry="primitive:cylinder;height:0.5;radius:0.1;">
         </a-mixin>
         <a-mixin id="star"
+                 star
                  material="color:yellow; metalness: 0.8; roughness:0.2"
                  geometry="primitive:star; innerRadius:0.04;outerRadius:0.12;points:5;depth:0.01"
                  movement="type:grabbable; stickiness:stickable">
         </a-mixin>
         <a-mixin id="bauble"
-                 movement="type:grabbable; stickiness:stickable">
+                 bauble
+                 movement="type:grabbable; stickiness:stickable; attachEvent:task-move-baubles">
         </a-mixin>
         <a-mixin id="marble-run-base"
                  material="color:brown; metalness: 0.5; roughness:0.2"
                  movement="type:static; stickiness:sticky2">
         </a-mixin>
         <a-mixin id="marble-run-ramp"
+                 detect-bauble
                  material="color:orange; metalness: 0.5; roughness:0.2"
-                 movement="type:grabbable; stickiness:stickable2">
+                 movement="type:grabbable; stickiness:stickable2; attacheEvent:task-change-marble-run">
         </a-mixin>
         <a-mixin id="ribbon-large"
                  geometry="primitive:ribbon;height: 0.4; depth:0.5; width:0.5; ribbon:0.06">
         </a-mixin>
         <a-mixin id="present-large"
+                 present
                  geometry="primitive:box;height: 0.4; depth:0.5; width:0.5"
                  movement="type:grabbable; stickiness:none; initialState:dynamic">
         </a-mixin>
@@ -109,6 +123,7 @@
                  geometry="primitive:ribbon;height: 0.2; depth:0.3; width:0.2; ribbon:0.05">
         </a-mixin>
         <a-mixin id="present-medium"
+                 present
                  geometry="primitive:box;height: 0.2; depth:0.3; width:0.2"
                  movement="type:grabbable; stickiness:none; initialState:dynamic">
         </a-mixin>
@@ -116,6 +131,7 @@
                  geometry="primitive:ribbon;height: 0.1; depth:0.2; width:0.1; ribbon:0.04">
         </a-mixin>
         <a-mixin id="present-small"
+                 present
                  geometry="primitive:box;height: 0.1; depth:0.2; width:0.1"
                  movement="type:grabbable; stickiness:none; initialState:dynamic">
         </a-mixin>
@@ -171,7 +187,7 @@
                                                   velocitySpread: 1 0 1;
                                                   particleCount: 15000"></a-entity>
       <a-entity id="rig">
-        <a-camera id="camera" position="0 1.6 0"></a-camera>
+        <a-camera id="camera" camera-event-watcher position="0 1.6 0"></a-camera>
         <a-entity id="rhand" hand
                   snowball-generator
                   hand-controls="hand: right">

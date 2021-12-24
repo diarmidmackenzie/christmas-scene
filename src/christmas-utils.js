@@ -417,6 +417,7 @@ AFRAME.registerComponent('penguin', {
         this.upright = false;
         //this.toppled = true;
         this.scoreboard.emit("pin-down");
+        this.el.sceneEl.emit("task-knock-penguin");
 
         //setTimeout(() => this.toppled = false, 500);
       }
@@ -429,9 +430,9 @@ AFRAME.registerComponent('bowling-alley-scoreboard', {
   init() {
     this.text = document.createElement('a-text');
     this.text.setAttribute('value', '');
-    this.text.setAttribute('wrap-count', '3');
+    this.text.setAttribute('wrap-count', '7');
     this.text.setAttribute('color', 'blue');
-    this.text.setAttribute('width', '2.0');
+    this.text.setAttribute('width', '5.0');
     this.text.setAttribute('align', 'center');
 
     this.el.appendChild(this.text);
@@ -441,9 +442,25 @@ AFRAME.registerComponent('bowling-alley-scoreboard', {
     this.lastPinCount = 0;
     this.pinCount = 0;
     this.countingFallenPins = false;
+
+    this.sweeper = document.getElementById('bowling-alley-sweeper')
+
+    this.sweeper.addEventListener("sweep", this.startSweep.bind(this));
+
+  },
+
+  startSweep() {
+    // on sweep, we disable strike detection for ~15 seconds.
+    this.sweeping = true;
+
+    setTimeout(() => {
+      this.sweeping = false;
+    }, 15000);
   },
 
   pinDown() {
+
+    if (this.sweeping) return;
 
     if (!this.countingFallenPins) {
       // First pin down, start counting...
@@ -459,21 +476,15 @@ AFRAME.registerComponent('bowling-alley-scoreboard', {
 
   displayScore() {
 
-    var scoreText
+    var scoreText = "";
     this.countingFallenPins = false;
 
-    if (this.pinCount === 10) {
-      scoreText = "X"
-    }
-    else if (this.pinCount + this.lastPinCount >= 10) {
-      scoreText = "/"
-    }
-    else {
-      scoreText = this.pinCount;
+    if (this.pinCount >= 10) {
+      scoreText = "STRIKE!"
+      this.el.sceneEl.emit("task-strike-bowling");
     }
 
-    // Don't do this yet  - not reliable enough.
-    //this.text.setAttribute('value', scoreText);
+    this.text.setAttribute('value', scoreText);
 
     if (this.clearTimer) {
       // reset scoreboard clearing timer.
@@ -530,6 +541,8 @@ AFRAME.registerComponent('bowling-alley-sweeper', {
     penguins.forEach((el) => {
       el.emit("resetPin");
     })
+
+    this.el.sceneEl.emit("task-reset-bowling");
   }
 });
 
@@ -646,7 +659,12 @@ AFRAME.registerComponent('musical-note', {
     this.el.setAttribute('sound', {src: `#${this.data.note.id}`});
 
     // event listener to play on collide.
-    this.el.addEventListener('collidestart', this.onCollide.bind(this));
+    // slight delay before setting up to avoid triggering collides on physics init.
+    this.el.addEventListener('body-loaded', () => {
+      setTimeout(() => {
+        this.el.addEventListener('collidestart', this.onCollide.bind(this));
+      }, 500)
+    });
   },
 
   onCollide() {
@@ -655,6 +673,8 @@ AFRAME.registerComponent('musical-note', {
     // in a row, quickly.
     this.el.components['sound'].stopSound();
     this.el.components['sound'].playSound();
+
+    this.el.sceneEl.emit("task-xylophone");
   }
 });
 
@@ -837,6 +857,8 @@ AFRAME.registerComponent('snowball-generator', {
     this.el.object3D.getWorldPosition(snowball.object3D.position);
     snowball.setAttribute('snowball-grow-on-roll', "");
     this.playArea.appendChild(snowball);
+
+    this.el.sceneEl.emit("task-snowball")
   }
 });
 
@@ -878,6 +900,10 @@ AFRAME.registerComponent('snowball-grow-on-roll', {
     /*if (this.radius > this.data.maxGrabbableRadius) {
       this.el.setAttribute('movement', "type:dynamic; stickiness:none");
     }*/
+
+    if (this.radius > 0.3) {
+        this.el.sceneEl.emit("task-big-snowball");
+    }
   },
 
   tick(time, timeDelta) {
@@ -1202,6 +1228,8 @@ AFRAME.registerComponent('volume-control', {
   onChange(event) {
     //console.log(`Change: ${event.detail.value}`)
     this.data.music.setAttribute('volume', event.detail.value);
+
+    this.el.sceneEl.emit("task-change-volume");
   }
 });
 
@@ -1334,6 +1362,10 @@ AFRAME.registerComponent('paintbrush', {
 
 AFRAME.registerComponent('paintable', {
 
+  schema: {
+    snowball: {type: 'boolean', default: false}
+  },
+
   init() {
     this.el.addEventListener('collidestart', this.onCollide.bind(this));
     this.color = new THREE.Color();
@@ -1348,6 +1380,13 @@ AFRAME.registerComponent('paintable', {
     const color = targetEl.components['paintbrush'].color;
 
     this.el.setAttribute('material', `color: #${this.snowColor(color).getHexString()}`);
+
+    if (this.data.snowball) {
+      this.el.sceneEl.emit("snowball-painted")
+    }
+    else {
+      this.el.sceneEl.emit("icicle-painted")
+    }
   },
 
   snowColor(color) {
@@ -1374,8 +1413,7 @@ AFRAME.registerComponent('perimeter-fence', {
     for (ii = 0; ii < this.data.posts; ii++) {
 
         const branch = document.createElement('a-entity');
-        branch.setAttribute("mixin", "branch");
-        branch.setAttribute('scale', "0.3 0.3 0.3")
+        branch.setAttribute("mixin", "fence-post");
         branch.setAttribute("cylindrical-position",
                             `height:0.4;
                              radius:${this.data.radius};
@@ -1403,7 +1441,8 @@ AFRAME.registerComponent('letters-block', {
     block.setAttribute('height', dim);
     block.setAttribute('width', dim);
     block.setAttribute('depth', dim);
-    block.setAttribute('movement', "type:grabbable; stickiness:stickable; initialState:dynamic");
+    block.setAttribute('movement', `type:grabbable; stickiness:stickable;
+                                    initialState:dynamic; releaseEvent: task-move-alphabet`);
     block.setAttribute("ammo-shape", "type:box");
     block.setAttribute("rotation", `0 ${30 * (Math.random() - 0.5)} 0`);
     block.setAttribute("color", this.data.color);
@@ -1448,7 +1487,7 @@ AFRAME.registerComponent('task-board', {
 
     this.tasks = [
       {text: "Try to catch a snowflake in your mouth",
-       event: "task-move-nose"
+       event: "task-catch-snowflake"
      },
      {text: "Move the snowman's nose",
       event: "task-move-nose"
@@ -1496,7 +1535,7 @@ AFRAME.registerComponent('task-board', {
      event: "task-move-alphabet"
     },
     {text: "Paint all the icicles different colors",
-     event: "task-paint-snowballs"
+     event: "task-paint-icicles"
     },
     {text: "Re-set the bowling alley",
      event: "task-reset-bowling"
@@ -1507,13 +1546,13 @@ AFRAME.registerComponent('task-board', {
     {text: "Get a STRIKE in the bowling alley",
      event: "task-strike-bowling"
     },
-    {text: "Put the star 20 meters in the air",
+    {text: "Put the star 10 meters in the air",
      event: "task-high-star"
     },
     {text: "Play 'We wish you a Merry Christmas'",
      event: "task-merry-christmas"
     },
-    {text: "Make a 6 foot long carrot!",
+    {text: "Make a 3 foot long carrot!",
      event: "task-large-carrot"
     },
     {text: "Complete all these tasks",
@@ -1592,5 +1631,235 @@ AFRAME.registerGeometry('check', {
     this.geometry.rotateZ(Math.PI/4);
 
     recenterGeometry(this.geometry);
+  }
+});
+
+AFRAME.registerGeometry('camera-event-watcher', {
+
+  init() {
+    this.xAxis = new THREE.Vector3();
+    this.yAxis = new THREE.Vector3();
+    this.defaultYAxis = new THREE.Vector3(0, 1, 0);
+    this.zAxis = new THREE.Vector3();
+
+    this.snowflakeTime = 0;
+    this.snowAngelTime = 0;
+
+    this.tick = AFRAME.utils.throttleTick(this.tick, 1000, this);
+  },
+
+  tick(t, dt) {
+
+    this.el.object3D.matrix.extractBasis(this.xAxis, this.yAxis, this.zAxis);
+
+    if (this.zAxis.angleTo(this.defaultYAxis) < 0.3) {
+      // looking straight up.
+
+      if (this.el.object3D.position < 0.3) {
+        // lying on floor - snow angel.
+        this.snowAngelTime += dt;
+      }
+      else {
+        this.snowAngelTime = 0;
+      }
+
+      this.snowflakeTime += dt;
+    }
+    else {
+      this.snowflakeTime = 0;
+    }
+
+    if (this.snowAngelTime > 5000) {
+      this.el.sceneEl.emit("task-snow-angel");
+    }
+
+    if (this.snowflakeTime > 5000) {
+      this.el.sceneEl.emit("task-catch-snowflake");
+    }
+  }
+});
+
+
+AFRAME.registerGeometry('detect-bauble', {
+
+  init() {
+    this.el.addEventListener('collidestart', this.onCollide.bind(this));
+  },
+
+  onCollide(event) {
+
+    if (event.detail.targetEl.hasAttribute('bauble')) {
+      this.el.sceneEl.emit("task-marble-run")
+    }
+  }
+
+});
+
+AFRAME.registerComponent('bauble', {
+
+  init() {
+
+    this.worldPosition = new THREE.Vector3();
+    this.distanceToCamera = new THREE.Vector3();
+    this.tick = AFRAME.utils.throttleTick(this.tick, 1000, this);
+  },
+
+  tick() {
+
+     this.el.object3D.getWorldPosition(this.worldPosition);
+     this.el.sceneEl.camera.getWorldPosition(this.distanceToCamera);
+     this.distanceToCamera.sub(this.worldPosition);
+
+     if (this.distanceToCamera.lengthSq < 0.1) {
+       // approx 30cm from camera.
+       this.el.sceneEl.emit("task-close-look");
+     }
+  }
+
+});
+
+AFRAME.registerComponent('star', {
+
+  init() {
+
+    this.worldPosition = new THREE.Vector3();
+    this.tick = AFRAME.utils.throttleTick(this.tick, 1000, this);
+  },
+
+  tick() {
+
+     this.el.object3D.getWorldPosition(this.worldPosition);
+
+     if (this.worldPosition.y > 10) {
+        this.el.sceneEl.emit("task-high-star");
+     }
+  }
+
+});
+
+AFRAME.registerComponent('count-painted-snowballs', {
+
+  init() {
+    this.snowballsPainted = 0;
+    this.el.sceneEl.addEventListener("snowball-painted", this.snowballPainted.bind(this));
+    this.el.sceneEl.addEventListener("icicle-painted", this.iciclePainted.bind(this));
+  },
+
+  snowballPainted() {
+
+    this.snowballsPainted++;
+
+    if (this.snowballsPainted === 5) {
+      this.el.sceneEl.emit("task-paint-snowballs");
+    }
+  },
+
+  iciclePainted() {
+
+    const icicles = document.querySelectorAll('[musical-note]');
+
+    const colors = [];
+
+    icicles.forEach((el) => {
+      const color = el.getAttribute("material").color;
+
+      if (!colors.includes(color)) {
+        colors.push(color);
+      }
+    })
+
+    if (colors.length >= 8) {
+      this.el.sceneEl.emit("task-paint-icicles");
+    }
+  }
+});
+
+AFRAME.registerComponent('carrot-watch', {
+
+  init() {
+    this.tick = AFRAME.utils.throttleTick(this.tick, 1000, this);
+
+    this.worldScale = new THREE.Vector3();
+  },
+
+  tick() {
+
+     this.el.object3D.getWorldScale(this.worldScale);
+     if (this.worldScale.x > 3) {
+       // carrot grew to 3 foot!
+       this.el.sceneEl.emit("task-large-carrot")
+     }
+
+     this.el.removeAttribute('carrot-watch')
+  }
+
+});
+
+AFRAME.registerComponent('check-for-present-stack', {
+
+  init() {
+    this.presents = document.querySelectorAll('[present]')
+
+    this.tick = AFRAME.utils.throttleTick(this.tick, 500, this);
+  },
+
+  tick() {
+
+    var stackCount = 0;
+
+    // look for a & b stacked over each other.
+    this.presents.forEach((a) => {
+
+      this.presents.forEach((b) => {
+        if (this.presentsStacked(a,b)) {
+          stackCount += 1;
+        }
+      });
+    });
+
+    // A stack of 3 presents a, b, c will give us 3 stacked relationships:
+    // b over a, c over b & c over a.
+
+    if (stackCount >= 3) {
+
+      this.el.sceneEl.emit("task-stack-presents");
+
+      this.el.removeAttribute("check-for-present-stack");
+    }
+  },
+
+  presentsStacked(a, b) {
+    var top;
+    var bottom;
+
+    if (!a.object3D) return;
+    if (!b.object3D) return;
+
+    if (a.object3D.position.y > b.object3D.position.y) {
+      top = a;
+      bottom = b;
+    }
+    else {
+      // not stacked this way round (a over b).
+      return;
+    }
+
+    const yOffset = top.object3D.position.y - bottom.object3D.position.y;
+
+    // smallest presents are height 0.1
+    if (yOffset < 0.09) {
+      return false;
+    }
+    const xOffset = Math.abs(top.object3D.position.x - bottom.object3D.position.x);
+    const zOffset = Math.abs(top.object3D.position.z - bottom.object3D.position.z);
+
+    // approximate stacking check.  boxes are roughly cubes, so this is a decent
+    // (simple) way of judging whether they are stacked vs. side-by-side.
+    if (xOffset < yOffset && zOffset < yOffset) {
+      return true;
+    }
+    else {
+      return false;
+    }
   }
 });
