@@ -1611,10 +1611,12 @@ AFRAME.registerComponent('task-board', {
   taskComplete(taskNumber) {
     console.log(taskNumber + " complete");
 
-    this.checks[taskNumber].object3D.visible = true;
-    this.checks[taskNumber].emit("object3DUpdated");
+    if (!this.checks[taskNumber].object3D.visible) {
 
-    this.tasksComplete++;
+      this.checks[taskNumber].object3D.visible = true;
+      this.checks[taskNumber].emit("object3DUpdated");
+      this.tasksComplete++;
+    }
 
     if (this.tasksComplete === 23) {
       this.el.sceneEl.emit("task-all-tasks")
