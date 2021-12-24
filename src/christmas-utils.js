@@ -1546,7 +1546,7 @@ AFRAME.registerComponent('task-board', {
     {text: "Get a STRIKE in the bowling alley",
      event: "task-strike-bowling"
     },
-    {text: "Put the star 10 meters in the air",
+    {text: "Hoist the star 10 meters into the air",
      event: "task-high-star"
     },
     {text: "Play 'We wish you a Merry Christmas'",
@@ -1637,10 +1637,9 @@ AFRAME.registerGeometry('check', {
 AFRAME.registerComponent('camera-event-watcher', {
 
   init() {
-    this.xAxis = new THREE.Vector3();
-    this.yAxis = new THREE.Vector3();
     this.defaultYAxis = new THREE.Vector3(0, 1, 0);
-    this.zAxis = new THREE.Vector3();
+    this.camDir = new THREE.Vector3();
+    this.camQ = new THREE.Quaternion();
 
     this.snowflakeTime = 0;
     this.snowAngelTime = 0;
@@ -1650,30 +1649,33 @@ AFRAME.registerComponent('camera-event-watcher', {
 
   tick(t, dt) {
 
-    this.el.object3D.matrixWorld.extractBasis(this.xAxis, this.yAxis, this.zAxis);
+    var cam = this.el.object3D;
+    cam.updateMatrixWorld();
+    this.camQ.setFromRotationMatrix(cam.matrixWorld);
+    this.camDir.set(0, 0, -1);
+    this.camDir.applyQuaternion(this.camQ);
 
-    if (this.zAxis.angleTo(this.defaultYAxis) < 0.3) {
+    if (this.camDir.angleTo(this.defaultYAxis) < 0.5) {
       // looking straight up.
-
-      if (this.el.object3D.position < 0.3) {
-        // lying on floor - snow angel.
-        this.snowAngelTime += dt;
-      }
-      else {
-        this.snowAngelTime = 0;
-      }
-
       this.snowflakeTime += dt;
     }
     else {
       this.snowflakeTime = 0;
     }
 
-    if (this.snowAngelTime > 5000) {
+    if (this.el.object3D.position.y < 0.3) {
+      // lying on floor - snow angel.
+      this.snowAngelTime += dt;
+    }
+    else {
+      this.snowAngelTime = 0;
+    }
+
+    if (this.snowAngelTime > 3000) {
       this.el.sceneEl.emit("task-snow-angel");
     }
 
-    if (this.snowflakeTime > 5000) {
+    if (this.snowflakeTime > 3000) {
       this.el.sceneEl.emit("task-catch-snowflake");
     }
   }
@@ -1707,10 +1709,12 @@ AFRAME.registerComponent('bauble', {
   tick() {
 
      this.el.object3D.getWorldPosition(this.worldPosition);
-     this.el.sceneEl.camera.getWorldPosition(this.distanceToCamera);
+     var cam = this.el.sceneEl.camera.el.object3D;
+     cam.updateMatrixWorld();
+     this.distanceToCamera.setFromMatrixPosition(cam.matrixWorld);
      this.distanceToCamera.sub(this.worldPosition);
 
-     if (this.distanceToCamera.lengthSq < 0.1) {
+     if (this.distanceToCamera.lengthSq() < 0.1) {
        // approx 30cm from camera.
        this.el.sceneEl.emit("task-close-look");
      }
