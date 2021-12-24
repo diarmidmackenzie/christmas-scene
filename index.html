@@ -42,6 +42,7 @@
         <audio id="xC2" src="./assets/xylophone/xC2.wav"></audio>
 
         <audio id="background-music" src="./assets/music/christmas-magic.mp3"></audio>
+        <audio id="cheers-noise" src="./assets/sounds/cheers-noise.mp3"></audio>
 
         <a-mixin id="snowbase"
                  material="color:white"
@@ -161,11 +162,18 @@
                  instanced-mesh-member="mesh:#task-check-mesh">
         </a-mixin>
 
+        <a-mixin id="trophy"
+                 geometry="primitive: trophy"
+                 material="color:yellow; metalness: 0.8; roughness:0.2"
+                 scale="0.3 0.3 0.3">
+        </a-mixin>
+
         <!-- env-map dosesn't seem to work when deployed via mix-ins, hence no mixin for baubles-->
       </a-assets>
 
       <a-sound id="music" position="0 10 0" src="#background-music"
                autoplay="true" loop="true" volume="0.5"></a-sound>
+      <a-sound id="cheers" position="0 10 0" src="#cheers-noise"></a-sound>
       <a-entity environment="groundColor: #ffffff;
                              groundColor2: #eeeeee;
                              ground: noise;

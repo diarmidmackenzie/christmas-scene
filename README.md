@@ -98,6 +98,14 @@ Here's the features I have added so far.
 
 - "Merry Christmas" stackable alphabet blocks.
 
+**23 December**
+
+- Mechanism to clear and reset the bowling alley.
+
+**24 December**
+
+- Task board & celebration on completion
+
 
 
 ### Credits
@@ -109,6 +117,10 @@ https://soundcloud.com/ashamaluevmusic/christmas-magic
 Xylophone sounds by DANMITCH3LL, via freesound.org, under CC BY 3.0 license.
 
 https://freesound.org/people/DANMITCH3LL/packs/14220/
+
+Cheers & applause sounds by neilraouf, via freesound.org, under CC 0 license.
+
+https://freesound.org/people/neilraouf/sounds/484513/
 
 
 
