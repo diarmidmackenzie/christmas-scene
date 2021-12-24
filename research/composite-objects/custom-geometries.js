@@ -377,3 +377,22 @@ AFRAME.registerComponent('paintbrush', {
     mesh.material = materials;
   }
 });
+
+AFRAME.registerGeometry('check', {
+  schema: {
+  },
+
+  init: function (data) {
+    //radiusTop, radiusBottom, height, radialSegments
+    const geometries = [];
+    // 2 cylinders, one tall and thin for the hat, one short and wider for the brim.
+    geometries.push(new THREE.BoxGeometry(0.05, 0.05, 0.05));
+    geometries.push(new THREE.BoxGeometry(0.15, 0.05, 0.05));
+    geometries[1].translate(0.05, -0.05, 0);
+
+    this.geometry = THREE.BufferGeometryUtils.mergeBufferGeometries(geometries);
+    this.geometry.rotateZ(Math.PI/4);
+
+    recenterGeometry(this.geometry);
+  }
+});

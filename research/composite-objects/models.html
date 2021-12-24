@@ -54,6 +54,10 @@
                  scale="0.2 0.2 0.2">
         </a-mixin>
 
+        <a-mixin id="check"
+          geometry="primitive: check;"
+          material="color:#88ff44">
+        </a-entity>
       </a-assets>
 
       <a-entity id="play-area">
@@ -81,7 +85,7 @@
 
         <a-entity id="paintbrush" mixin="paintbrush" rotation="0 0 90" position="0 2.5 -1.5"></a-entity>
 
-
+        <a-entity id="check" mixin="check" position="-2 2.5 -1.5"></a-entity>
       </a-entity>
     </a-scene>
   </body>

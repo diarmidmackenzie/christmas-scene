@@ -14,6 +14,7 @@
     <script src="./lib/aframe-physics-system.js"></script>
     <script src="./src/move-objects.js"></script>
     <script src="./src/christmas-utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/diarmidmackenzie/instanced-mesh@v0.5.0/src/instanced-mesh.js"></script>
 
   </head>
   <body>
@@ -140,8 +141,15 @@
                  scale="0.05 0.05 0.05">
         </a-mixin>
 
+        <a-mixin id="task-check"
+                geometry="primitive: check;"
+                 material="color:#88ff44"
+                 instanced-mesh-member="mesh:#task-check-mesh">
+        </a-mixin>
+
         <!-- env-map dosesn't seem to work when deployed via mix-ins, hence no mixin for baubles-->
       </a-assets>
+
       <a-sound id="music" position="0 10 0" src="#background-music"
                autoplay="true" loop="true" volume="0.5"></a-sound>
       <a-entity environment="groundColor: #ffffff;
@@ -414,6 +422,14 @@
           <a-entity id="letter-block12" letters-block="letters:RMNOPQ;color:blue" position = "-0.2 0.45 0"></a-entity>
           <a-entity id="letter-block13" letters-block="letters:RMNOPQ;color:blue" position = "0.15 0.45 0"></a-entity>
           <a-entity id="letter-block14" letters-block="letters:YZ1234;color:purple" position = "0.5 0.45 0"></a-entity>
+        </a-entity>
+
+        <a-entity task-board cylindrical-position="height:1.8; radius:4; angle: 0">
+          <a-entity id="task-check-mesh"
+            geometry="primitive: check"
+            material="color:#88ff44"
+            instanced-mesh>
+          </a-entity>
         </a-entity>
 
         <a-box id="floor-plane"
