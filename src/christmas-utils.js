@@ -1625,7 +1625,7 @@ AFRAME.registerComponent('task-board', {
     if (this.tasksComplete === 24) {
 
       // Party time!  Set board to gold.
-      this.board.setAttribute("color", "yellow");
+      this.board.setAttribute("color", "goldenrod");
       this.board.setAttribute("metalness", 0.7);
       this.board.setAttribute("roughness", 0.3);
       this.board.setAttribute("material", "envMap:#env");
@@ -1647,7 +1647,7 @@ AFRAME.registerComponent('task-board', {
 
     const trophy = document.createElement('a-entity');
     trophy.setAttribute("mixin", "trophy")
-    trophy.setAttribute("material", "color:yellow;metalness:0.7;roughness:0.3;envMap:#env");
+    trophy.setAttribute("material", "color:goldenrod;metalness:0.7;roughness:0.3;envMap:#env");
     trophy.setAttribute('movement', "type:grabbable; stickiness:stickable; initialState:dynamic");
     trophy.setAttribute("ammo-shape", "type:hull");
     trophy.object3D.position.set(0, 0.5, 0);
