@@ -11,7 +11,10 @@ Best experienced on the Oculus Quest 2, but may work on other VR headsets as wel
 
 ### Development Log
 
-Here's the features I have added so far.
+If you'd like to see more detail, you can take a look through this thread on twitter, where I posted videos daily through out the project.
+https://twitter.com/dhmackenzie/status/1466763356421996545?s=20
+
+Here's the features I have added day by day.
 
 **3 December**
 
