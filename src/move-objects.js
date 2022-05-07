@@ -51,8 +51,8 @@ AFRAME.registerComponent('movement', {
 
     if (this.data.type === 'static') {
       // setup for static objects is very simple.
-      this.el.setAttribute('ammo-body', 'type: static');
-      this.el.setAttribute('ammo-body', 'emitCollisionEvents: true');
+      this.el.setAttribute('physx-body', 'type: static');
+      this.el.setAttribute('physx-body', 'emitCollisionEvents: true');
       return;
     }
 
@@ -61,8 +61,8 @@ AFRAME.registerComponent('movement', {
     // must start as dynamic of ever to become dynamic (Ammo.js bug).
 
     // for case where object is spawned after physics initialized, these must both be set on the same call.
-    this.el.setAttribute('ammo-body', 'type: dynamic;emitCollisionEvents: true');
-    this.el.setAttribute('ammo-body', `gravity: 0 ${-this.data.gravity} 0`);
+    this.el.setAttribute('physx-body', 'type: dynamic;emitCollisionEvents: true');
+    this.el.setAttribute('physx-body', `gravity: 0 ${-this.data.gravity} 0`);
 
     // set to invisible until fully initialized, so we don't see weird effects
     // of being temporarily dynamic.
@@ -101,14 +101,14 @@ AFRAME.registerComponent('movement', {
     this.el.addEventListener("released", this.released.bind(this));
 
     // Workaround for Ammo.js issues with switching from dynamic to kinematic & vice-versa.
-    if (this.el.components['ammo-body'].body) {
+    //if (this.el.components['physx-body'].body) {
       this.initOnceBodyLoaded();
-    }
+    /*}
     else {
       this.el.addEventListener("body-loaded", () => {
         this.initOnceBodyLoaded();
       });
-    }
+    }*/
 
     this.state = OBJECT_FIXED;
     this.stickyOverlaps = [];
@@ -177,9 +177,9 @@ AFRAME.registerComponent('movement', {
 
   initOnceBodyLoaded() {
     setTimeout(() => {
-      this.el.setAttribute('ammo-body', 'type:kinematic');
-      this.el.setAttribute('ammo-body', 'type:dynamic');
-      this.el.setAttribute('ammo-body', {type : this.data.initialState});
+      this.el.setAttribute('physx-body', 'type:kinematic');
+      this.el.setAttribute('physx-body', 'type:dynamic');
+      this.el.setAttribute('physx-body', {type : this.data.initialState});
 
       // reset position to saved world position if kinematic.
       if (this.data.initialState === 'kinematic') {
@@ -206,7 +206,7 @@ AFRAME.registerComponent('movement', {
   setKinematic() {
     // set object to kinematic.
     console.log("set to kinematic")
-    this.el.setAttribute('ammo-body', 'type: kinematic');
+    this.el.setAttribute('physx-body', 'type: kinematic');
 
     // re-instate collisions on descandants that may have been disabled.
     // use a timer to avoid race conditions around dynamic->kinematic switch.
@@ -223,15 +223,15 @@ AFRAME.registerComponent('movement', {
     this.suppressCollisionsOnOverlappingDescendants(this.el.object3D);
     // set object to dynamic.
     console.log("set to dynamic")
-    this.el.setAttribute('ammo-body', 'type: dynamic');
+    this.el.setAttribute('physx-body', 'type: dynamic');
 
   },
 
   enableCollisionOnDescendants(object) {
 
     if ((object.el) &&
-        (object.el.hasAttribute('ammo-body')))  {
-          object.el.setAttribute('ammo-body', 'disableCollision:false');
+        (object.el.hasAttribute('physx-body')))  {
+          object.el.setAttribute('physx-body', 'disableCollision:false');
         }
 
     object.children.forEach((o) => {
@@ -245,7 +245,7 @@ AFRAME.registerComponent('movement', {
     if (object.el &&
         object.el !== this.el &&
         this.stickyOverlaps.includes(object.el)) {
-          object.el.setAttribute('ammo-body', 'disableCollision:true');
+          object.el.setAttribute('physx-body', 'disableCollision:true');
         }
 
     object.children.forEach((o) => {
@@ -586,8 +586,8 @@ AFRAME.registerComponent('hand', {
     this.collider.setAttribute('id', `${this.el.id}-collider`);
     this.collider.setAttribute('radius', 0.05);
     this.collider.setAttribute('visible', false);
-    this.collider.setAttribute('ammo-body', 'type: kinematic');
-    this.collider.setAttribute('ammo-body', 'emitCollisionEvents: true');
+    this.collider.setAttribute('physx-body', 'type: kinematic');
+    this.collider.setAttribute('physx-body', 'emitCollisionEvents: true');
     this.collider.setAttribute('ammo-shape', 'type: sphere');
     this.el.appendChild(this.collider)
 
@@ -613,7 +613,7 @@ AFRAME.registerComponent('hand', {
 
     this.gripDown = true;
     // collider should be set already, but set it again to be sure.
-    this.collider.setAttribute('ammo-body', 'disableCollision: false');
+    this.collider.setAttribute('physx-body', 'disableCollision: false');
 
     if (this.collisions.length > 0) {
       console.log("grab object on grip down")
@@ -626,11 +626,11 @@ AFRAME.registerComponent('hand', {
     this.gripDown = false;
     // remove collisions, so we don't apply weird forces to objects as we release them.
     // 500 msecs should be plenty.
-    this.collider.setAttribute('ammo-body', 'disableCollision: true');
+    this.collider.setAttribute('physx-body', 'disableCollision: true');
 
     // actually, it's a nicer UX to have no collisions on grip up...
     //setTimeout(() => {
-    //  this.collider.setAttribute('ammo-body', 'disableCollision: false')
+    //  this.collider.setAttribute('physx-body', 'disableCollision: false')
     //}, 500);
 
     if (this.grabbedEl) {

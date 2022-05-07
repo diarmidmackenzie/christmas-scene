@@ -341,7 +341,7 @@ AFRAME.registerComponent('penguin', {
 
   resetPin() {
 
-    this.el.setAttribute('ammo-body', 'type:kinematic')
+    this.el.setAttribute('physx-body', 'type:kinematic')
 
     // must be child of bowling alley for repositioning to work.
     GLOBAL_FUNCS.reparent(this.el.object3D,
@@ -384,7 +384,7 @@ AFRAME.registerComponent('penguin', {
 
     // set back to dynamic
     setTimeout(() => {
-      this.el.setAttribute('ammo-body', 'type:dynamic')
+      this.el.setAttribute('physx-body', 'type:dynamic')
     }, 6000);
   },
 
@@ -653,7 +653,7 @@ AFRAME.registerComponent('musical-note', {
 
   init() {
     // for collision detection, we need a static physics object.
-    this.el.setAttribute('ammo-body', 'type: static; emitCollisionEvents: true');
+    this.el.setAttribute('physx-body', 'type: static; emitCollisionEvents: true');
     this.el.setAttribute('ammo-shape', 'type: hull');
 
     this.el.setAttribute('sound', {src: `#${this.data.note.id}`});
@@ -1567,7 +1567,7 @@ AFRAME.registerComponent('task-board', {
     this.board.setAttribute('height', 4);
     this.board.setAttribute('width', 1.5);
     this.board.setAttribute('depth', 0.1);
-    this.board.setAttribute('ammo-body', 'type:static');
+    this.board.setAttribute('physx-body', 'type:static');
     this.board.setAttribute('ammo-shape', 'type:box');
     this.board.setAttribute('color', "#5C4033");
     this.el.appendChild(this.board);

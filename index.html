@@ -10,15 +10,18 @@
     <!-- unpkg version of particle system hits shader compile errors -->
     <!-- <script src="https://unpkg.com/aframe-particle-system-component@1.0.x/dist/aframe-particle-system-component.min.js"></script>-->
     <script src="./lib/aframe-particle-system-component.js"></script>
-    <script src="https://mixedreality.mozilla.org/ammo.js/builds/ammo.wasm.js"></script>
-    <script src="./lib/aframe-physics-system.js"></script>
+    <!--<script src="https://mixedreality.mozilla.org/ammo.js/builds/ammo.wasm.js"></script>-->
+    <!--<script src="./lib/aframe-physics-system.js"></script>-->    
     <script src="./src/move-objects.js"></script>
     <script src="./src/christmas-utils.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/diarmidmackenzie/instanced-mesh@v0.5.0/src/instanced-mesh.js"></script>
+    <!-- PhysX taken from: https://stemkoski.github.io/A-Frame-Examples/quest-physics.html-->
+    <script src="./lib/physx.release.js"></script>
+    <script src="./lib/physics.js"></script>
 
   </head>
   <body>
-    <a-scene physics="driver: ammo"
+    <a-scene physx="autoLoad: true; delay: 1000; wasmUrl: https://stemkoski.github.io/A-Frame-Examples/js/physx.release.wasm; useDefaultScene: false;"
             count-painted-snowballs
             check-for-present-stack
             tune-detector>
@@ -418,7 +421,7 @@
           <a-cylinder id="bowling-alley-sweeper" rotation = "0 0 90" height="2" radius = "0.2"
                       bowling-alley-sweeper
                       position="0 0 6.2"
-                      ammo-body="type:kinematic"
+                      physx-body="type:kinematic"
                       material="color:brown" ammo-shape="type:hull">
           </a-cylinder>
 
