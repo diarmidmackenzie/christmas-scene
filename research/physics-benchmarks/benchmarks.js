@@ -136,7 +136,8 @@ AFRAME.registerComponent('ball-recycler', {
 AFRAME.registerComponent('tick-time-display', {
 
     schema: {
-        outputEl: {type: 'selector'}
+        outputEl: {type: 'selector'},
+        sceneOutputEl: {type: 'selector'}
     },
 
     init() {
@@ -149,5 +150,6 @@ AFRAME.registerComponent('tick-time-display', {
     updateData(evt) {
 
         this.data.outputEl.innerHTML = evt.detail.msecs
+        this.data.sceneOutputEl.setAttribute("text", `value: Average tick (msecs): ${evt.detail.msecs}`)
     }
 })
