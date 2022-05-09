@@ -2,6 +2,7 @@
 AFRAME.registerComponent('pinboard', {
 
     schema: {
+        physics: {type: 'string'}, // physx or ammo.
         width: {type: 'number', default: 10},
         height: {type: 'number', default: 10},
     },
@@ -17,8 +18,15 @@ AFRAME.registerComponent('pinboard', {
             box.setAttribute('height', height)
             box.setAttribute('depth', depth)
             box.setAttribute('color', color)
-            box.setAttribute('ammo-body', 'type:static')
-            box.setAttribute('ammo-shape', 'type:box;fit:all')
+
+            if (this.data.physics === "ammo") {
+                box.setAttribute('ammo-body', 'type:static')
+                box.setAttribute('ammo-shape', 'type:box;fit:all')
+            }
+            else {
+                box.setAttribute('physx-body', 'type:static')
+            }
+            
             box.object3D.position.set(x, y, z)
             box.object3D.rotation.set(0, yRot, 0)
             this.el.appendChild(box)
@@ -45,18 +53,26 @@ AFRAME.registerComponent('pinboard', {
     }
 })
 
-
 AFRAME.registerComponent('dynamic-ball', {
 
     schema: {
+        physics: {type: 'string'}, // physx or ammo.
         yKill: {type: 'number', default: -10}
     },
 
     init() {
         const el = this.el
         el.setAttribute('radius', 0.3)
-        el.setAttribute('ammo-body', 'type:dynamic')
-        el.setAttribute('ammo-shape', 'type:sphere; fit:all')
+
+        if (this.data.physics === "ammo") {
+            el.setAttribute('ammo-body', 'type:dynamic')
+            el.setAttribute('ammo-shape', 'type:sphere; fit:all')
+            
+        }
+        else {
+            el.setAttribute('physx-body', 'type:dynamic')
+        }
+        
         el.setAttribute('color', 'yellow')
     },
 
@@ -70,6 +86,7 @@ AFRAME.registerComponent('dynamic-ball', {
 AFRAME.registerComponent('ball-recycler', {
 
     schema: {
+        physics: {type: 'string'}, // physx or ammo.
         ballCount: {type: 'number', default: 10},
         width: {type: 'number', default: 8}, // width of spawn field
         depth: {type: 'number', default: 8}, // depth of spawn field (after initial spawn balls always spawned at far depth)
@@ -94,7 +111,8 @@ AFRAME.registerComponent('ball-recycler', {
 
         const ball = document.createElement('a-sphere')
             
-        ball.setAttribute('dynamic-ball', {yKill: this.data.yKill})
+        ball.setAttribute('dynamic-ball', {yKill: this.data.yKill,
+                                           physics: this.data.physics})
         x = pos.x + Math.random() * width - width / 2
         z = recycled ? (pos.z -depth / 2) : (pos.z + Math.random() * depth - depth / 2)
         ball.object3D.position.set(x, pos.y, z)
@@ -111,5 +129,25 @@ AFRAME.registerComponent('ball-recycler', {
         ball.parentNode.removeChild(ball);
 
         this.createBall(true)
+    }
+})
+
+
+AFRAME.registerComponent('tick-time-display', {
+
+    schema: {
+        outputEl: {type: 'selector'}
+    },
+
+    init() {
+        this.updateData = this.updateData.bind(this);
+
+        this.el.sceneEl.addEventListener('physics-tick-timer', this.updateData)
+
+    },
+
+    updateData(evt) {
+
+        this.data.outputEl.innerHTML = evt.detail.msecs
     }
 })
