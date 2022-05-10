@@ -149,7 +149,7 @@ AFRAME.registerComponent('tick-time-display', {
 
     updateData(evt) {
 
-        this.data.outputEl.innerHTML = evt.detail.msecs
-        this.data.sceneOutputEl.setAttribute("text", `value: Average tick (msecs): ${evt.detail.msecs}`)
+        this.data.outputEl.innerHTML = `${evt.detail.engine} engine / ${evt.detail.wrapper} wrapper`
+        this.data.sceneOutputEl.setAttribute("text", `value: Average tick (msecs): ${evt.detail.engine} engine /  ${evt.detail.wrapper} wrapper`)
     }
 })
