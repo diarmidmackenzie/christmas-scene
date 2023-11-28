@@ -28,6 +28,7 @@
     <script src="https://air-hockey-naf-server.glitch.me/easyrtc/easyrtc.js"></script>
     <script src="https://unpkg.com/networked-aframe@^0.11.0/dist/networked-aframe.min.js"></script>
     <script src="https://unpkg.com/aframe-randomizer-components@^3.0.1/dist/aframe-randomizer-components.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aframe-desktop-vr-controller@0.1.1/dist/desktop-vr-controller.min.js"></script>
     <script>
       // Temporary workaround for template declaration; see issue 167
       NAF.schemas.getComponentsOriginal = NAF.schemas.getComponents;
@@ -64,6 +65,10 @@
 
         <!-- Avatar -->
         <template id="rig-template">
+          <a-entity></a-entity>
+        </template>
+
+        <template id="player-template">
           <a-entity></a-entity>
         </template>
 
@@ -250,25 +255,33 @@
                                                   maxAge: 6;
                                                   velocitySpread: 1 0 1;
                                                   particleCount: 15000"></a-entity>
-      <a-entity id="rig" spawn-in-circle="radius:0.5" networked="template:#rig-template;">
+      <a-entity id="rig"
+                wasd-controls
+                spawn-in-circle="radius:0.5"
+                networked="template:#rig-template;">
         <a-entity id="player"
                   camera
                   camera-event-watcher
                   position="0 1.6 0"
-                  wasd-controls
+                  
                   look-controls
-                  networked="template:#head-template;"
-                  visible="false">
+                  networked="template:#player-template;">
+          <a-entity networked="template:#head-template;"
+                    visible="false">
+          </a-entity>
         </a-entity>
-                                            
         <a-entity id="rhand" hand
                   snowball-generator
-                  hand-controls="hand: right">
+                  hand-controls="hand: right"
+                  position="0.4 1.4 -0.5"
+                  desktop-vr-controller>
         </a-entity>
         <a-entity id="lhand" hand
                   teleport-controls="cameraRig: #rig; teleportOrigin: #camera; button: trigger"
                   snowball-generator
-                  hand-controls="hand: left">
+                  hand-controls="hand: left"
+                  position="-0.4 1.4 -0.5"
+                  desktop-vr-controller></a-entity>>
         </a-entity>
       </a-entity>
       <a-entity id="play-area">
