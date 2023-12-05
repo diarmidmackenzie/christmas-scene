@@ -17,18 +17,8 @@ const GLOBAL_FUNCS = {
 
     console.log(`Reparenting ${object.el.id} from ${oldParent.el ? oldParent.el.id : "unknown"} to ${newParent.el ? newParent.el.id : "unknown"}`);
 
-    oldParent.updateMatrixWorld();
-    oldParent.updateMatrix();
-    object.updateMatrix();
-    newParent.updateMatrixWorld();
-    newParent.updateMatrix();
-
-    GLOBAL_DATA.tempMatrix.copy(newParent.matrixWorld).invert();
-    object.matrix.premultiply(oldParent.matrixWorld);
-    object.matrix.premultiply(GLOBAL_DATA.tempMatrix);
-    object.matrix.decompose(object.position, object.quaternion, object.scale);
-    object.matrixWorldNeedsUpdate = true;
-    newParent.add(object);
+    const newParentId = newParent.el.id
+    object.el.setAttribute('object-parent', `parentId: ${newParentId}`)
   },
 };
 
@@ -99,6 +89,8 @@ AFRAME.registerComponent('movement', {
     this.el.addEventListener("collideend", this.collideEnd.bind(this));
     this.el.addEventListener("grabbed", this.grabbed.bind(this));
     this.el.addEventListener("released", this.released.bind(this));
+    this.el.addEventListener("dragstart", this.grabbed.bind(this));
+    this.el.addEventListener("dragend", this.released.bind(this));
 
     // Workaround for Ammo.js issues with switching from dynamic to kinematic & vice-versa.
     if (this.el.components['ammo-body'].body) {
