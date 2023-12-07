@@ -1,0 +1,123 @@
+<a-mixin id="snowbase"
+          material="color:white"
+          paintable="snowball:true"
+          geometry="primitive:sphere;segments-height:7;segments-width:13;radius:0.5"
+          movement="type:static; stickiness:sticky">
+</a-mixin>
+<a-mixin id="snowball"
+          material="color:white"
+          paintable="snowball:true"
+          geometry="primitive:sphere;segments-height:7;segments-width:13;radius:0.5"
+          movement="type:grabbable; stickiness:sticky">
+</a-mixin>
+<a-mixin id="coal"
+          material="color:black"
+          geometry="primitive:sphere;segments-height:7;segments-width:13;radius:0.04"
+          movement="type:grabbable; stickiness:stickable">
+</a-mixin>
+<a-mixin id="carrot"
+          carrot-watch
+          material="color:orange"
+          geometry="primitive:cone;height:0.2;radius-bottom:0.025; radius-top:0.005"
+          movement="type:grabbable; stickiness:stickable; attachEvent:task-move-nose">
+</a-mixin>
+<a-mixin id="hat"
+          material="color:black"
+          geometry="primitive:tophat-hollow"
+          movement="type:grabbable; stickiness:stickable">
+</a-mixin>
+<a-mixin id="branch"
+          material="color:#5C4033"
+          geometry="primitive:branch"
+          scale="0.2 0.2 0.2"
+          movement="type:grabbable; stickiness:stickable">
+</a-mixin>
+<a-mixin id="fence-post"
+          material="color:#5C4033"
+          geometry="primitive:branch"
+          scale="0.3 0.3 0.3"
+          movement="type:grabbable; stickiness:stickable; attachEvent:task-move-fence-post">
+</a-mixin>
+
+<a-mixin id="tree-tier"
+          material="color:green"
+          geometry="primitive:cone;height:0.5;radius-bottom:0.5;segments-height:1;segments-radial:9"
+          movement="type:static; stickiness:sticky">
+</a-mixin>
+<a-mixin id="trunk"
+          material="color:#5C4033"
+          geometry="primitive:cylinder;height:0.5;radius:0.1;">
+</a-mixin>
+<a-mixin id="star"
+          star
+          material="color:yellow; metalness: 0.8; roughness:0.2"
+          geometry="primitive:star; innerRadius:0.04;outerRadius:0.12;points:5;depth:0.01"
+          movement="type:grabbable; stickiness:stickable">
+</a-mixin>
+<a-mixin id="bauble"
+          bauble
+          movement="type:grabbable; stickiness:stickable; attachEvent:task-move-baubles">
+</a-mixin>
+<a-mixin id="marble-run-base"
+          material="color:brown; metalness: 0.5; roughness:0.2"
+          movement="type:static; stickiness:sticky2">
+</a-mixin>
+<a-mixin id="marble-run-ramp"
+          detect-bauble
+          material="color:orange; metalness: 0.5; roughness:0.2"
+          movement="type:grabbable; stickiness:stickable2; attachEvent:task-change-marble-run">
+</a-mixin>
+<a-mixin id="ribbon-large"
+          geometry="primitive:ribbon;height: 0.4; depth:0.5; width:0.5; ribbon:0.06">
+</a-mixin>
+<a-mixin id="present-large"
+          geometry="primitive:box;height: 0.4; depth:0.5; width:0.5"
+          networked-movement="type:grabbable; stickiness:none; initialState:dynamic">
+</a-mixin>
+<a-mixin id="ribbon-medium"
+          geometry="primitive:ribbon;height: 0.2; depth:0.3; width:0.2; ribbon:0.05">
+</a-mixin>
+<a-mixin id="present-medium"
+          geometry="primitive:box;height: 0.2; depth:0.3; width:0.2"
+          networked-movement="type:grabbable; stickiness:none; initialState:dynamic">
+</a-mixin>
+<a-mixin id="ribbon-small"
+          geometry="primitive:ribbon;height: 0.1; depth:0.2; width:0.1; ribbon:0.04">
+</a-mixin>
+<a-mixin id="present-small"
+          geometry="primitive:box;height: 0.1; depth:0.2; width:0.1"
+          networked-movement="type:grabbable; stickiness:none; initialState:dynamic">
+</a-mixin>
+<a-mixin id="ribbon-gold"
+          material="color:yellow; metalness: 0.5; roughness:0.2">
+</a-mixin>
+<a-mixin id="ribbon-green"
+          material="color:green; metalness: 0.5; roughness:0.2">
+</a-mixin>
+<a-mixin id="ribbon-blue"
+          material="color:green; metalness: 0.5; roughness:0.2">
+</a-mixin>
+<a-mixin id="ribbon-red"
+          material="color:red; metalness: 0.5; roughness:0.2">
+</a-mixin>
+<a-mixin id="penguin"
+          penguin
+          scale="0.1 0.1 0.1"
+          movement="type:grabbable; stickiness:none; initialState:dynamic">
+</a-mixin>
+<a-mixin id="paintbrush"
+          paintbrush="color:blue"
+          scale="0.05 0.05 0.05">
+</a-mixin>
+
+<a-mixin id="task-check"
+        geometry="primitive: check;"
+          material="color:#88ff44"
+          instanced-mesh-member="mesh:#task-check-mesh">
+</a-mixin>
+
+<a-mixin id="trophy"
+          geometry="primitive: trophy"
+          material="color:yellow; metalness: 0.8; roughness:0.2"
+          scale="0.3 0.3 0.3">
+</a-mixin>
