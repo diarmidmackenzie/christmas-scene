@@ -1,0 +1,17 @@
+<!--frame for icicle xylophone-->
+<a-box position="0.5 0.9 1.5" color="#5C4033" width="0.1" depth="0.2" height="1.8"
+        movement="type: static; stickiness: none" ammo-shape="type:box"></a-box>
+<a-box position="-0.5 0.9 1.5" color="#5C4033" width="0.1" depth="0.2" height="1.8"
+        movement="type: static; stickiness: none" ammo-shape="type:box"></a-box>
+<a-box position="0 1.81 1.5" color="#5C4033" width="1.1" depth="0.2" height="0.02"
+        movement="type: static; stickiness: none" ammo-shape="type:box"></a-box>
+<a-entity position="-0.55 1.1 1.5" rotation="90 0 90" scale="0.6 0.6 0.6"
+          ui-rotary
+          volume-control></a-entity>
+
+<!--and the xylophone itself-->
+<a-entity id="xylophone" position="0 1.8 1.5" xylophone="count:8;width:0.9"></a-entity>
+
+<!-- calendar positioned above-->
+<a-entity id="calendar" calendar="width:0.4; height:0.4" rotation = "0 180 0" position="0.2 2.02 1.5"></a-entity>
+<a-entity id="xmas-counter" xmas-counter="width:0.4; height:0.4" rotation = "0 180 0" position="-0.2 2.02 1.5"></a-entity>

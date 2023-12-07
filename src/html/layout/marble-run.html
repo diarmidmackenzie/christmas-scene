@@ -1,0 +1,60 @@
+<!--marble run-->
+<a-box width="1.5" height = "2" depth = "0.5"
+        position="-2 0.7 0.2"
+        rotation="-45 90 0"
+        mixin="marble-run-base"
+        ammo-shape="type:box;fit:manual;half-extents:0.75 1 0.25">
+        <a-entity geometry="primitive:box; width:1.3; height: 0.01; depth:0.1"
+              position="0.1 0.7 0.3"
+              rotation="0 0 10"
+              mixin="marble-run-ramp"
+              ammo-shape="type:box;fit:manual;half-extents:0.65 0.005 0.05">
+        </a-entity>
+        <a-box width="1.3" height = "0.01" depth = "0.1"
+              position="-0.1 0.4 0.3"
+              rotation="0 0 -10"
+              mixin="marble-run-ramp"
+              ammo-shape="type:box;fit:manual;half-extents:0.65 0.005 0.05">
+        </a-box>
+        <a-box width="1.3" height = "0.01" depth = "0.1"
+              position="0.1 0.1 0.3"
+              rotation="0 0 10"
+              mixin="marble-run-ramp"
+              ammo-shape="type:box;fit:manual;half-extents:0.65 0.005 0.05">
+        </a-box>
+        <a-box width="1.3" height = "0.01" depth = "0.1"
+              position="-0.1 -0.2 0.3"
+              rotation="0 0 -10"
+              mixin="marble-run-ramp"
+              ammo-shape="type:box;fit:manual;half-extents:0.65 0.005 0.05">
+        </a-box>
+        <a-box width="1.3" height = "0.01" depth = "0.1"
+              position="0.1 -0.5 0.3"
+              rotation="0 0 10"
+              mixin="marble-run-ramp"
+              ammo-shape="type:box;fit:manual;half-extents:0.65 0.005 0.05">
+        </a-box>
+        <a-box width="1.3" height = "0.01" depth = "0.1"
+              position="-0.1 -0.8 0.3"
+              rotation="0 0 -10"
+              mixin="marble-run-ramp"
+              ammo-shape="type:box;fit:manual;half-extents:0.65 0.005 0.05">
+        </a-box>
+        <!-- sides-->
+        <a-box width="0.01" height = "2" depth = "0.1"
+              position="-0.745 0 0.3"
+              mixin="marble-run-base"
+              ammo-shape="type:box;fit:manual;half-extents:0.005 1 0.05">
+        </a-box>
+        <a-box width="0.01" height = "2" depth = "0.1"
+              position="0.745 0 0.3"
+              mixin="marble-run-base"
+              ammo-shape="type:box;fit:manual;half-extents:0.005 1 0.05">
+        </a-box>
+        <!--post that "holds it up"-->
+        <a-box width="0.1" height = "0.1" depth = "2"
+              position="0 0.95 -1"
+              mixin="marble-run-base"
+              ammo-shape="type:box;fit:manual;half-extents:0.05 0.05 1">
+        </a-box>
+</a-box>

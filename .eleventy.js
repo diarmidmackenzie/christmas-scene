@@ -4,7 +4,7 @@ module.exports = function(eleventyConfig) {
   eleventyConfig.addPassthroughCopy("assets/**");
   return {
     dir: {
-      includes: "./src/html",
+      includes: "./src/html" 
     }
   }
 };

@@ -1,0 +1,54 @@
+<!-- Bowling alley-->
+<a-box id="bowling-alley"
+  width = "2" height = "1" depth = "12"
+  movement="type:static; stickiness:none"
+  ammo-shape="type:box"
+  color="white"
+  env-map="#env" metalness="0.8" roughness="0.2"
+  position = "5.7 -0.4 -5.7"
+  rotation = "0 -45 0">
+  <!-- sides-->
+  <a-box id="bowling-alley"
+    width = "0.4" height = "0.1" depth = "12"
+    movement="type:static; stickiness:none"
+    ammo-shape="type:box"
+    color="white"
+    env-map="#env" metalness="0.8" roughness="0.2"
+    position = "1.1 0.6 0"
+    rotation = "0 0 45">
+  </a-box>
+  <a-box id="bowling-alley"
+    width = "0.4" height = "0.1" depth = "12"
+    movement="type:static; stickiness:none"
+    ammo-shape="type:box"
+    color="white"
+    env-map="#env" metalness="0.8" roughness="0.2"
+    position = "-1.1 0.6 0"
+    rotation = "0 0 -45">
+  </a-box>
+  <!--penguin bowling pins-->
+  <a-entity id="penguin1" position="-0.6 0.8 -3.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
+  <a-entity id="penguin2" position="-0.2 0.8 -3.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
+  <a-entity id="penguin3" position="0.2 0.8 -3.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
+  <a-entity id="penguin4" position="0.6 0.8 -3.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
+  <a-entity id="penguin5" position="-0.4 0.8 -3" mixin="penguin" ammo-shape="type:hull"></a-entity>
+  <a-entity id="penguin6" position="0 0.8 -3" mixin="penguin" ammo-shape="type:hull"></a-entity>
+  <a-entity id="penguin7" position="0.4 0.8 -3" mixin="penguin" ammo-shape="type:hull"></a-entity>
+  <a-entity id="penguin8" position="-0.2 0.8 -2.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
+  <a-entity id="penguin9" position="0.2 0.8 -2.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
+  <a-entity id="penguin10" position="0 0.8 -2" mixin="penguin" ammo-shape="type:hull"></a-entity>
+
+  <a-entity id="bowling-alley-scoreboard" position="0 3 -6" bowling-alley-scoreboard></a-entity>
+  <a-cylinder id="bowling-alley-sweeper" rotation = "0 0 90" height="2" radius = "0.2"
+              bowling-alley-sweeper
+              position="0 0 6.2"
+              ammo-body="type:kinematic"
+              material="color:brown" ammo-shape="type:hull">
+  </a-cylinder>
+
+  <a-box position="-1.1 0.5 6.2" color="#5C4033" width="0.3" depth="0.3" height="1.1"
+          movement="type: static; stickiness: none" ammo-shape="type:box">
+      <a-entity id="bowling-alley-reset" position="0 0.58 0" ui-button bowling-alley-reset>
+      </a-entity>
+  </a-box>
+</a-box>

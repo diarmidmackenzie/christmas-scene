@@ -1,0 +1,21 @@
+<a-sound id="music" position="0 10 0" src="#background-music"
+autoplay="true" loop="true" volume="0.5"></a-sound>
+<a-sound id="cheers" position="0 10 0" src="#cheers-noise"></a-sound>
+<a-entity environment="groundColor: #ffffff;
+              groundColor2: #eeeeee;
+              ground: noise;
+              groundYScale: 4;
+              groundTexture: walkernoise;
+              dressing: trees;
+              dressingAmount: 50;
+              dressingColor: #ffffff;
+              dressingScale: 1;
+              lighting: distant
+               "></a-entity>
+<a-entity position="0 12 0" particle-system="preset: snow;
+                                   size: 0.1;
+                                   velocityValue: 0 2 0;
+                                   positionSpread: 20 2 20;
+                                   maxAge: 6;
+                                   velocitySpread: 1 0 1;
+                                   particleCount: 15000"></a-entity>
