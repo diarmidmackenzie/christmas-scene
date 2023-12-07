@@ -14,11 +14,15 @@ AFRAME.registerComponent('letters-block', {
     block.setAttribute('height', dim);
     block.setAttribute('width', dim);
     block.setAttribute('depth', dim);
-    block.setAttribute('movement', `type:grabbable; stickiness:stickable;
+    block.setAttribute('networked-movement', `type:grabbable; stickiness:stickable;
                                     initialState:dynamic; releaseEvent: task-move-alphabet`);
     block.setAttribute("ammo-shape", "type:box");
     block.setAttribute("rotation", `0 ${30 * (Math.random() - 0.5)} 0`);
     block.setAttribute("color", this.data.color);
+    block.setAttribute('networked', `template:#block-template;
+                                     persistent: true;
+                                     networkId: block-${this.data.letters};
+                                     owner: scene`)
     this.el.appendChild(block);
 
     const positions = [

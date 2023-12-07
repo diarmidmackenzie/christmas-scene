@@ -26,6 +26,16 @@ NAF.schemas.getComponents = (template) => {
       ]
     });
   }
+  if (!NAF.schemas.hasTemplate('#block-template')) {
+    NAF.schemas.add({
+      template: '#block-template',
+      components: [
+        'position',
+        'rotation',
+        'object-parent'
+      ]
+    });
+  }
   const components = NAF.schemas.getComponentsOriginal(template);
   return components;
 };

@@ -27,16 +27,26 @@
     rotation = "0 0 -45">
   </a-box>
   <!--penguin bowling pins-->
-  <a-entity id="penguin1" position="-0.6 0.8 -3.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
-  <a-entity id="penguin2" position="-0.2 0.8 -3.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
-  <a-entity id="penguin3" position="0.2 0.8 -3.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
-  <a-entity id="penguin4" position="0.6 0.8 -3.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
-  <a-entity id="penguin5" position="-0.4 0.8 -3" mixin="penguin" ammo-shape="type:hull"></a-entity>
-  <a-entity id="penguin6" position="0 0.8 -3" mixin="penguin" ammo-shape="type:hull"></a-entity>
-  <a-entity id="penguin7" position="0.4 0.8 -3" mixin="penguin" ammo-shape="type:hull"></a-entity>
-  <a-entity id="penguin8" position="-0.2 0.8 -2.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
-  <a-entity id="penguin9" position="0.2 0.8 -2.5" mixin="penguin" ammo-shape="type:hull"></a-entity>
-  <a-entity id="penguin10" position="0 0.8 -2" mixin="penguin" ammo-shape="type:hull"></a-entity>
+  <a-entity id="penguin1" position="-0.6 0.8 -3.5" mixin="penguin" ammo-shape="type:hull"
+            networked="template:#penguin-template; persistent: true; networkId: penguin1; owner: scene"></a-entity>
+  <a-entity id="penguin2" position="-0.2 0.8 -3.5" mixin="penguin" ammo-shape="type:hull"
+  networked="template:#penguin-template; persistent: true; networkId: penguin2; owner: scene"></a-entity>
+  <a-entity id="penguin3" position="0.2 0.8 -3.5" mixin="penguin" ammo-shape="type:hull"
+  networked="template:#penguin-template; persistent: true; networkId: penguin3; owner: scene"></a-entity>
+  <a-entity id="penguin4" position="0.6 0.8 -3.5" mixin="penguin" ammo-shape="type:hull"
+  networked="template:#penguin-template; persistent: true; networkId: penguin4; owner: scene"></a-entity>
+  <a-entity id="penguin5" position="-0.4 0.8 -3" mixin="penguin" ammo-shape="type:hull"
+  networked="template:#penguin-template; persistent: true; networkId: penguin5; owner: scene"></a-entity>
+  <a-entity id="penguin6" position="0 0.8 -3" mixin="penguin" ammo-shape="type:hull"
+  networked="template:#penguin-template; persistent: true; networkId: penguin6; owner: scene"></a-entity>
+  <a-entity id="penguin7" position="0.4 0.8 -3" mixin="penguin" ammo-shape="type:hull"
+  networked="template:#penguin-template; persistent: true; networkId: penguin7; owner: scene"></a-entity>
+  <a-entity id="penguin8" position="-0.2 0.8 -2.5" mixin="penguin" ammo-shape="type:hull"
+  networked="template:#penguin-template; persistent: true; networkId: penguin8; owner: scene"></a-entity>
+  <a-entity id="penguin9" position="0.2 0.8 -2.5" mixin="penguin" ammo-shape="type:hull"
+  networked="template:#penguin-template; persistent: true; networkId: penguin9; owner: scene"></a-entity>
+  <a-entity id="penguin10" position="0 0.8 -2" mixin="penguin" ammo-shape="type:hull"
+  networked="template:#penguin-template; persistent: true; networkId: penguin10; owner: scene"></a-entity>
 
   <a-entity id="bowling-alley-scoreboard" position="0 3 -6" bowling-alley-scoreboard></a-entity>
   <a-cylinder id="bowling-alley-sweeper" rotation = "0 0 90" height="2" radius = "0.2"
