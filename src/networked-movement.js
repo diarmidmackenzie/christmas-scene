@@ -492,14 +492,14 @@ AFRAME.registerComponent('networked-movement', {
     GLOBAL_DATA.tempMatrix.copy(object.parent.matrixWorld).invert();
     position.applyMatrix4(GLOBAL_DATA.tempMatrix);
     this.el.object3D.position.copy(position);
+
   },
 
   setWorldQuaternion(object, quaternion) {
-
+    
     object.parent.getWorldQuaternion(GLOBAL_DATA.tempQuaternion);
     GLOBAL_DATA.tempQuaternion.invert();
     quaternion.premultiply(GLOBAL_DATA.tempQuaternion);
     this.el.object3D.quaternion.copy(quaternion);
-  },
-
+  }
 });

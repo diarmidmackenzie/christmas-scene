@@ -2,7 +2,7 @@
           material="color:white"
           paintable="snowball:true"
           geometry="primitive:sphere;segments-height:7;segments-width:13;radius:0.5"
-          movement="type:static; stickiness:sticky">
+          networked-movement="type:static; stickiness:sticky">
 </a-mixin>
 <a-mixin id="snowball"
           material="color:white"
@@ -13,30 +13,30 @@
 <a-mixin id="coal"
           material="color:black"
           geometry="primitive:sphere;segments-height:7;segments-width:13;radius:0.04"
-          movement="type:grabbable; stickiness:stickable">
+          networked-movement="type:grabbable; stickiness:stickable">
 </a-mixin>
 <a-mixin id="carrot"
           carrot-watch
           material="color:orange"
           geometry="primitive:cone;height:0.2;radius-bottom:0.025; radius-top:0.005"
-          movement="type:grabbable; stickiness:stickable; attachEvent:task-move-nose">
+          networked-movement="type:grabbable; stickiness:stickable; attachEvent:task-move-nose">
 </a-mixin>
 <a-mixin id="hat"
           material="color:black"
           geometry="primitive:tophat-hollow"
-          movement="type:grabbable; stickiness:stickable">
+          networked-movement="type:grabbable; stickiness:stickable">
 </a-mixin>
 <a-mixin id="branch"
           material="color:#5C4033"
           geometry="primitive:branch"
           scale="0.2 0.2 0.2"
-          movement="type:grabbable; stickiness:stickable">
+          networked-movement="type:grabbable; stickiness:stickable">
 </a-mixin>
 <a-mixin id="fence-post"
           material="color:#5C4033"
           geometry="primitive:branch"
           scale="0.3 0.3 0.3"
-          movement="type:grabbable; stickiness:stickable; attachEvent:task-move-fence-post">
+          networked-movement="type:grabbable; stickiness:stickable; attachEvent:task-move-fence-post">
 </a-mixin>
 
 <a-mixin id="tree-tier"
@@ -103,7 +103,7 @@
 <a-mixin id="penguin"
           penguin
           scale="0.1 0.1 0.1"
-          movement="type:grabbable; stickiness:none; initialState:dynamic">
+          networked-movement="type:grabbable; stickiness:none; initialState:dynamic">
 </a-mixin>
 <a-mixin id="paintbrush"
           paintbrush="color:blue"
@@ -111,7 +111,7 @@
 </a-mixin>
 
 <a-mixin id="task-check"
-        geometry="primitive: check;"
+          geometry="primitive: check;"
           material="color:#88ff44"
           instanced-mesh-member="mesh:#task-check-mesh">
 </a-mixin>
