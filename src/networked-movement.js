@@ -29,7 +29,7 @@ AFRAME.registerComponent('networked-movement', {
     // must start as dynamic of ever to become dynamic (Ammo.js bug).
 
     // for case where object is spawned after physics initialized, these must both be set on the same call.
-    this.el.setAttribute('networked-body', 'type: dynamic');
+    this.el.setAttribute('networked-body', 'kinematic: false');
     this.el.setAttribute('ammo-body', `emitCollisionEvents: true; gravity: 0 ${-this.data.gravity} 0`);
 
     // Save off world position, so we can undo any dynamic movement that happens
@@ -65,7 +65,10 @@ AFRAME.registerComponent('networked-movement', {
     this.el.addEventListener("dragstart", this.grabbed.bind(this));
     this.el.addEventListener("dragend", this.released.bind(this));
 
-    this.state = OBJECT_FIXED;
+    // was initialized to OBJECT_FIXED in "movement" component,
+    // but this leads to objects not sticking at start of day.
+    // I don't yet understand how this worked before...
+    this.state = OBJECT_LOOSE;
     this.stickyOverlaps = [];
 
     this.lastPositions = [new THREE.Vector3(),
@@ -143,7 +146,7 @@ AFRAME.registerComponent('networked-movement', {
   setKinematic() {
     // set object to kinematic.
     console.log("set to kinematic")
-    this.el.setAttribute('ammo-body', 'type: kinematic');
+    this.el.setAttribute('networked-body', 'kinematic: true');
 
     // re-instate collisions on descandants that may have been disabled.
     // use a timer to avoid race conditions around dynamic->kinematic switch.
@@ -160,7 +163,7 @@ AFRAME.registerComponent('networked-movement', {
     this.suppressCollisionsOnOverlappingDescendants(this.el.object3D);
     // set object to dynamic.
     console.log("set to dynamic")
-    this.el.setAttribute('ammo-body', 'type: dynamic');
+    this.el.setAttribute('networked-body', 'kinematic: false');
 
   },
 
