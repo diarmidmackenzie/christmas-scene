@@ -11,6 +11,8 @@ const GLOBAL_DATA = {
 const GLOBAL_FUNCS = {
   reparent : function (object, oldParent, newParent) {
 
+    if (!NAF.utils.isMine(object.el)) return
+
     if (object.parent === newParent) {
       return;
     }

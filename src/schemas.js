@@ -16,7 +16,16 @@ NAF.schemas.getComponents = (template) => {
       ]
     });
   }
-
+  if (!NAF.schemas.hasTemplate('#bauble-template')) {
+    NAF.schemas.add({
+      template: '#bauble-template',
+      components: [
+        'position',
+        'rotation',
+        'object-parent'
+      ]
+    });
+  }
   const components = NAF.schemas.getComponentsOriginal(template);
   return components;
 };
