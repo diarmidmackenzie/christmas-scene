@@ -16,19 +16,9 @@ NAF.schemas.getComponents = (template) => {
       ]
     });
   }
-  if (!NAF.schemas.hasTemplate('#bauble-template')) {
+  if (!NAF.schemas.hasTemplate('#object-template')) {
     NAF.schemas.add({
-      template: '#bauble-template',
-      components: [
-        'position',
-        'rotation',
-        'object-parent'
-      ]
-    });
-  }
-  if (!NAF.schemas.hasTemplate('#block-template')) {
-    NAF.schemas.add({
-      template: '#block-template',
+      template: '#object-template',
       components: [
         'position',
         'rotation',

@@ -19,7 +19,7 @@ AFRAME.registerComponent('letters-block', {
     block.setAttribute("ammo-shape", "type:box");
     block.setAttribute("rotation", `0 ${30 * (Math.random() - 0.5)} 0`);
     block.setAttribute("color", this.data.color);
-    block.setAttribute('networked', `template:#block-template;
+    block.setAttribute('networked', `template:#object-template;
                                      persistent: true;
                                      networkId: block-${this.data.letters};
                                      owner: scene`)
