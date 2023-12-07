@@ -29,29 +29,10 @@ AFRAME.registerComponent('networked-movement', {
     // must start as dynamic of ever to become dynamic (Ammo.js bug).
 
     // for case where object is spawned after physics initialized, these must both be set on the same call.
-    this.el.setAttribute('networked-body', 'kinematic: false');
+    this.el.setAttribute('networked-body', {kinematic: this.data.initialState === 'kinematic'});
     this.el.setAttribute('ammo-body', `emitCollisionEvents: true; gravity: 0 ${-this.data.gravity} 0`);
 
-    // Save off world position, so we can undo any dynamic movement that happens
-    // while initializing objects (even kinetic objects are initially created as dynamic).
-
-    this.worldPosition = new THREE.Vector3();
-    this.worldQuaternion = new THREE.Quaternion();
-    if (this.el.sceneEl.hasLoaded) {
-      this.el.object3D.parent.updateMatrixWorld();
-      this.el.object3D.getWorldPosition(this.worldPosition);
-      this.el.object3D.getWorldQuaternion(this.worldQuaternion);
-      this.playArea = document.getElementById("play-area");
-    }
-    else {
-      this.el.sceneEl.addEventListener('loaded', () => {
-        this.el.object3D.parent.updateMatrixWorld();
-        this.el.object3D.getWorldPosition(this.worldPosition);
-        this.el.object3D.getWorldQuaternion(this.worldQuaternion);
-        this.playArea = document.getElementById("play-area");
-      });
-    }
-
+    this.playArea = document.getElementById("play-area");
 
     // Basic logic of this element:
     // When held, kinematic, move anywhere.
@@ -89,6 +70,9 @@ AFRAME.registerComponent('networked-movement', {
     this.lockTransformMatrix = new THREE.Matrix4();
 
     this.throwaway = new THREE.Vector3();
+
+    this.worldPosition = new THREE.Vector3();
+    this.worldQuaternion = new THREE.Quaternion();
   },
 
   update() {

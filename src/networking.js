@@ -44,6 +44,13 @@ AFRAME.registerComponent('networked-body', {
         this.el.setAttribute('ammo-body', 'type:dynamic');
         this.bodyTypeAdjustable = true
         this.el.emit('body-type-adjustable')
+
+        // reset position to saved world position if kinematic.
+        if (this.data.kinematic) {
+
+          this.setWorldPosition(this.el.object3D, this.worldPosition);
+          this.setWorldQuaternion(this.el.object3D, this.worldQuaternion);
+        }
       }, 1);
     });
 
@@ -52,6 +59,22 @@ AFRAME.registerComponent('networked-body', {
     this.el.addEventListener('ownership-lost', this.update.bind(this))
 
     this.el.sceneEl.addEventListener('naf-connected', this.onConnect.bind(this))
+
+    this.worldPosition = new THREE.Vector3();
+    this.worldQuaternion = new THREE.Quaternion();
+    if (this.el.sceneEl.hasLoaded) {
+      this.el.object3D.parent.updateMatrixWorld();
+      this.el.object3D.getWorldPosition(this.worldPosition);
+      this.el.object3D.getWorldQuaternion(this.worldQuaternion);
+      this.playArea = document.getElementById("play-area");
+    }
+    else {
+      this.el.sceneEl.addEventListener('loaded', () => {
+        this.el.object3D.parent.updateMatrixWorld();
+        this.el.object3D.getWorldPosition(this.worldPosition);
+        this.el.object3D.getWorldQuaternion(this.worldQuaternion);    
+      });
+    }
   },
 
   update() {
@@ -84,5 +107,20 @@ AFRAME.registerComponent('networked-body', {
         this.update()
       }
     }, this.data.ownershipTimer)  
+  },
+
+  setWorldPosition(object, position) {
+
+    GLOBAL_DATA.tempMatrix.copy(object.parent.matrixWorld).invert();
+    position.applyMatrix4(GLOBAL_DATA.tempMatrix);
+    this.el.object3D.position.copy(position);
+  },
+
+  setWorldQuaternion(object, quaternion) {
+
+    object.parent.getWorldQuaternion(GLOBAL_DATA.tempQuaternion);
+    GLOBAL_DATA.tempQuaternion.invert();
+    quaternion.premultiply(GLOBAL_DATA.tempQuaternion);
+    this.el.object3D.quaternion.copy(quaternion);
   }
 });
