@@ -2,10 +2,10 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Winter Wonderland Christmas Playground</title>
+    <title>Winter Wonderland Christmas Playground - Bowling Alley Only</title>
     <meta name="description" content="Merry Christmas 2021!">
     {% include "scripts.html" %}
-    <script src="./bundle.js"></script>
+    <script src="../../bundle.js"></script>
   </head>
   <body>
     <a-scene physics="driver: ammo"
@@ -15,7 +15,7 @@
             networking>
       <a-assets>
         {% include "templates.html" %}
-        {% include "assets.html" %}
+        {% include "test-assets.html" %}
         {% include "mixins.html" %}
       </a-assets>
 
@@ -23,16 +23,7 @@
       {% include "layout/rig.html" %}
 
       <a-entity id="play-area">
-        {% include "layout/snowman.html" %}
-        {% include "layout/fence.html" %}
-        {% include "layout/tree.html" %}
-        {% include "layout/presents.html" %}
-        {% include "layout/xylophone.html" %}
-        {% include "layout/marble-run.html" %}
         {% include "layout/bowling.html" %}
-        {% include "layout/blocks.html" %}
-        {% include "layout/task-board.html" %}
-        {% include "layout/floor.html" %}
       </a-entity>
     </a-scene>
     <script>
