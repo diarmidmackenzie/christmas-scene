@@ -1,0 +1,27 @@
+{
+  "name": "christmas-scene",
+  "version": "0.0.1",
+  "description": "For Christmas 2021, I'm building a Winter Wonderland in VR.",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/diarmidmackenzie/christmas-scene.git"
+  },
+  "keywords": [],
+  "author": "Diarmid Mackenzie",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/diarmidmackenzie/christmas-scene/issues"
+  },
+  "homepage": "https://github.com/diarmidmackenzie/christmas-scene#readme",
+  "devDependencies": {
+    "@11ty/eleventy": "^2.0.1"
+  }
+}

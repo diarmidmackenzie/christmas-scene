@@ -1,3 +1,5 @@
 
 research/naf/node_modules/
 backend/
+_site/
+node_modules
