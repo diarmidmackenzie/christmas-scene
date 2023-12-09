@@ -43,6 +43,15 @@
 
         NAF.connection.adapter.enableMicrophone(true)
       }
+
+      document.body.addEventListener('clientConnected', function (evt) {
+        console.log('clientConnected event. clientId =', evt.detail.clientId);
+        // Although NAF already makes a call to `NAF.entities.completeSync()`
+        // on client connection, this doesn't seem to trigger replication of 
+        // all entities.  This second call seems to be required.
+        // Not fully understood why...
+        NAF.entities.completeSync(evt.detail.clientId, false)
+      });
     </script>
   </body>
 </html>

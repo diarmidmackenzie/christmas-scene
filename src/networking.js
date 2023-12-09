@@ -23,7 +23,8 @@ AFRAME.registerComponent('networked-body', {
 
   schema: {
     kinematic: {default: false},
-    ownershipTimer: {default: 1000}
+    // how long to allow an existing client to assert ownership of entities.
+    ownershipTimer: {default: 5000} 
   },
 
   init() {
