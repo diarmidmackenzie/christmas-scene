@@ -1,30 +1,30 @@
 <a-entity id="rig"
         spawn-in-circle="radius:0.5"
+        keep-control
         networked="template:#rig-template;">
-<a-entity id="player"
-          camera
-          camera-event-watcher
-          position="0 1.6 0"
-          wasd-controls
-          look-controls
-          networked="template:#player-template;"
-          drag-controls="objects: [grabbable]">
-  <a-entity networked="template:#head-template;"
+  <a-entity id="player"
+            camera
+            camera-event-watcher
+            position="0 1.6 0"
+            wasd-controls
+            look-controls
+            keep-control
+            networked="template:#avatar-template;"
+            drag-controls="objects: [grabbable]"
             visible="false">
   </a-entity>
-</a-entity>
-<a-entity id="rhand" hand
-          snowball-generator
-          hand-controls="hand: right"
-          position="0.4 1.4 -0.5">
-</a-entity>
-<a-entity id="lhand" hand
-          blink-controls="cameraRig: #rig;
-                          teleportOrigin: #camera;
-                          button: trigger;
-                          rotateOnTeleport: false"
-          snowball-generator
-          hand-controls="hand: left"
-          position="-0.4 1.4 -0.5"></a-entity>
-</a-entity>
+  <a-entity id="rhand" hand
+            snowball-generator
+            hand-controls="hand: right"
+            position="0.4 1.4 -0.5">
+  </a-entity>
+  <a-entity id="lhand" hand
+            blink-controls="cameraRig: #rig;
+                            teleportOrigin: #camera;
+                            button: trigger;
+                            rotateOnTeleport: false"
+            snowball-generator
+            hand-controls="hand: left"
+            position="-0.4 1.4 -0.5"></a-entity>
+  </a-entity>
 </a-entity>
