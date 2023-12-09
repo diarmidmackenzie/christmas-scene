@@ -20,6 +20,7 @@
       // Called by Networked-Aframe when connected to server
       function onConnect() {
         console.log('onConnect', new Date());
+        NAF.connection.adapter.enableMicrophone(true)
       }
     </script>
   </body>
