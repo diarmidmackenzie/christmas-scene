@@ -16,7 +16,7 @@ AFRAME.registerComponent('perimeter-fence', {
                              angle:${ii * 360 / this.data.posts};
                              randomOrientation: true`);
         branch.setAttribute("ammo-shape", "type:hull");
-        branch.setAttribute("networked", `networked=template:#object-template;
+        branch.setAttribute("networked", `template:#object-template;
                                           persistent: true;
                                           networkId: post-${ii};
                                           owner: scene`);
