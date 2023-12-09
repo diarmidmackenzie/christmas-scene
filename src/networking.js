@@ -5,7 +5,8 @@ AFRAME.registerComponent('networking', {
     this.el.setAttribute('networked-scene', 
                          `serverURL: christmas-scene-naf-server.glitch.me;
                           room: ${ROOM_KEY};
-                          adapter: wseasyrtc`)
+                          adapter: wseasyrtc;
+                          audio: true;`)
   }
 })
 
