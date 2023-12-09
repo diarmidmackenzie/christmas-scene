@@ -19,7 +19,10 @@
           position="0.4 1.4 -0.5">
 </a-entity>
 <a-entity id="lhand" hand
-          teleport-controls="cameraRig: #rig; teleportOrigin: #camera; button: trigger"
+          blink-controls="cameraRig: #rig;
+                          teleportOrigin: #camera;
+                          button: trigger;
+                          rotateOnTeleport: false"
           snowball-generator
           hand-controls="hand: left"
           position="-0.4 1.4 -0.5"></a-entity>
