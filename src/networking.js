@@ -7,6 +7,7 @@ AFRAME.registerComponent('networking', {
                           room: ${ROOM_KEY};
                           adapter: easyrtc;
                           audio: true;`)
+    this.el.setAttribute('persistent-p2p', '')
   }
 })
 

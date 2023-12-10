@@ -62,10 +62,14 @@ AFRAME.registerComponent('snowball-generator', {
     const radius = snowball.mixinEls[0].componentCache.geometry.radius;
     snowball.setAttribute('ammo-shape', `type:sphere; fit:manual; sphereRadius:${radius * this.data.scale}`)
     snowball.setAttribute('id', `snowball-${Math.random().toFixed(4)}`)
+    snowball.setAttribute('networked', 'persistent: true; template:#object-template')
     snowball.object3D.scale.set(this.data.scale, this.data.scale, this.data.scale);
     this.el.object3D.getWorldPosition(snowball.object3D.position);
     snowball.setAttribute('snowball-grow-on-roll', "");
     this.playArea.appendChild(snowball);
+
+    // See: https://github.com/networked-aframe/networked-aframe/blob/master/examples/persistent-peer-to-peer.html
+    document.body.dispatchEvent(new CustomEvent('persistentEntityCreated', {detail: {el: snowball}}));
 
     this.el.sceneEl.emit("task-snowball")
   }
