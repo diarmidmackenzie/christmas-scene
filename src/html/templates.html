@@ -11,6 +11,14 @@
   <a-entity></a-entity>
 </template>
 
+<template id="snowball-template">
+  <a-entity mixin="snowball"
+            ammo-shape="type:sphere; fit:manual; sphereRadius:0.075"
+            snowball-grow-on-roll
+            networked-movement="">
+  </a-entity>
+</template>
+
 <template id="avatar-template">
   <a-entity class="avatar" networked-audio-source>
     <a-sphere class="head" scale="0.2 0.22 0.2" random-color></a-sphere>

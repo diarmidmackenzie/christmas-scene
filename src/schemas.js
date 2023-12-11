@@ -26,6 +26,17 @@ NAF.schemas.getComponents = (template) => {
       ]
     });
   }
+  if (!NAF.schemas.hasTemplate('#snowball-template')) {
+    NAF.schemas.add({
+      template: '#snowball-template',
+      components: [
+        'position',
+        'rotation',
+        'scale',
+        'object-parent'
+      ]
+    });
+  }
   const components = NAF.schemas.getComponentsOriginal(template);
   return components;
 };
