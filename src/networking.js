@@ -29,7 +29,12 @@ AFRAME.registerComponent('networked-body', {
   },
 
   init() {
-    this.el.setAttribute('ammo-body', 'type: dynamic');
+
+    // ?? BUG in aframe-physics-system where emitCOllisionEvents has to be set at
+    // the same time as ammo-body in the case where ammo-body is set after physics is
+    // already iniitalized.
+    this.el.setAttribute('ammo-body', 'type: dynamic; emitCollisionEvents: true');
+
     // better to specify shape separately & explicitly.
     // this.el.setAttribute('ammo-shape', 'fit: auto');
     this.bodyTypeAdjustable = false
@@ -41,21 +46,18 @@ AFRAME.registerComponent('networked-body', {
     // The workaround used here is to quickly switch the object from dynamic to kinematic & back to dynamic
     // on initialization.
     // This enables fully flexible switching between dynamic & kinematic as required.
-    this.el.addEventListener("body-loaded", () => {
-      setTimeout(() => {
-        this.el.setAttribute('ammo-body', 'type:kinematic');
-        this.el.setAttribute('ammo-body', 'type:dynamic');
-        this.bodyTypeAdjustable = true
-        this.el.emit('body-type-adjustable')
-
-        // reset position to saved world position if kinematic.
-        if (this.data.kinematic) {
-
-          this.setWorldPosition(this.el.object3D, this.worldPosition);
-          this.setWorldQuaternion(this.el.object3D, this.worldQuaternion);
-        }
-      }, 1);
-    });
+    //
+    // Note that ammo-body can set the body snchronously (if physics already started - e.g. when
+    // spawning an object) or asynchronously (normal case for objects present at start of day).
+    const ammoBody = this.el.components['ammo-body']
+    if (ammoBody.body) {
+      this.initBodyOnceLoaded()
+    }
+    else {
+      this.el.addEventListener("body-loaded", () => {
+        this.initBodyOnceLoaded()
+      });
+    }
 
     this.el.addEventListener('ownership-gained', this.update.bind(this))
     this.el.addEventListener('ownership-changed', this.update.bind(this))
@@ -125,5 +127,21 @@ AFRAME.registerComponent('networked-body', {
     GLOBAL_DATA.tempQuaternion.invert();
     quaternion.premultiply(GLOBAL_DATA.tempQuaternion);
     this.el.object3D.quaternion.copy(quaternion);
+  },
+
+  initBodyOnceLoaded() {
+    setTimeout(() => {
+      this.el.setAttribute('ammo-body', 'type:kinematic');
+      this.el.setAttribute('ammo-body', 'type:dynamic');
+      this.bodyTypeAdjustable = true
+      this.el.emit('body-type-adjustable')
+
+      // reset position to saved world position if kinematic.
+      if (this.data.kinematic) {
+
+        this.setWorldPosition(this.el.object3D, this.worldPosition);
+        this.setWorldQuaternion(this.el.object3D, this.worldQuaternion);
+      }
+    }, 1);
   }
 });
