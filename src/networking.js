@@ -1,12 +1,18 @@
 AFRAME.registerComponent('networking', {
 
+  schema: {
+    audio: {default: true}
+  },
+
   init() {
+
+    const adapter = this.data.audio ? 'easyrtc' : 'wseasyrtc'
 
     this.el.setAttribute('networked-scene', 
                          `serverURL: christmas-scene-naf-server.glitch.me;
                           room: ${ROOM_KEY};
-                          adapter: easyrtc;
-                          audio: true;`)
+                          adapter: ${adapter};
+                          audio: ${this.data.audio}`)
     this.el.setAttribute('persistent-p2p', '')
   }
 })
