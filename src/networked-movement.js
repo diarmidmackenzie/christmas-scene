@@ -227,11 +227,11 @@ AFRAME.registerComponent('networked-movement', {
                           stickyParent.object3D);
 
     // check for a chain of 10 snowballs stuck together
-    function countStickySnowballs(el, child) {
+    function countStickySnowballs(el) {
 
       var stickySnowballs;
 
-      if (el.hasAttribute('sticky')) {
+      if (el && el.hasAttribute('sticky')) {
 
          stickySnowballs = 1 + countStickySnowballs(el.object3D.parent.el)
       }
