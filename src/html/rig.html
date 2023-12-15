@@ -2,6 +2,14 @@
         spawn-in-circle="radius:0.5"
         keep-control
         networked="template:#rig-template;">
+  <a-entity id="cursor"
+            cursor="rayOrigin: mouse"
+            raycaster="objects: [grabbable]"
+            mouse-manipulation="controlMethod: transform;
+                                grabEvents: true;
+                                grabEvent: dragstart;
+                                releaseEvent: dragend">
+  </a-entity>
   <a-entity id="player"
             camera
             camera-event-watcher
@@ -10,7 +18,6 @@
             look-controls
             keep-control
             networked="template:#avatar-template;"
-            drag-controls="objects: [grabbable]"
             visible="false">
   </a-entity>
   <a-entity id="rhand" hand

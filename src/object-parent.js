@@ -1,3 +1,6 @@
+// mouse-manipulation includes a version of `object-parent`, which we need to override.
+delete(AFRAME.components['object-parent'])
+
 // Change the parent of an object
 AFRAME.registerComponent('object-parent', {
 
