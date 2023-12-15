@@ -1,0 +1,85 @@
+#flat-page {
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  flex-wrap: wrap;
+  text-align: center;
+  font-size: 1.1rem;
+  font-family: Arial, Helvetica, sans-serif;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  z-index: 1000;
+  width: 100%
+}
+
+#header-banner {
+  background: white;
+  width: 100%;
+}
+
+#room-code {
+  width: 60%;
+  min-width: 300px;
+  height: 100px;
+  margin: auto;
+  border-radius: 50px;
+  font-size: 60px;
+  background: white;
+  border: black 2px solid;
+  line-height: 100px;
+  text-align: center;
+}
+
+#new-room-code {
+  width: 60%;
+  min-width: 300px;
+  height: 100px;
+  margin: auto;
+  border-radius: 50px;
+  font-size: 60px;
+  background: white;
+  border: black 2px solid;
+  line-height: 100px;
+  text-align: center;
+}
+
+#room-code-caption {
+  font-size: 20px;
+  background: white;
+  width: 40%;
+  margin: auto;
+  position: relative;
+  top: -100px;
+}
+
+#change-room-button {
+  width: 60%;
+  min-width: 300px;
+  height: 100px;
+  margin: auto;
+  border-radius: 50px;
+  font-size: 40px;
+  background: white;
+}
+
+#enter-vr-button {
+  width: 60%;
+  min-width: 300px;
+  height: 100px;
+  margin: auto;
+  border-radius: 50px;
+  font-size: 40px;
+  background: white;
+}
+
+#web-launch-button {
+  width: 60%;
+  min-width: 300px;
+  height: 100px;
+  margin: auto;
+  border-radius: 50px;
+  font-size: 40px;
+  display: none;
+  background: white;
+}

@@ -1,0 +1,82 @@
+<script>
+  const webLaunchButtonClick = () => {
+    window.open(
+      'https://www.oculus.com/open_url/?url=' +
+        encodeURIComponent(window.location.href),
+    );
+  };
+
+  addEventListener('DOMContentLoaded', () => {
+    const vrSupported = AFRAME.utils.device.isMobileVR()
+    const webLaunchButton = document.getElementById("web-launch-button")
+    const enterVrButton = document.getElementById("enter-vr-button")
+    const changeRoomButton = document.getElementById("change-room-button")
+    const roomCode = document.getElementById("room-code")
+    const newRoomCode = document.getElementById("new-room-code")
+
+    if (vrSupported)
+    {
+      webLaunchButton.style.display = 'none'
+      enterVrButton.style.display = 'block'
+    }
+    else {
+      webLaunchButton.style.display = 'block' 
+      enterVrButton.style.display = 'none'
+    }
+
+    changeRoomButton.disabled = true
+    roomCode.innerHTML = ROOM_KEY
+    newRoomCode.addEventListener("input", onRoomInput)
+  })
+
+  const onRoomInput = (e) => {
+    const target = e.target
+    target.value = target.value.toUpperCase()
+
+    const changeRoomButton = document.getElementById("change-room-button")
+    if (target.value.length === 4 && target.value !== ROOM_KEY) {
+      changeRoomButton.disabled = false
+    }
+    else {
+      changeRoomButton.disabled = true
+    }
+  }
+
+  const changeRoomButtonClick = () => {
+    const newRoomCode = document.getElementById("new-room-code")
+    let params = new URLSearchParams(window.location.search);
+    params.set("room", newRoomCode.value)
+    location.search = params
+  }
+</script>
+
+<div id="flat-page">
+  <div id="header-banner">
+    <h1>Winter Wonderland Christmas Playground</h1>
+    <p>By Diarmid Mackenzie</p>
+  </div>
+  <p></p>
+  <div id="room-code">
+  </div>
+  <p></p>
+  <input id="new-room-code"
+         type="text"
+         value=""
+         maxLength="4"
+         >
+  </input>
+  <p id="room-code-caption">New Room Code (4 characters)</p>
+  <p></p>
+  <button id="change-room-button"
+          onclick="changeRoomButtonClick()">
+    Change Room
+  </button>
+  <p></p>
+  <button id="enter-vr-button">
+    Enter VR
+  </button>
+  <button id="web-launch-button"
+          onclick="webLaunchButtonClick()">
+    Launch on Meta Quest
+  </button>
+</div>
