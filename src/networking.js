@@ -20,7 +20,8 @@ AFRAME.registerComponent('networking', {
   tick() {
     if (this.data.clientCountDisplay) {
       const remoteClients = Object.keys(NAF.connection.connectedClients).length
-      this.data.clientCountDisplay.innerHTML = `${remoteClients} others in room`
+      const othersText = remoteClients === 1 ? "other in room" : "others in room"
+      this.data.clientCountDisplay.innerHTML = `${remoteClients} ${othersText}`
     }
   }
 })
