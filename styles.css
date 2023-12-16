@@ -53,6 +53,15 @@
   top: -100px;
 }
 
+#client-count-display {
+  font-size: 20px;
+  background: white;
+  width: 40%;
+  margin: auto;
+  position: relative;
+  top: -25px;
+}
+
 #change-room-button {
   width: 60%;
   min-width: 300px;
