@@ -61,7 +61,7 @@ AFRAME.registerComponent('snowball-generator', {
     snowball.setAttribute('mixin', this.data.mixin)
     const radius = snowball.mixinEls[0].componentCache.geometry.radius;
     snowball.setAttribute('ammo-shape', `type:sphere; fit:manual; sphereRadius:${radius * this.data.scale}`)
-    snowball.setAttribute('id', `snowball-${Math.random().toFixed(4)}`)
+    snowball.setAttribute('id', `snowball-${((Math.random() + 1).toString(36).substring(4, 10))}`)
     snowball.setAttribute('networked', 'persistent: true; template:#snowball-template; attachTemplateToLocal: false')
     snowball.object3D.scale.set(this.data.scale, this.data.scale, this.data.scale);
     this.el.object3D.getWorldPosition(snowball.object3D.position);

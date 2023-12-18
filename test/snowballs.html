@@ -28,6 +28,12 @@
       <a-assets>
         {% include "templates.html" %}
         {% include "test-assets.html" %}
+        <a-mixin id="snowball"
+          material="color:brown"
+          paintable="snowball:true"
+          geometry="primitive:sphere;segments-height:7;segments-width:13;radius:0.5"
+          networked-movement="type:grabbable; stickiness:sticky">
+        </a-mixin>
         {% include "mixins.html" %}
       </a-assets>
       {% include "rig.html" %}

@@ -125,6 +125,11 @@ AFRAME.registerComponent('networked-body', {
         console.log("Updating owner for:", this.el.id)
         NAF.utils.takeOwnership(this.el)
         this.update()
+
+        // Reset any drift out of position that happened during initialization
+        // of the object.
+        this.setWorldPosition(this.el.object3D, this.worldPosition);
+        this.setWorldQuaternion(this.el.object3D, this.worldQuaternion);
       }
     }, this.data.ownershipTimer)  
   },
@@ -151,8 +156,9 @@ AFRAME.registerComponent('networked-body', {
       this.bodyTypeAdjustable = true
       this.el.emit('body-type-adjustable')
 
-      // reset position to saved world position if kinematic.
-      if (this.data.kinematic) {
+      // reset position to saved world position if kinematic && owned
+      if (this.data.kinematic &&
+          NAF.utils.isMine(this.el)) {
 
         this.setWorldPosition(this.el.object3D, this.worldPosition);
         this.setWorldQuaternion(this.el.object3D, this.worldQuaternion);

@@ -20,7 +20,7 @@ const GLOBAL_FUNCS = {
     console.log(`Reparenting ${object.el.id} from ${oldParent.el ? oldParent.el.id : "unknown"} to ${newParent.el ? newParent.el.id : "unknown"}`);
 
     const newParentId = newParent.el ? newParent.el.id : ""
-    object.el.setAttribute('object-parent', `parentId: ${newParentId}`)
+    object.el.setAttribute('object-parent', `parentId: ${newParentId}; parentNetworkId:`)
   },
 };
 
