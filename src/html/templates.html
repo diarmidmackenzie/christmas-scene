@@ -11,9 +11,11 @@
   <a-entity></a-entity>
 </template>
 
+<!-- fit:all is necessary due to use of scale on snowballs.
+     fit: manual doesn't work with non-unit scale-->
 <template id="snowball-template">
   <a-entity mixin="snowball"
-            ammo-shape="type:sphere; fit:manual; sphereRadius:0.5"
+            ammo-shape="type:sphere; fit: all"
             snowball-grow-on-roll
             networked-movement="">
   </a-entity>

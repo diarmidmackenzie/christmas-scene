@@ -87,6 +87,16 @@ AFRAME.registerComponent('persistent-p2p', {
             };
             NAF.connection.sendDataGuaranteed(targetClientId, 'events', data);
           }
+
+          /* Sometimes replication of snowballs get stuck when a new player enters a room
+            This extra call seems to unstick things. 
+            Not really sure why it's necessary.
+            Possible race condition where applyPersistentFirstSync() doesn't get called on
+            remote clients due to a race between `hasLoaded` and the `initialized` event, 
+            but I'm not completely sure if that's related.
+            For now, this is the workaround that works best... */
+          networkedComponent.syncAll(null, false)
+          
         }
       }
     });
