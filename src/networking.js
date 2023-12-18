@@ -1,7 +1,8 @@
 AFRAME.registerComponent('networking', {
 
   schema: {
-    audio: {default: true}
+    audio: {default: true},
+    clientCountDisplay: {type: 'selector'}
   },
 
   init() {
@@ -14,6 +15,14 @@ AFRAME.registerComponent('networking', {
                           adapter: ${adapter};
                           audio: ${this.data.audio}`)
     this.el.setAttribute('persistent-p2p', '')
+  },
+
+  tick() {
+    if (this.data.clientCountDisplay) {
+      const remoteClients = Object.keys(NAF.connection.connectedClients).length
+      const othersText = remoteClients === 1 ? "other in room" : "others in room"
+      this.data.clientCountDisplay.innerHTML = `${remoteClients} ${othersText}`
+    }
   }
 })
 
