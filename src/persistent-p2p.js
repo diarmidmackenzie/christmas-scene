@@ -96,7 +96,6 @@ AFRAME.registerComponent('persistent-p2p', {
             but I'm not completely sure if that's related.
             For now, this is the workaround that works best... */
           networkedComponent.syncAll(null, false)
-          
         }
       }
     });
