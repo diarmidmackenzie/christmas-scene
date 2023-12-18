@@ -151,8 +151,9 @@ AFRAME.registerComponent('networked-body', {
       this.bodyTypeAdjustable = true
       this.el.emit('body-type-adjustable')
 
-      // reset position to saved world position if kinematic.
-      if (this.data.kinematic) {
+      // reset position to saved world position if kinematic && owned
+      if (this.data.kinematic &&
+          NAF.utils.isMine(this.el)) {
 
         this.setWorldPosition(this.el.object3D, this.worldPosition);
         this.setWorldQuaternion(this.el.object3D, this.worldQuaternion);
