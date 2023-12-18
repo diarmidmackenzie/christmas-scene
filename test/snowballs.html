@@ -22,14 +22,14 @@
   </head>
   <body>
     <a-scene networking="audio: false"
-             physics="driver: ammo"
-             spawn-snowball-on-space>
+             physics="driver: ammo; debug: true"
+             spawn-snowball-on-space
+             background="color:#330">
       <a-assets>
         {% include "templates.html" %}
         {% include "test-assets.html" %}
         {% include "mixins.html" %}
       </a-assets>
-      {% include "environment.html" %}
       {% include "rig.html" %}
       <a-entity id="play-area">
         {% include "layout/floor.html" %}
