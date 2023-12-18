@@ -47,6 +47,17 @@ AFRAME.registerComponent('object-parent', {
     }
 
     const newParent = newParentEl.object3D
+
+
+    if (this.isMyDescendant(newParent)) {
+      // parenting an object to one of its descendents creates an infinite stack loop.
+      console.warn("Error: request received to parent object to it's own descendant")
+      console.warn(`Object: ${this.el.id}; requested parent: ${newParentEl.id}`)
+      console.warn("This object: ", this.el.object3D)
+      console.warn("Requested parent object: ", newParent)
+      return;
+    }
+
     this.reparent(newParent)
 
     const networkId = newParentEl.components?.networked?.data?.networkId
@@ -98,4 +109,11 @@ AFRAME.registerComponent('object-parent', {
       this.el.components.networked.removeLerp();
     }
   },
+
+  isMyDescendant(object) {
+    if (!object.parent) return false;
+    if (object.parent === this.el.object3D) return true;
+
+    return (this.isMyDescendant(object.parent));
+  }
 });
