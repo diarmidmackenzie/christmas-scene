@@ -95,7 +95,7 @@ AFRAME.registerComponent('persistent-p2p', {
             remote clients due to a race between `hasLoaded` and the `initialized` event, 
             but I'm not completely sure if that's related.
             For now, this is the workaround that works best... */
-          networkedComponent.syncAll(null, false)
+          networkedComponent.syncAll(targetClientId, false)
         }
       }
     });
