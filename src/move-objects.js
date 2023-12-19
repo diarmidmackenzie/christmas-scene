@@ -21,6 +21,11 @@ const GLOBAL_FUNCS = {
 
     const newParentId = newParent.el ? newParent.el.id : ""
     object.el.setAttribute('object-parent', `parentId: ${newParentId}; parentNetworkId:`)
+
+    // sync all positions 
+    object.el.components.networked.syncAll(null, false)
+    oldParent.el.components.networked.syncAll(null, false)
+    newParent.el.components.networked.syncAll(null, false)
   },
 };
 
